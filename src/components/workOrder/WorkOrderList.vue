@@ -30,9 +30,9 @@
 								<a-button @click>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6aa;</i>终止
 								</a-button>
-								<a-button @click="toTransferOrder">
+								<!-- <a-button @click="toTransferOrder">
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60b;</i>移交单
-								</a-button>
+								</a-button>-->
 							</a-col>
 
 							<a-col :span="12" style="text-align:right">
@@ -100,12 +100,20 @@
 									</i>
 								</div>
 							</template>
-							<template slot="workerNames" slot-scope="text, record, index">
+							<template slot="priority" slot-scope="text, record, index">
 								<div>
-									<a-tag v-if="text==0" color="#F59A23">待审批</a-tag>
-									<a-tag v-if="text==1" color="#D8D8D8">已审批</a-tag>
-									<a-tag v-if="text==2" color="#8400FF">被驳回</a-tag>
+									<i class="iconfont" style="color:#F59A23;">&#xe649;</i>
 								</div>
+							</template>
+							<template slot="schedule" slot-scope="text, record, index">
+								<div>
+									<!-- <a-progress :percent="50" status="active"/>
+									<a-progress :percent="70" status="exception"/>-->
+									<a-progress :percent="100"/>
+								</div>
+							</template>
+							<template slot="detail" slot-scope="text, record, index">
+								<span style="color:#1890ff;cursor: pointer;" @click="toWorkOrderDetailsList">工单明细</span>
 							</template>
 						</a-table>
 						<a-pagination
@@ -124,9 +132,9 @@
 			</a-row>
 		</div>
 		<a-modal
-			title="新增工作令"
+			title="新增工单"
 			:footer="null"
-			width="800px"
+			width="1000px"
 			:visible="addVisible"
 			@cancel="handleCancel(1)"
 			:maskClosable="false"
@@ -134,9 +142,9 @@
 			<add-work-order v-on:changeAddModal="changeAddModal"></add-work-order>
 		</a-modal>
 		<a-modal
-			title="修改工作令"
+			title="修改工单"
 			:footer="null"
-			width="800px"
+			width="1000px"
 			:visible="editVisible"
 			@cancel="handleCancel(2)"
 			:maskClosable="false"
@@ -166,47 +174,62 @@ const rowSelection = {
 const columns = [
 	{
 		dataIndex: "deviceNo",
-		title: "工作令号",
+		title: "工单号",
 		width: 100,
 		key: "deviceNo"
 	},
 	{
 		dataIndex: "deviceName",
-		title: "关联订单",
+		title: "工单标题",
 		width: 100,
 		key: "deviceName"
 	},
 	{
 		dataIndex: "deviceCategoryName",
 		key: "deviceCategoryName",
-		title: "工作令名称",
+		title: "客户名称",
 		width: 160
 	},
 	{
-		dataIndex: "organizeName",
-		key: "organizeName",
-		title: "移交单",
-		width: 80
+		dataIndex: "priority",
+		key: "priority",
+		title: "优先级",
+		width: 80,
+		scopedSlots: { customRender: "priority" }
 	},
 	{
 		dataIndex: "locationNo",
 		key: "locationNo",
-		title: "状态",
+		title: "生产状态",
 		width: 80,
 		scopedSlots: { customRender: "deviceModel" }
 	},
 	{
-		dataIndex: "deviceState",
-		key: "deviceState",
-		title: "负责人",
+		dataIndex: "schedule",
+		key: "schedule",
+		title: "生产进度",
 		width: 100,
-		scopedSlots: { customRender: "deviceState" }
+		scopedSlots: { customRender: "schedule" }
+	},
+	{
+		dataIndex: "comment",
+		key: "comment",
+		title: "备注",
+		width: 80,
+		scopedSlots: { customRender: "comment" }
 	},
 	{
 		dataIndex: "deviceModel",
 		key: "deviceModel",
 		title: "创建时间",
 		width: 120
+	},
+	{
+		dataIndex: "detail",
+		key: "detail",
+		title: "工单明细",
+		width: 80,
+		scopedSlots: { customRender: "detail" }
 	}
 ];
 const data = [
@@ -264,8 +287,8 @@ export default {
 		};
 	},
 	methods: {
-		toTransferOrder(){
-			this.$router.push({path:"/WorkOrderList/transferOrder/"+1})
+		toWorkOrderDetailsList() {
+			this.$router.push({ path: "/WorkOrderList/WorkOrderDetailsList/" + 1 });
 		},
 		onDelete() {},
 		changeEditModal(params) {

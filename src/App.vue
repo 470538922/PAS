@@ -139,6 +139,11 @@ Vue.component(Tooltip.name, Tooltip);
 
 const global = window;
 export default {
+	provide() {
+		return {
+			reload: this.reload
+		};
+	},
 	data() {
 		return {
 			zh_CN,
@@ -292,5 +297,18 @@ export default {
 }
 body {
 	min-width: 1200px;
+}
+.ant-menu-root.ant-menu-vertical,
+.ant-menu-root.ant-menu-vertical-left,
+.ant-menu-root.ant-menu-vertical-right,
+.ant-menu-root.ant-menu-inline {
+	overflow-x: hidden;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+}
+input[type="number"] {
+	-moz-appearance: textfield;
 }
 </style>

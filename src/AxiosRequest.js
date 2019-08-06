@@ -1,7 +1,11 @@
 import axios from 'axios';
+import Vue from 'vue';
 axios.defaults.withCredentials = true;
 import global from './components/global/Global';
-
+import {
+  message
+} from 'ant-design-vue'
+Vue.prototype.$message = message;
 export default ({
   url,
   type,
@@ -52,13 +56,13 @@ export default ({
           if (res.status === 200 && (res.data.code === 200 || res.data.code === 204)) {
             resolve(res);
           } else if (res.status === 200 && res.data.code >= 300 && res.data.code < 400) {
-            this.$message.error(`登录失效，即将跳转至登录页`);
+            message.error(`登录失效，即将跳转至登录页`);
             window.setTimeout(() => {
-              vue.$router.replace("/Login");
+              window.location.href = "login.html"
             }, 1000);
           } else {
             //console.log(res.data.msg);
-            this.$message.error(`${res.data.msg}(${res.data.code})`);
+            message.error(`${res.data.msg}(${res.data.code})`);
             reject({
               type: 'faild',
               info: res.data
@@ -66,7 +70,7 @@ export default ({
           }
         }).catch(res => {
           loadingConfig.done();
-          this.$message.error(`网络异常：${res.message}`);
+          message.error(`网络异常：${res.message}`);
           reject({
             type: 'error',
             info: res
@@ -77,7 +81,7 @@ export default ({
     return new Promise((resolve, reject) => {
       window.setTimeout(() => {
         Promise.all(runAsync).then(function (results) {
-          option.enableMsg && this.$message.error(option.successMsg);
+          option.enableMsg && message.error(option.successMsg);
           resolve(results);
         });
       }, 10);
@@ -101,17 +105,17 @@ export default ({
       } : params, config || {}).then(res => {
         if (res.status === 200 && (res.data.code === 200 || res.data.code === 204)) {
           //success && success(res.data);
-          option.enableMsg && option.enableMsg && this.$message.success(option.successMsg);
+          option.enableMsg && option.enableMsg && message.success(option.successMsg);
           resolve(res);
         } else if (res.status === 200 && res.data.code >= 300 && res.data.code < 400) {
-          this.$message.error(`登录失效，即将跳转至登录页`);
+          message.error(`登录失效，即将跳转至登录页`);
           window.setTimeout(() => {
-            vue.$router.replace("/Login");
+            window.location.href = "login.html"
           }, 1000);
         } else {
           //faild && faild(res.data);
           console.log(res.data.msg);
-          this.$message.error(`${res.data.msg}(${res.data.code})`);
+          message.error(`${res.data.msg}(${res.data.code})`);
           reject({
             type: 'faild',
             info: res.data
@@ -122,7 +126,7 @@ export default ({
         //error && error(res);
         loadingConfig.done();
         //console.log(info);
-        this.$message.error(`网络异常：${res.message}`);
+        message.error(`网络异常：${res.message}`);
         reject({
           type: 'error',
           info: res

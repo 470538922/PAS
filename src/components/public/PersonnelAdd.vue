@@ -37,7 +37,7 @@ const columns = [
 		dataIndex: "age"
 	},
 	{
-		title: "只能/工种",
+		title: "职能/工种",
 		dataIndex: "address"
 	},
 	{
@@ -110,7 +110,8 @@ export default {
 				this.selectedRowKeys = [];
 			}, 1000);
 		},
-		onSelectChange(selectedRowKeys) {
+		onSelectChange(selectedRowKeys,a) {
+			console.log(a);
 			console.log("selectedRowKeys changed: ", selectedRowKeys);
 			this.selectedRowKeys = selectedRowKeys;
 		}
@@ -123,7 +124,7 @@ export default {
 		border: 1px solid #d9d9d9;
 		border-radius: 4px;
 		height: 500px;
-		overflow: scroll;
+		overflow-y: scroll;
 	}
 }
 </style>

@@ -1,8 +1,8 @@
 {
-  "name": "ppass",
+  "name": "pms",
   "version": "1.0.0",
-  "description": "生产计划和调度系统",
-  "author": "wei.huang",
+  "description": "生产管理系统",
+  "author": "zlc",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",

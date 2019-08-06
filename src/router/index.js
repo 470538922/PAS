@@ -23,28 +23,63 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   routes: [{
+      path: '/',
+      redirect: '/Enterprise',
+    },
+    {
+      path: '/DrawingsList',
+      name: 'DrawingsList',
+      components: require('../components/drawing/index.vue'),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: '/ModuleCustomization',
+      name: 'ModuleCustomization',
+      components: require('../components/system/moduleCustomization/ModuleCustomization.vue'),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: '/Enterprise',
       name: 'Enterprise',
-      components: require('../components/enterprise/index.vue')
+      components: require('../components/enterprise/index.vue'),
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/Dashboard',
       name: 'Dashboard',
-      components: require('../components/public/PersonnelAdd.vue')
+      components: require('../components/public/PersonnelAdd.vue'),
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/OrderList',
       name: 'OrderList',
       component: OrderList,
+      meta: {
+        requireAuth: true,
+      },
       children: [{
           path: 'OrderAdd',
           name: 'OrderAdd',
-          component: OrderAdd
+          component: OrderAdd,
+          meta: {
+            requireAuth: true,
+          },
         },
         {
           path: 'OrderEdit/:id/',
           name: 'OrderEdit',
-          component: OrderEdit
+          component: OrderEdit,
+          meta: {
+            requireAuth: true,
+          },
         },
       ]
     },
@@ -52,84 +87,150 @@ export default new Router({
       path: '/MyDevice',
       name: 'MyDevice',
       component: MyDevice,
+      meta: {
+        requireAuth: true,
+      },
       children: [{
           path: 'AddEquipment',
           name: 'AddEquipment',
-          component: AddEquipment
+          component: AddEquipment,
+          meta: {
+            requireAuth: true,
+          },
         },
         {
           path: 'EditEquipment/:id/',
           name: 'EditEquipment',
-          component: EditEquipment
+          component: EditEquipment,
+          meta: {
+            requireAuth: true,
+          },
         }
       ]
     },
     {
       path: '/DeviceCategory',
       name: 'DeviceCategory',
-      component: DeviceCategory
+      component: DeviceCategory,
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/Organization',
       name: 'Organization',
-      component: Organization
+      component: Organization,
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/Employee',
       name: 'Employee',
       component: Employee,
+      meta: {
+        requireAuth: true,
+      },
       children: [{
           path: 'AddEmployee',
           name: 'AddEmployee',
-          component: AddEmployee
+          component: AddEmployee,
+          meta: {
+            requireAuth: true,
+          },
         },
         {
           path: 'EditEmployee/:id/',
           name: 'EditEmployee',
-          component: EditEmployee
+          component: EditEmployee,
+          meta: {
+            requireAuth: true,
+          },
         }
       ]
     },
     {
       path: '/Admin',
       name: 'Admin',
-      component: Admin
+      component: Admin,
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/Authority',
       name: 'Authority',
       component: Authority,
+      meta: {
+        requireAuth: true,
+      },
       children: [{
           path: 'AddAuthority',
           name: 'AddAuthority',
-          component: AddAuthority
+          component: AddAuthority,
+          meta: {
+            requireAuth: true,
+          },
         },
         {
           path: 'EditAuthority/:id/',
           name: 'EditAuthority',
-          component: EditAuthority
+          component: EditAuthority,
+          meta: {
+            requireAuth: true,
+          },
         }
       ]
     },
     {
       path: '/ProcessTypes',
       name: 'ProcessTypes',
-      component: ProcessTypes
+      component: ProcessTypes,
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/Subcontract',
       name: 'Subcontract',
-      component: Subcontract
+      component: Subcontract,
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: '/WorkOrderList',
       name: 'WorkOrderList',
       components: require('@/components/workOrder/WorkOrderList.vue'),
+      meta: {
+        requireAuth: true,
+      },
       children: [{
-        path: 'TransferOrder/:id/',
-        name: 'TransferOrder',
-        components: require('../components/workOrder/transferForm/TransferForm.vue')
-      }, ]
+          path: 'TransferOrder/:id/',
+          name: 'TransferOrder',
+          components: require('../components/workOrder/transferForm/TransferForm.vue'),
+          meta: {
+            requireAuth: true,
+          },
+        },
+        {
+          path: 'WorkOrderDetailsList/:id/',
+          name: 'WorkOrderDetailsList',
+          components: require('../components/workOrder/workOrderDetails/Index.vue'),
+          meta: {
+            requireAuth: true,
+          },
+        }
+      ]
+    },
+    {
+      path: '/materialManagementList',
+      name: 'materialManagementList',
+      components: require('@/components/materialManagement/Index'),
+      meta: {
+        requireAuth: true,
+      },
+      children: []
     },
   ]
 })

@@ -6,52 +6,47 @@
 				<a-row>
 					<div style="line-height:50px;">
 						<a-col :span="8">
-							<a-button type="primary" @click="$router.push({path:'/Employee/AddEmployee'})">
+							<!-- <a-button type="primary" @click="$router.push({path:'/Employee/AddEmployee'})">
 								<a-icon type="plus-circle"/>添加
+							</a-button>-->
+							<a-button @click="$router.push({path:'/Employee/AddEmployee'})">
+								<a-icon style="color:#1890ff;" type="plus"/>新增
+							</a-button>
+							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+								<a-icon style="color:#1890ff;" type="edit"/>修改
+							</a-button>
+							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+								<i style="color:#1890ff;margin-right:6px;display:inline-block;" class="iconfont">&#xe6b6;</i>
+								重置密码
+							</a-button>
+							<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+								<a-icon style="color:#1890ff;" type="delete"/>删除
 							</a-button>
 						</a-col>
 
-						<a-col :span="16" style="text-align:right">关键字：
-							<a-input type="text" style="width:300px" placeholder="姓名，员工编号"></a-input>
-							<a-button type="primary" icon="search">搜索</a-button>
+						<a-col :span="16" style="text-align:right">
+							关键字：
+							<a-input type="text" v-model="param" style="width:300px" placeholder="姓名，员工编号"></a-input>
+							<a-button type="primary" icon="search" @click="getList">搜索</a-button>
 						</a-col>
 					</div>
 				</a-row>
 				<a-row style="padding-top:10px;">
-					<a-table :columns="columns" :pagination="false" :dataSource="data">
+					<a-table
+						:columns="columns"
+						:pagination="false"
+						:dataSource="data"
+						:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
+						rowKey="id"
+					>
 						<template slot="state" slot-scope="text, record, index">
 							<div>
 								<a-switch
 									checkedChildren="正常"
 									unCheckedChildren="禁用"
 									:defaultChecked="record.state==0?true:false"
+									@click="changeState(record,index)"
 								/>
-							</div>
-						</template>
-						<template slot="operation" slot-scope="text, record, index">
-							<div class="editable-row-operations">
-								<span class="handle_style">
-									<a-popover placement="top">
-										<template slot="content">
-											<span>修改</span>
-										</template>
-										<a-icon type="edit" @click="() => edit(record,text,index)"/>
-									</a-popover>&nbsp;&nbsp;
-									<a-popconfirm
-										title="确定删除吗？"
-										@confirm="confirm"
-										@cancel="cancel"
-										okText="确定"
-										cancelText="取消"
-									>
-										<a-popover placement="top">
-											<template slot="content">
-												<span>删除</span>
-											</template>
-											<a-icon type="delete" @click="() => edit(record,text,index)"/>
-										</a-popover>
-									</a-popconfirm>
-								</span>
 							</div>
 						</template>
 					</a-table>
@@ -72,95 +67,74 @@
 	</div>
 </template>
 <script>
+const rowSelection = {
+	culumnsWidth: "5%",
+	onChange: (selectedRowKeys, selectedRows) => {
+		console.log(
+			`selectedRowKeys: ${selectedRowKeys}`,
+			"selectedRows: ",
+			selectedRows
+		);
+	},
+	onSelect: (record, selected, selectedRows) => {
+		console.log(record, selected, selectedRows);
+	},
+	onSelectAll: (selected, selectedRows, changeRows) => {
+		console.log(selected, selectedRows, changeRows);
+	}
+};
 const columns = [
 	{
-		dataIndex: "deviceNo",
+		dataIndex: "employeeNo",
 		title: "员工编号",
-		width: 120,
-		key: "deviceNo"
+		width: "15%",
+		key: "devicemployeeNoeNo"
 	},
 	{
-		dataIndex: "deviceName",
+		dataIndex: "userName",
 		title: "姓名",
-		width: 120,
-		key: "deviceName"
+		width: "10%",
+		key: "userName"
 	},
 	{
-		dataIndex: "deviceState",
-		key: "deviceState",
-		title: "性别",
-		width: 70,
+		dataIndex: "phone",
+		key: "phone",
+		title: "手机号",
+		width: "15%",
 		scopedSlots: { customRender: "deviceState" }
 	},
 	{
 		dataIndex: "organizeName",
 		key: "organizeName",
 		title: "所处班组",
-		width: 140
+		width: "25%"
 	},
 	{
-		dataIndex: "location",
-		key: "location",
+		dataIndex: "roleName",
+		key: "roleName",
+		title: "角色分配",
+		width: "15%"
+	},
+	{
+		dataIndex: "workTypeName",
+		key: "workTypeName",
 		title: "只能/工种",
-		width: 70
+		width: "10%"
 	},
 	{
 		dataIndex: "state",
 		key: "state",
 		title: "状态",
-		width: 70,
+		width: "10%",
 		scopedSlots: { customRender: "state" }
-	},
-	{
-		dataIndex: "operation",
-		key: "operation",
-		title: "操作",
-		width: 80,
-		scopedSlots: { customRender: "operation" }
-	}
-];
-const data = [
-	{
-		key: "0",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		state: "1",
-		deviceCategoryName: "11",
-		deviceModel: "11",
-		workerNames: "11"
-	},
-	{
-		key: "1",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		state: "0",
-		deviceCategoryName: "11",
-		deviceModel: "11",
-		workerNames: "11"
-	},
-	{
-		key: "2",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		state: "0",
-		deviceCategoryName: "11",
-		deviceModel: "11",
-		workerNames: "11"
 	}
 ];
 
 export default {
 	data() {
 		return {
+			param: "",
+			rowSelection,
 			visible: false,
 			isHideList: this.$route.params.id !== undefined ? true : false,
 			allClassify: [
@@ -171,34 +145,134 @@ export default {
 				"其他设备"
 			],
 			columns,
-			data,
+			data: [],
 			current: 1,
 			pageSize: 10,
-			total: 50
+			total: 0,
+			selectedRowKeys: []
 		};
 	},
 	methods: {
-		confirm(e) {
-			console.log(e);
-			this.$message.success("Click on Yes");
+		onSelectChange(selectedRowKeys) {
+			this.selectedRowKeys = selectedRowKeys;
+			console.log(this.selectedRowKeys);
 		},
-		cancel(e) {
-			console.log(e);
-			this.$message.error("Click on No");
+		showDeleteConfirm() {
+			let that = this;
+			this.$confirm({
+				title: "确定删除吗？",
+				content: "",
+				okText: "确定",
+				okType: "danger",
+				cancelText: "取消",
+				onOk: function() {
+					that.onDelete();
+				},
+				onCancel() {}
+			});
 		},
+		onDelete(e) {
+			let qs = require("qs");
+			let data = qs.stringify({
+				employeeId: this.selectedRowKeys[0]
+			});
+			this.Axios(
+				{
+					url: "/api-platform/employee/del",
+					params: data,
+					type: "post",
+					option: { successMsg: "删除成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList();
+						this.selectedRowKeys = [];
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.getList();
 		},
 		onChange(current, pageNumber) {
 			console.log("Page: ", pageNumber);
 			console.log("第几页: ", current);
 			this.current = current;
+			this.getList();
 		},
-		edit(record, text, index) {
-			this.$router.push({ path: "/Employee/EditEmployee/" + record.key });
+		edit() {
+			this.$router.push({
+				path: "/Employee/EditEmployee/" + this.selectedRowKeys[0]
+			});
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-platform/employee/list",
+					params: {
+						page: this.current,
+						size: this.pageSize,
+						param: this.param
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.data = result.data.data.content;
+
+						for (let i = 0; i < this.data.length; i++) {
+							this.data[i].workTypeName = this.data[i].workType.workTypeName;
+						}
+
+						this.total = result.data.data.totalElement;
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		changeState(row, index) {
+			let urlStr;
+			if (row.state == -2) {
+				urlStr = "/api-platform/employee/start";
+			} else {
+				urlStr = "/api-platform/employee/stop";
+			}
+			let qs = require("qs");
+			let data = qs.stringify({
+				employeeId: row.id
+			});
+			this.Axios(
+				{
+					url: urlStr,
+					params: data,
+					type: "post",
+					option: { successMsg: "修改成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.getList();
+					}
+				},
+				({ type, info }) => {
+					this.getList();
+				}
+			);
 		}
 	},
 	created() {
+		this.getList();
 		let a = this.$route.matched.find(item => item.name === "AddEmployee")
 			? true
 			: false;
@@ -207,6 +281,8 @@ export default {
 	},
 	watch: {
 		$route() {
+			this.getList();
+			this.selectedRowKeys = [];
 			let a = this.$route.matched.find(item => item.name === "AddEmployee")
 				? true
 				: false;

@@ -4,13 +4,23 @@
 			<a-row>
 				<div style="line-height:50px;">
 					<a-col :span="8">
-						<a-button type="primary" @click="modalNewVisible=true">
+						<!-- <a-button type="primary" @click="modalNewVisible=true">
 							<a-icon type="plus-circle"/>添加
+						</a-button>-->
+						<a-button @click="modalNewVisible=true">
+							<a-icon style="color:#1890ff;" type="plus"/>新增
+						</a-button>
+						<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
+							<a-icon style="color:#1890ff;" type="edit"/>修改
+						</a-button>
+						<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+							<a-icon style="color:#1890ff;" type="delete"/>删除
 						</a-button>
 					</a-col>
-					<a-col :span="16" style="text-align:right">关键字：
-						<a-input type="text" style="width:300px" placeholder="委外单位名称，联系人，电话"></a-input>
-						<a-button type="primary" icon="search">搜索</a-button>
+					<a-col :span="16" style="text-align:right">
+						关键字：
+						<a-input type="text" v-model="keyword" style="width:300px" placeholder="委外单位名称，联系人，电话"></a-input>
+						<a-button type="primary" icon="search" @click="getList">搜索</a-button>
 					</a-col>
 				</div>
 				<a-modal
@@ -20,50 +30,94 @@
 					v-model="modalNewVisible"
 					@ok="() => modalNewVisible = false"
 					@cancel="form.resetFields()"
-					width="600px"
+					width="800px"
+					:footer="null"
 				>
 					<a-form :form="form">
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="委外单位名称">
-							<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写委外单位名称' }]}]"></a-input>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="类型">
+							<a-select
+								showSearch
+								placeholder="请选择"
+								optionFilterProp="children"
+								v-decorator="['type',{rules: [{ required: true, message: '请选择类型' }]}]"
+							>
+								<a-select-option :value="1">常规合作</a-select-option>
+								<a-select-option :value="2">承制单位</a-select-option>
+							</a-select>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="委外联系人">
-							<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写委外联系人' }]}]"></a-input>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="单位名称">
+							<a-input v-decorator="['name',{rules: [{ required: true, message: '请填写单位名称' }]}]"></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="委外联系人电话">
-							<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写委外联系人电话' }]}]"></a-input>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人">
+							<a-input v-decorator="['contact',{rules: [{ required: true, message: '请填写联系人' }]}]"></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="备注">
-							<a-textarea :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人电话">
+							<a-input
+								type="number"
+								v-decorator="['phone',{rules: [{ required: true, message: '请填写联系人电话' }]}]"
+							></a-input>
+						</a-form-item>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
+							<a-textarea v-decorator="['remark']" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+						</a-form-item>
+						<a-form-item :wrapper-col="{ span: 20,offset: 4 }" style="text-align: right;">
+							<a-button style="margin-right:12px;" @click="form.resetFields();modalNewVisible = false">取消</a-button>
+							<a-button type="primary" @click="add">保存</a-button>
 						</a-form-item>
 					</a-form>
 				</a-modal>
 				<a-modal
 					title="修改委外单位"
 					:maskClosable="false"
+					:footer="null"
 					centered
 					v-model="modalEditVisible"
 					@ok="() => modalEditVisible = false"
 					@cancel="form.resetFields()"
-					width="600px"
+					width="800px"
 				>
 					<a-form :form="form">
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="委外单位名称">
-							<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写委外单位名称' }]}]"></a-input>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="类型">
+							<a-select
+								showSearch
+								placeholder="请选择"
+								optionFilterProp="children"
+								v-decorator="['type',{rules: [{ required: true, message: '请选择类型' }]}]"
+							>
+								<a-select-option :value="1">常规合作</a-select-option>
+								<a-select-option :value="2">承制单位</a-select-option>
+							</a-select>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="委外联系人">
-							<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写委外联系人' }]}]"></a-input>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="单位名称">
+							<a-input v-decorator="['name',{rules: [{ required: true, message: '请填写单位名称' }]}]"></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="委外联系人电话">
-							<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写委外联系人电话' }]}]"></a-input>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人">
+							<a-input v-decorator="['contact',{rules: [{ required: true, message: '请填写联系人' }]}]"></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 6 }" :wrapper-col="{ span: 18 }" label="备注">
-							<a-textarea :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人电话">
+							<a-input v-decorator="['phone',{rules: [{ required: true, message: '请填写联系人电话' }]}]"></a-input>
+						</a-form-item>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
+							<a-textarea v-decorator="['remark']" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+						</a-form-item>
+						<a-form-item :wrapper-col="{ span: 20,offset: 4 }" style="text-align: right;">
+							<a-button style="margin-right:12px;" @click="form.resetFields();modalEditVisible = false">取消</a-button>
+							<a-button type="primary" @click="edit">保存</a-button>
 						</a-form-item>
 					</a-form>
 				</a-modal>
 			</a-row>
 			<a-row style="padding-top:10px;">
-				<a-table :columns="columns" :pagination="false" :dataSource="data">
+				<a-table
+					:columns="columns"
+					:pagination="false"
+					:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
+					:dataSource="data"
+					rowKey="id"
+				>
+					<template slot="type" slot-scope="text, record, index">
+						<div>{{text==1?"常规合作":"承制单位"}}</div>
+					</template>
 					<template slot="state" slot-scope="text, record, index">
 						<div>
 							<a-switch
@@ -71,32 +125,6 @@
 								unCheckedChildren="禁用"
 								:defaultChecked="record.state==0?true:false"
 							/>
-						</div>
-					</template>
-					<template slot="operation" slot-scope="text, record, index">
-						<div class="editable-row-operations">
-							<span class="handle_style">
-								<a-popover placement="top">
-									<template slot="content">
-										<span>修改</span>
-									</template>
-									<a-icon type="edit" @click="() => edit(record,text,index)"/>
-								</a-popover>&nbsp;&nbsp;
-								<a-popconfirm
-									title="确定删除吗？"
-									@confirm="confirm"
-									@cancel="cancel"
-									okText="确定"
-									cancelText="取消"
-								>
-									<a-popover placement="top">
-										<template slot="content">
-											<span>删除</span>
-										</template>
-										<a-icon type="delete"/>
-									</a-popover>
-								</a-popconfirm>
-							</span>
 						</div>
 					</template>
 				</a-table>
@@ -118,106 +146,110 @@
 <script>
 const columns = [
 	{
-		dataIndex: "deviceNo",
+		dataIndex: "type",
+		title: "类型",
+		width: "10%",
+		key: "type",
+		scopedSlots: { customRender: "type" }
+	},
+	{
+		dataIndex: "name",
 		title: "委外单位名称",
-		width: 300,
-		key: "deviceNo"
+		width: "30%",
+		key: "name"
 	},
 	{
-		dataIndex: "deviceName",
-		title: "委外联系人",
-		width: 120,
-		key: "deviceName"
+		dataIndex: "contact",
+		title: "联系人",
+		width: "10%",
+		key: "contact"
 	},
 	{
-		dataIndex: "deviceState",
-		key: "deviceState",
-		title: "委外联系人电话",
-		width: 120,
+		dataIndex: "phone",
+		key: "phone",
+		title: "联系人电话",
+		width: "20%",
 		scopedSlots: { customRender: "deviceState" }
 	},
 	{
-		dataIndex: "organizeName",
-		key: "organizeName",
+		dataIndex: "remark",
+		key: "remark",
 		title: "备注",
-		width: 200
-	},
-	{
-		dataIndex: "state",
-		key: "state",
-		title: "状态",
-		width: 70,
-		scopedSlots: { customRender: "state" }
-	},
-	{
-		dataIndex: "operation",
-		key: "operation",
-		title: "操作",
-		width: 80,
-		scopedSlots: { customRender: "operation" }
+		width: "25%"
 	}
-];
-const data = [
-	{
-		key: "0",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		state: "1",
-		deviceCategoryName: "11",
-		deviceModel: "11",
-		workerNames: "11"
-	},
-	{
-		key: "1",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		state: "0",
-		deviceCategoryName: "11",
-		deviceModel: "11",
-		workerNames: "11"
-	},
-	{
-		key: "2",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		state: "0",
-		deviceCategoryName: "11",
-		deviceModel: "11",
-		workerNames: "11"
-	}
+	// {
+	// 	dataIndex: "state",
+	// 	key: "state",
+	// 	title: "状态",
+	// 	width: 70,
+	// 	scopedSlots: { customRender: "state" }
+	// },
+	// {
+	// 	dataIndex: "operation",
+	// 	key: "operation",
+	// 	title: "操作",
+	// 	width: 80,
+	// 	scopedSlots: { customRender: "operation" }
+	// }
 ];
 
 export default {
 	data() {
 		return {
+			selectedRowKeys: [],
 			form: this.$form.createForm(this),
 			modalNewVisible: false,
 			modalEditVisible: false,
 			isHideList: this.$route.params.id !== undefined ? true : false,
 			columns,
-			data,
+			data: [],
 			current: 1,
 			pageSize: 10,
-			total: 50
+			total: 50,
+			keyword: ""
 		};
 	},
 	methods: {
-		confirm(e) {
-			console.log(e);
-			this.$message.success("Click on Yes");
+		onSelectChange(selectedRowKeys) {
+			this.selectedRowKeys = selectedRowKeys;
+			console.log(this.selectedRowKeys);
 		},
-		cancel(e) {
-			console.log(e);
-			this.$message.error("Click on No");
+		showDeleteConfirm() {
+			let that = this;
+			this.$confirm({
+				title: "确定删除吗？",
+				content: "",
+				okText: "确定",
+				okType: "danger",
+				cancelText: "取消",
+				onOk: function() {
+					that.onDelete();
+				},
+				onCancel() {}
+			});
+		},
+		onDelete(e) {
+			let qs = require("qs");
+			let data = qs.stringify({
+				id: this.selectedRowKeys[0]
+			});
+			this.Axios(
+				{
+					url: "/api-platform/collaborationUnit/del",
+					params: data,
+					type: "post",
+					option: { successMsg: "删除成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList();
+						this.selectedRowKeys = [];
+					}
+				},
+				({ type, info }) => {}
+			);
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
@@ -227,11 +259,134 @@ export default {
 			console.log("第几页: ", current);
 			this.current = current;
 		},
-		edit(record, text, index) {
-			this.modalEditVisible = true;
+		editShow() {
+			this.Axios(
+				{
+					url: "/api-platform/collaborationUnit/findOne",
+					params: {
+						id: this.selectedRowKeys[0]
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.modalEditVisible = true;
+						setTimeout(() => {
+							this.form.setFieldsValue({
+								type: result.data.data.type,
+								name: result.data.data.name,
+								contact: result.data.data.contact,
+								phone: result.data.data.phone,
+								remark: result.data.data.remark
+							});
+						}, 100);
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		edit() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					// console.log("Received values of form: ", values);
+					let qs = require("qs");
+					let data = qs.stringify({
+						id: this.selectedRowKeys[0],
+						type: values.type,
+						name: values.name,
+						contact: values.contact,
+						phone: values.phone,
+						remark: values.remark
+					});
+					this.Axios(
+						{
+							url: "/api-platform/collaborationUnit/update",
+							params: data,
+							type: "post",
+							option: { successMsg: "修改成功！" }
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								console.log(result);
+								this.getList();
+								this.modalEditVisible = false;
+								this.selectedRowKeys = [];
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-platform/collaborationUnit/list",
+					params: {
+						page: this.current,
+						size: this.pageSize,
+						keyword: this.keyword
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.data = result.data.data.content;
+						this.total = result.data.data.totalElement;
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		add() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					// console.log("Received values of form: ", values);
+					let qs = require("qs");
+					let data = qs.stringify({
+						type: values.type,
+						name: values.name,
+						contact: values.contact,
+						phone: values.phone,
+						remark: values.remark
+					});
+					this.Axios(
+						{
+							url: "/api-platform/collaborationUnit/add",
+							params: data,
+							type: "post",
+							option: { successMsg: "添加成功！" }
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								console.log(result);
+								this.getList();
+								this.modalNewVisible = false;
+								this.selectedRowKeys = [];
+								this.form.resetFields();
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
 		}
 	},
-	created() {},
+	created() {
+		this.getList();
+	},
 	watch: {}
 };
 </script>

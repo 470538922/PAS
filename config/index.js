@@ -46,6 +46,7 @@ module.exports = {
     // Template for index.html
     index: path.resolve(__dirname, '../dist/index.html'),
     login: path.resolve(__dirname, '../dist/login.html'),
+    priview: path.resolve(__dirname, '../dist/priview.html'),
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',

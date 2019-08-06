@@ -1,35 +1,47 @@
 <template>
 	<div class="organization">
-		<a-tree :treeData="treeData" defaultExpandAll>
-			<template slot="title" slot-scope="{title}">
+		<a-tree :treeData="treeData" v-if="treeData.length" autoExpandParent defaultExpandAll>
+			<template slot="title" slot-scope="item">
 				<span class="item_case">
-					{{title}}
+					{{item.title}}
 					&nbsp;&nbsp;&nbsp;&nbsp;
 					<span class="show_icon" @click.stop>
-						<a-popover placement="top">
+						<!-- <a-popover placement="top">
 							<template slot="content">
 								<span>添加同级</span>
 							</template>
-							<a-icon class="icon_style" type="plus" @click="modalEquativeVisible=true"/>
-						</a-popover>&nbsp;&nbsp;
+							<a-icon
+								class="icon_style"
+								type="plus"
+								@click="modalEquativeShow(item)"
+								v-if="item.organizeParentCode!=0"
+							/>
+						</a-popover>&nbsp;&nbsp;-->
 						<a-popover placement="top">
 							<template slot="content">
 								<span>添加子级</span>
 							</template>
-							<a-icon class="icon_style" type="plus-circle" @click="modalSublevelVisible=true"/>
+							<a-icon class="icon_style" type="plus-circle" @click="modalSublevelShow(item)"/>
 						</a-popover>&nbsp;&nbsp;
 						<a-popover placement="top">
 							<template slot="content">
 								<span>修改</span>
 							</template>
-							<a-icon class="icon_style" type="edit" @click="modalEditVisible=true"/>
+							<a-icon
+								class="icon_style"
+								v-if="item.organizeParentCode!=0"
+								type="edit"
+								@click="modalEditShow(item)"
+							/>
 						</a-popover>&nbsp;&nbsp;
-						<a-popover placement="top">
-							<template slot="content">
-								<span>删除</span>
-							</template>
-							<a-icon class="icon_style" type="delete"/>
-						</a-popover>
+						<a-popconfirm title="确定删除吗?" @confirm="onDelete(item)">
+							<a-popover placement="top">
+								<template slot="content">
+									<span>删除</span>
+								</template>
+								<a-icon class="icon_style" v-if="item.organizeParentCode!=0" type="delete"/>
+							</a-popover>
+						</a-popconfirm>
 					</span>
 				</span>
 			</template>
@@ -53,7 +65,7 @@
 			:maskClosable="false"
 			centered
 			v-model="modalSublevelVisible"
-			@ok="() => modalSublevelVisible = false"
+			@ok="() => handleSubmit(1)"
 			@cancel="form.resetFields()"
 		>
 			<a-form :form="form">
@@ -67,7 +79,7 @@
 			:maskClosable="false"
 			centered
 			v-model="modalEditVisible"
-			@ok="() => modalEditVisible = false"
+			@ok="() => handleSubmit(2)"
 			@cancel="form.resetFields()"
 		>
 			<a-form :form="form">
@@ -79,30 +91,6 @@
 	</div>
 </template>
 <script>
-const treeData = [
-	{
-		title: "parent 1",
-		key: "0-0",
-		slots: {
-			icon: "smile",
-			title: "aaaa"
-		},
-		scopedSlots: { title: "title" },
-		children: [
-			{
-				title: "leaf",
-				key: "0-0-0",
-				scopedSlots: { title: "title" },
-				slots: { icon: "meh" }
-			},
-			{
-				title: "leaf",
-				key: "0-0-1",
-				scopedSlots: { icon: "custom", title: "title" }
-			}
-		]
-	}
-];
 export default {
 	data() {
 		return {
@@ -110,8 +98,175 @@ export default {
 			modalEquativeVisible: false,
 			modalSublevelVisible: false,
 			modalEditVisible: false,
-			treeData
+			treeData: [],
+			rowData: {}
 		};
+	},
+	methods: {
+		onDelete(row) {
+			this.rowData = row;
+			this.delOrganization();
+		},
+		handleSubmit(a) {
+			if (a == 1) {
+				this.form.validateFieldsAndScroll((err, values) => {
+					if (!err) {
+						console.log(values);
+						this.addOrganization(values);
+					}
+				});
+			}
+			if (a == 2) {
+				this.form.validateFieldsAndScroll((err, values) => {
+					if (!err) {
+						console.log(values);
+						// this.addOrganization(values);
+						this.updeteOrganization(values);
+					}
+				});
+			}
+		},
+		modalEditShow(value) {
+			this.rowData = value;
+			console.log(this.rowData);
+			this.modalEditVisible = true;
+			setTimeout(() => {
+				this.form.setFieldsValue({
+					processName: value.title
+				});
+			}, 100);
+		},
+		modalSublevelShow(value) {
+			this.rowData = value;
+			this.modalSublevelVisible = true;
+		},
+		addOrganization(row) {
+			let qs = require("qs");
+			let data = qs.stringify({
+				parentId: this.rowData.key,
+				organizeInfo: row.processName,
+				organizeName: row.processName
+			});
+			this.Axios(
+				{
+					url: "/api-platform/organize/addOrganize",
+					params: data,
+					type: "post",
+					option: { successMsg: "添加成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.modalSublevelVisible = false;
+						this.getList();
+						this.form.resetFields();
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		delOrganization() {
+			let qs = require("qs");
+			let data = qs.stringify({
+				organizeId: this.rowData.key
+			});
+			this.Axios(
+				{
+					url: "/api-platform/organize/del",
+					params: data,
+					type: "post",
+					option: { successMsg: "删除成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList();
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		updeteOrganization(row) {
+			let qs = require("qs");
+			let data = qs.stringify({
+				organizeId: this.rowData.key,
+				organizeInfo: row.processName,
+				organizeName: row.processName
+			});
+			this.Axios(
+				{
+					url: "/api-platform/organize/update",
+					params: data,
+					type: "post",
+					option: { successMsg: "修改成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList();
+						this.form.resetFields();
+						this.modalEditVisible = false;
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-platform/organize/list",
+					params: {},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.treeData = result.data.data.map(item => {
+							return {
+								title: item.organizeName,
+								key: item.id,
+								organizeCode: parseInt(item.organizeCode),
+								organizeParentCode: parseInt(item.organizeParentCode),
+								scopedSlots: { title: "title" }
+							};
+						});
+						let code = Math.min.apply(
+							null,
+							this.treeData.map(item => {
+								return item.organizeParentCode;
+							})
+						);
+						this.treeData = this.filterArray(this.treeData, code);
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		filterArray(data, parent) {
+			let vm = this;
+			var tree = [];
+			var temp;
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].organizeParentCode == parent) {
+					var obj = data[i];
+					temp = this.filterArray(data, data[i].organizeCode);
+					if (temp.length > 0) {
+						obj.children = temp;
+					}
+					tree.push(obj);
+				}
+			}
+			return tree;
+		}
+	},
+	created() {
+		this.getList();
 	}
 };
 </script>

@@ -120,12 +120,12 @@ export default {
 			// console.log(this.password);
 			let qs = require("qs");
 			let data = qs.stringify({
-				params: this.user.userName,
+				param: this.user.userName,
 				password: pass
 			});
 			this.Axios(
 				{
-					url: "/api-sso/user/login",
+					url: "/api-sso/Admin/login",
 					params: data,
 					type: "post",
 					option: { enableMsg: false }
@@ -134,8 +134,9 @@ export default {
 			).then(
 				result => {
 					if (result.data.code === 200) {
-						console.log(result);
+						console.log(result.data.data);
 						// this.$router.replace("/Dashboard");
+						sessionStorage.token = result.data.data.token;
 						window.location.href = "/Dashboard";
 					}
 				},

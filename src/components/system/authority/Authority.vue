@@ -6,41 +6,29 @@
 				<a-row>
 					<div style="line-height:50px;">
 						<a-col :span="8">
-							<a-button type="primary" @click="$router.push({path:'/Authority/AddAuthority'})">
+							<!-- <a-button type="primary" @click="$router.push({path:'/Authority/AddAuthority'})">
 								<a-icon type="plus-circle"/>新增
+							</a-button>-->
+							<a-button @click="$router.push({path:'/Authority/AddAuthority'})">
+								<a-icon style="color:#1890ff;" type="plus"/>新增
+							</a-button>
+							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+								<a-icon style="color:#1890ff;" type="edit"/>修改
+							</a-button>
+							<a-button :disabled="selectedRowKeys.length!=1" @click="showDeleteConfirm">
+								<a-icon style="color:#1890ff;" type="delete"/>删除
 							</a-button>
 						</a-col>
 					</div>
 				</a-row>
 				<a-row style="padding-top:10px;">
-					<a-table :columns="columns" :pagination="false" :dataSource="data">
-						<template slot="operation" slot-scope="text, record, index">
-							<div class="editable-row-operations">
-								<span class="handle_style">
-									<a-popover placement="top">
-										<template slot="content">
-											<span>修改</span>
-										</template>
-										<a-icon type="edit" @click="() => edit(record,text,index)"/>
-									</a-popover>&nbsp;&nbsp;
-									<a-popconfirm
-										title="确定删除吗？"
-										@confirm="confirm"
-										@cancel="cancel"
-										okText="确定"
-										cancelText="取消"
-									>
-										<a-popover placement="top">
-											<template slot="content">
-												<span>删除</span>
-											</template>
-											<a-icon type="delete" @click="() => edit(record,text,index)"/>
-										</a-popover>
-									</a-popconfirm>
-								</span>
-							</div>
-						</template>
-					</a-table>
+					<a-table
+						:columns="columns"
+						:pagination="false"
+						:dataSource="data"
+						:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
+						rowKey="id"
+					></a-table>
 					<a-pagination
 						style="padding-top:12px;text-align: right;"
 						showQuickJumper
@@ -58,25 +46,34 @@
 	</div>
 </template>
 <script>
+const rowSelection = {
+	culumnsWidth: "5%",
+	onChange: (selectedRowKeys, selectedRows) => {
+		console.log(
+			`selectedRowKeys: ${selectedRowKeys}`,
+			"selectedRows: ",
+			selectedRows
+		);
+	},
+	onSelect: (record, selected, selectedRows) => {
+		console.log(record, selected, selectedRows);
+	},
+	onSelectAll: (selected, selectedRows, changeRows) => {
+		console.log(selected, selectedRows, changeRows);
+	}
+};
 const columns = [
 	{
-		dataIndex: "deviceNo",
+		dataIndex: "name",
 		title: "角色名称",
-		width: 300,
-		key: "deviceNo"
+		width: "60%",
+		key: "name"
 	},
 	{
-		dataIndex: "deviceName",
+		dataIndex: "description",
 		title: "备注",
-		width: 200,
-		key: "deviceName"
-	},
-	{
-		dataIndex: "operation",
-		key: "operation",
-		title: "操作",
-		width: 80,
-		scopedSlots: { customRender: "operation" }
+		width: "35%",
+		key: "description"
 	}
 ];
 const data = [
@@ -123,34 +120,96 @@ export default {
 		return {
 			isHideList: this.$route.params.id !== undefined ? true : false,
 			columns,
-			data,
+			data: [],
 			current: 1,
 			pageSize: 10,
-			total: 50
+			total: 50,
+			selectedRowKeys: []
 		};
 	},
 	methods: {
-		confirm(e) {
-			console.log(e);
-			this.$message.success("Click on Yes");
+		onSelectChange(selectedRowKeys) {
+			this.selectedRowKeys = selectedRowKeys;
+			console.log(this.selectedRowKeys);
 		},
-		cancel(e) {
-			console.log(e);
-			this.$message.error("Click on No");
+		onDelete(e) {
+			let qs = require("qs");
+			let data = qs.stringify({
+				roleId: this.selectedRowKeys[0]
+			});
+			this.Axios(
+				{
+					url: "/api-sso/role/delRole",
+					params: data,
+					type: "post",
+					option: { successMsg: "删除成功！" }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.getList();
+						this.selectedRowKeys = [];
+					}
+				},
+				({ type, info }) => {}
+			);
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.getList();
 		},
 		onChange(current, pageNumber) {
 			console.log("Page: ", pageNumber);
 			console.log("第几页: ", current);
 			this.current = current;
+			this.getList();
 		},
 		edit(record, text, index) {
-			this.$router.push({ path: "/Authority/EditAuthority/" + record.key });
+			this.$router.push({
+				path: "/Authority/EditAuthority/" + this.selectedRowKeys[0]
+			});
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-sso/role/roleList",
+					params: {
+						page: this.current,
+						size: this.pageSize
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.data = result.data.data.content;
+						this.total = result.data.data.totalElement;
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		showDeleteConfirm() {
+			let that = this;
+			this.$confirm({
+				title: "确定删除吗？",
+				content: "",
+				okText: "确定",
+				okType: "danger",
+				cancelText: "取消",
+				onOk: function() {
+					that.onDelete();
+				},
+				onCancel() {}
+			});
 		}
 	},
 	created() {
+		this.getList();
 		let a = this.$route.matched.find(item => item.name === "AddAuthority")
 			? true
 			: false;
@@ -159,6 +218,8 @@ export default {
 	},
 	watch: {
 		$route() {
+			this.getList();
+			this.selectedRowKeys = [];
 			let a = this.$route.matched.find(item => item.name === "AddAuthority")
 				? true
 				: false;

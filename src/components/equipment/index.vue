@@ -49,34 +49,12 @@
 						</div>
 					</a-row>
 					<a-row style="padding-top:10px;">
-						<a-table :columns="columns" :pagination="false" :dataSource="data">
-							<template slot="operation" slot-scope="text, record, index">
-								<div class="editable-row-operations">
-									<span class="handle_style">
-										<a-popover placement="top">
-											<template slot="content">
-												<span>修改</span>
-											</template>
-											<a-icon type="edit" @click="() => edit(record,text,index)" style="cursor:pointer;"/>
-										</a-popover>&nbsp;&nbsp;
-										<a-popconfirm
-											title="确定删除吗？"
-											@confirm="confirm"
-											@cancel="cancel"
-											okText="确定"
-											cancelText="取消"
-										>
-											<a-popover placement="top">
-												<template slot="content">
-													<span>删除</span>
-												</template>
-												<a-icon type="delete"/>
-											</a-popover>
-										</a-popconfirm>
-									</span>
-								</div>
-							</template>
-						</a-table>
+						<a-table
+							:columns="columns"
+							:pagination="false"
+							:dataSource="data"
+							:rowSelection="rowSelection"
+						></a-table>
 						<a-pagination
 							style="padding-top:12px;text-align: right;"
 							showQuickJumper
@@ -154,6 +132,21 @@
 	</div>
 </template>
 <script>
+const rowSelection = {
+	onChange: (selectedRowKeys, selectedRows) => {
+		console.log(
+			`selectedRowKeys: ${selectedRowKeys}`,
+			"selectedRows: ",
+			selectedRows
+		);
+	},
+	onSelect: (record, selected, selectedRows) => {
+		console.log(record, selected, selectedRows);
+	},
+	onSelectAll: (selected, selectedRows, changeRows) => {
+		console.log(selected, selectedRows, changeRows);
+	}
+};
 const columns = [
 	{
 		dataIndex: "deviceNo",
@@ -241,6 +234,7 @@ const data = [
 export default {
 	data() {
 		return {
+			rowSelection,
 			form: this.$form.createForm(this),
 			visible: false,
 			isHideList: this.$route.params.id !== undefined ? true : false,

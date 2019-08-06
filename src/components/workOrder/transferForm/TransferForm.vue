@@ -280,6 +280,14 @@ export default {
 		};
 	},
 	methods: {
+		handleChangeTable(value, key, column) {
+			const newData = [...this.data];
+			const target = newData.filter(item => key === item.key)[0];
+			if (target) {
+				target[column] = value;
+				this.data = newData;
+			}
+		},
 		handleChange(info) {
 			if (info.file.status !== "uploading") {
 				console.log(info.file, info.fileList);

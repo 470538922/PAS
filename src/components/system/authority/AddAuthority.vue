@@ -7,12 +7,23 @@
 			<div class="content_case">
 				<a-form :form="form">
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="角色名称">
-						<a-input></a-input>
+						<a-input
+							v-decorator="[
+							'name',
+							{rules: [{ required: true, message: '请填写角色名称' }]}
+							]"
+							maxlength="50"
+						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="备注">
-						<a-textarea placeholder :autosize="{ minRows: 4, maxRows: 4 }"/>
+						<a-textarea
+							maxlength="50"
+							v-decorator="['description']"
+							placeholder
+							:autosize="{ minRows: 4, maxRows: 4 }"
+						/>
 					</a-form-item>
-					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="角色名称">
+					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="权限分配">
 						<a-tree
 							checkable
 							@expand="onExpand"
@@ -24,7 +35,7 @@
 						/>
 					</a-form-item>
 					<a-form-item :wrapper-col="{ span: 22,offset: 2 }">
-						<a-button type="primary">提交</a-button>
+						<a-button type="primary" @click="addRole()">提交</a-button>
 					</a-form-item>
 				</a-form>
 			</div>
@@ -32,6 +43,7 @@
 	</div>
 </template>
 <script>
+import axios from "axios";
 const treeData = [
 	{
 		title: "0-0",
@@ -80,7 +92,7 @@ export default {
 	data() {
 		return {
 			form: this.$form.createForm(this),
-			treeData,
+			treeData: [],
 			expandedKeys: [],
 			autoExpandParent: true,
 			checkedKeys: [],
@@ -96,7 +108,98 @@ export default {
 		onCheck(checkedKeys) {
 			console.log("onCheck", checkedKeys);
 			this.checkedKeys = checkedKeys;
+		},
+		getRoleList() {
+			this.Axios(
+				{
+					url: "/api-sso/permission/enterprisePermissions",
+					params: {},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.treeData = result.data.data.map(item => {
+							return {
+								title: item.permissionName,
+								key: item.id,
+								code: parseInt(item.code),
+								parentCode: parseInt(item.parentCode)
+							};
+						});
+						let code = Math.min.apply(
+							null,
+							this.treeData.map(item => {
+								return item.parentCode;
+							})
+						);
+						console.log(code);
+						this.treeData = this.filterArray(this.treeData, code);
+						console.log(this.treeData);
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		filterArray(data, parent) {
+			let vm = this;
+			var tree = [];
+			var temp;
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].parentCode == parent) {
+					var obj = data[i];
+					temp = this.filterArray(data, data[i].code);
+					if (temp.length > 0) {
+						obj.children = temp;
+					}
+					tree.push(obj);
+				}
+			}
+			return tree;
+		},
+		addRole() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					// console.log("Received values of form: ", values);
+					if (!this.checkedKeys.length) {
+						this.$message.error("请分配角色权限");
+						return false;
+					}
+					let qs = require("qs");
+					let data = {
+						description: values.description,
+						name: values.name,
+						permissionIds: this.checkedKeys
+					};
+					this.Axios(
+						{
+							url: "/api-sso/role/addRole",
+							params: data,
+							type: "post",
+							option: { successMsg: "添加成功！" },
+							config: {
+								headers: { "Content-Type": "application/json" }
+							}
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								console.log(result);
+								this.$router.back(-1);
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
 		}
+	},
+	created() {
+		this.getRoleList();
 	}
 };
 </script>
