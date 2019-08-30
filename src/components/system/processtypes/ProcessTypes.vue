@@ -8,16 +8,14 @@
 							<a-icon type="plus-circle"/>添加
 						</a-button>-->
 						<a-button @click="modalNewVisible=true">
-							<a-icon style="color:#1890ff;" type="plus"/>新增
+							<a-icon style="color:#1890ff;" type="plus" />新增
 						</a-button>
 						<a-button @click="modalEditShow" :disabled="selectedRows.length!=1">
-							<a-icon style="color:#1890ff;" type="edit"/>修改
+							<a-icon style="color:#1890ff;" type="edit" />修改
 						</a-button>
-						<a-popconfirm title="确定删除吗?" @confirm="() => onDelete()">
-							<a-button :disabled="selectedRowKeys.length!=1">
-								<a-icon style="color:#1890ff;" type="delete"/>删除
-							</a-button>
-						</a-popconfirm>
+						<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+							<a-icon style="color:#1890ff;" type="delete" />删除
+						</a-button>
 					</a-col>
 					<!-- <a-col :span="16" style="text-align:right">
 						关键字：
@@ -33,18 +31,23 @@
 					@ok="addProcessTypes"
 					@cancel="form.resetFields()"
 				>
-					<a-form :form="form">
+					<a-form :form="form" @keyup.enter.native="addProcessTypes">
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工种名称">
-							<a-input v-decorator="['typeName',{rules: [{ required: true, message: '请填写工种名称' }]}]"></a-input>
+							<a-input
+								maxlength="20"
+								v-decorator="['typeName',{rules: [{ required: true, message: '请填写工种名称' }]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工时单价">
 							<a-input
-								v-decorator="['price',{rules: [{ required: true, message: '请填写工时单价' }]}]"
+								type="number"
+								oninput="if(value.length>10)value=value.slice(0,10)"
+								v-decorator="['price',{rules: [{ required: true, message: '请填写工时单价' },{validator: chickNumber}]}]"
 								addonAfter="元/时"
 							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
-							<a-textarea :autosize="{ minRows: 4, maxRows: 4 }" v-decorator="['remarks']"></a-textarea>
+							<a-textarea maxlength="50" :autosize="{ minRows: 4, maxRows: 4 }" v-decorator="['remarks']"></a-textarea>
 						</a-form-item>
 					</a-form>
 				</a-modal>
@@ -56,18 +59,23 @@
 					@ok="editProcessTypes"
 					@cancel="form.resetFields()"
 				>
-					<a-form :form="form">
+					<a-form :form="form" @keyup.enter.native="editProcessTypes">
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工种名称">
-							<a-input v-decorator="['workTypeName',{rules: [{ required: true, message: '请填写工种名称' }]}]"></a-input>
+							<a-input
+								maxlength="20"
+								v-decorator="['typeName',{rules: [{ required: true, message: '请填写工种名称' }]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工时单价">
 							<a-input
-								v-decorator="['price',{rules: [{ required: true, message: '请填写工时单价' }]}]"
+								type="number"
+								oninput="if(value.length>10)value=value.slice(0,10)"
+								v-decorator="['price',{rules: [{ required: true, message: '请填写工时单价' },{validator: chickNumber}]}]"
 								addonAfter="元/时"
 							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
-							<a-textarea :autosize="{ minRows: 4, maxRows: 4 }" v-decorator="['remarks']"></a-textarea>
+							<a-textarea maxlength="50" :autosize="{ minRows: 4, maxRows: 4 }" v-decorator="['remarks']"></a-textarea>
 						</a-form-item>
 					</a-form>
 				</a-modal>
@@ -196,6 +204,40 @@ export default {
 		};
 	},
 	methods: {
+		// chickNumber(rule, value, callback) {
+		// 	if (
+		// 		(/^\d+(\.\d{0,2})?$/.test(value) == false || value <= 0) &&
+		// 		(value != null) & (value != "")
+		// 	) {
+		// 		callback(new Error("只能输入大于0且只能保留两位小数"));
+		// 	} else {
+		// 		callback();
+		// 	}
+		// },
+		chickNumber(rule, value, callback) {
+			if (
+				(/^\d+?$/.test(value) == false || value <= 0) &&
+				(value != null) & (value != "")
+			) {
+				callback(new Error("只能输入大于0的整数"));
+			} else {
+				callback();
+			}
+		},
+		showDeleteConfirm() {
+			let that = this;
+			this.$confirm({
+				title: "确定删除吗?",
+				content: "",
+				okText: "确定",
+				okType: "danger",
+				cancelText: "取消",
+				onOk: function() {
+					that.onDelete();
+				},
+				onCancel() {}
+			});
+		},
 		onSelectChange(a, b) {
 			console.log(b);
 			this.selectedRows = b;
@@ -209,7 +251,7 @@ export default {
 				this.modalEditVisible = true;
 				setTimeout(() => {
 					this.form.setFieldsValue({
-						workTypeName: this.selectedRows[0].workTypeName,
+						typeName: this.selectedRows[0].workTypeName,
 						price: this.selectedRows[0].price,
 						remarks: this.selectedRows[0].remarks
 					});
@@ -246,6 +288,7 @@ export default {
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
 			this.getList();
 		},
 		onChange(current, pageNumber) {

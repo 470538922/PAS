@@ -5,253 +5,181 @@ export default [{
     menu: '企业管理',
     permissionCode: 'enterprise',
     icon: '&#xe60a;',
-    defaultDock: true,
+    defaultDock: false,
     subMenu: [{
       menu: '企业列表',
       route: '/Enterprise',
       key: 'enterprise',
-      permissionCode: 'enterprise',
-      defaultDock: true
+      permissionCode: 'enterprise_lookup',
     }, ]
   },
   {
-    menu: '工作台',
-    permissionCode: 'mainDashboard',
+    menu: '默认首页',
+    permissionCode: 'workdesk',
     icon: '&#xe60a;',
     defaultDock: true,
     subMenu: [{
-        menu: '工作台',
-        route: '/Dashboard',
-        key: 'dashboard',
-        permissionCode: 'dashboard',
-        defaultDock: true
-      },
-      {
-        menu: '生产监控台',
-        route: '/Dashboard/progress',
-        key: 'progressDashboard',
-        permissionCode: 'progressDashboard'
-      }
-    ]
+      menu: '首页',
+      route: '/Dashboard',
+      key: 'dashboard',
+      permissionCode: 'workdesk_desk_lookup',
+    }, ]
   },
   {
     menu: '工单管理',
-    defaultDock: true,
-    permissionCode: 'order',
+    defaultDock: false,
+    permissionCode: 'workorder',
     icon: '&#xe602;',
-    subMenu: [
-      // {
-      //   menu: '生产订单',
-      //   route: '/OrderList',
-      //   key: 'orderList',
-      //   permissionCode: 'orderList'
-      // },
-      {
+    subMenu: [{
         menu: '工单管理',
         route: '/WorkOrderList',
         key: 'workOrderList',
-        permissionCode: 'workOrderList'
+        permissionCode: 'workorder_manage_lookup'
       },
       {
         menu: '工单明细',
         routeReg: /^\/WorkOrderList\/WorkOrderDetailsList\/\w{1,}$/i,
         key: 'WorkOrderDetailsList',
         visible: true,
-        permissionCode: 'WorkOrderDetailsList'
+        permissionCode: 'workorder_item_lookup'
+      },
+      {
+        menu: '物资清单',
+        routeReg: /^\/WorkOrderList\/Inventory\/\w{1,}$/i,
+        key: 'Inventory',
+        visible: true,
+        permissionCode: 'workorder_list_lookup'
       }
     ]
   },
-  // {
-  //   menu: '工作令',
-  //   permissionCode: 'workOrder',
-  //   icon: '&#xe63c;',
-  //   subMenu: [{
-  //       menu: '工作令管理',
-  //       route: '/WorkOrderList',
-  //       key: 'workOrderList',
-  //       permissionCode: 'workOrderList'
-  //     }, {
-  //       menu: '工作令新建',
-  //       route: '/WorkOrderAdd',
-  //       key: 'workOrderAdd',
-  //       permissionCode: 'workOrderAdd'
-  //     },
-  //     {
-  //       menu: '移交单管理',
-  //       routeReg: /^\/workOrder\/transferOrder\/\w{1,}$/i,
-  //       key: 'transferOrder',
-  //       permissionCode: 'transferOrder'
-  //     }
-  //   ]
-  // },
-  // {
-  //   menu: '生产设备',
-  //   defaultDock: true,
-  //   permissionCode: 'device"',
-  //   icon: '&#xe61c;',
-  //   subMenu: [{
-  //       menu: '我的设备',
-  //       route: '/MyDevice',
-  //       key: 'myDevice',
-  //       permissionCode: 'myDevice'
-  //     },
-  //     {
-  //       menu: '添加设备',
-  //       route: '/MyDevice/AddEquipment',
-  //       key: 'addEquipment',
-  //       visible: true,
-  //       permissionCode: 'addEquipment'
-  //     },
-  //     {
-  //       menu: '修改设备',
-  //       routeReg: /^\/MyDevice\/EditEquipment\/\w{1,}$/i,
-  //       key: 'editEquipment',
-  //       visible: true,
-  //       permissionCode: 'editEquipment'
-  //     },
-  //     {
-  //       menu: '设备分类',
-  //       route: '/DeviceCategory',
-  //       key: 'deviceCategory',
-  //       permissionCode: 'deviceCategory'
-  //     },
-  //     {
-  //       menu: '设备监控',
-  //       route: '/Monit',
-  //       key: 'monit',
-  //       permissionCode: 'monit'
-  //     },
-  //     {
-  //       menu: '设备绑定',
-  //       route: "/DeviceAdd",
-  //       key: 'deviceAdd',
-  //       permissionCode: 'deviceAdd'
-  //     }
-  //   ]
-  // },
-  // {
-  //   menu: '工艺卡片',
-  //   defaultDock: true,
-  //   permissionCode: 'processCard',
-  //   icon: '&#xe613;',
-  //   subMenu: [{
-  //       menu: '工艺卡片新建',
-  //       route: '/ProcessCardAdd',
-  //       key: 'processCardAdd',
-  //       permissionCode: 'processCardAdd'
-  //     },
-  //     {
-  //       menu: '工艺卡片管理',
-  //       route: '/ProcessCardList',
-  //       key: 'processCardList',
-  //       permissionCode: 'processCard'
-  //     }
-  //   ]
-  // },
   {
     menu: '工艺图纸',
-    defaultDock: true,
-    permissionCode: 'drawingsManager',
-    icon: '&#xe704;',
+    defaultDock: false,
+    permissionCode: 'drawing',
+    icon: '&#xe616;',
     subMenu: [{
       menu: '工艺图纸',
       route: '/DrawingsList',
       key: 'drawingsList',
-      permissionCode: 'drawings'
+      permissionCode: 'drawing_drawing_lookup'
     }]
   },
-  // {
-  //   menu: '生产记录',
-  //   defaultDock: true,
-  //   permissionCode: 'history',
-  //   icon: '&#xe915;',
-  //   subMenu: [{
-  //       menu: '生产记录管理',
-  //       route: '/HistoryList',
-  //       key: 'historyList',
-  //       permissionCode: 'historyList'
-  //     },
-  //     {
-  //       menu: '生产报表',
-  //       route: '/Report',
-  //       key: 'report',
-  //       permissionCode: 'report'
-  //     }
-  //   ]
-  // },
+  {
+    menu: '订单报价',
+    defaultDock: false,
+    permissionCode: 'offer',
+    icon: '&#xe61e;',
+    subMenu: [{
+        menu: '订单报价',
+        route: '/OrderPrice',
+        key: 'OrderPrice',
+        permissionCode: 'offer_order_lookup'
+      },
+      {
+        menu: '历史报价',
+        route: '/HistoricalQuote',
+        key: 'HistoricalQuote',
+        permissionCode: 'offer_history_lookup'
+      },
+    ]
+  },
+  {
+    menu: '工时统计',
+    defaultDock: false,
+    permissionCode: 'workhours',
+    icon: '&#xea06;',
+    subMenu: [{
+      menu: '工时统计',
+      route: '/WorkingHours',
+      key: 'workingHours',
+      permissionCode: 'workhours_lookup'
+    }, ]
+  },
   {
     menu: '工种管理',
-    defaultDock: true,
-    permissionCode: 'processTypes',
-    icon: '&#xe915;',
+    defaultDock: false,
+    permissionCode: 'worktype',
+    icon: '&#xe605;',
     subMenu: [{
       menu: '工种管理',
       route: '/ProcessTypes',
       key: 'ProcessTypes',
-      permissionCode: 'ProcessTypes'
+      permissionCode: 'worktype_worktype_lookup'
     }, ]
   },
   {
     menu: '员工管理',
-    defaultDock: true,
+    defaultDock: false,
     permissionCode: 'employee',
-    icon: '&#xe915;',
+    icon: '&#xe6de;',
     subMenu: [{
         menu: '员工管理',
         route: '/Employee',
         key: 'employee',
-        permissionCode: 'employee'
+        permissionCode: 'employee_list_lookup'
       },
       {
         menu: '员工添加',
         route: '/Employee/AddEmployee',
         key: 'addEmployee',
         visible: true,
-        permissionCode: 'addEmployee'
+        permissionCode: 'employee_add_lookup'
       },
       {
         menu: '员工修改',
         routeReg: /^\/Employee\/EditEmployee\/\w{1,}$/i,
         key: 'editEmployee',
         visible: true,
-        permissionCode: 'editEmployee'
+        permissionCode: 'employee_update_lookup'
       },
     ]
   },
   {
     menu: '原材料管理',
-    defaultDock: true,
-    permissionCode: 'materialManagement',
-    icon: '&#xe915;',
+    defaultDock: false,
+    permissionCode: 'rawMateria',
+    icon: '&#xe64a;',
     subMenu: [{
       menu: '原材料管理',
       route: '/materialManagementList',
       key: 'materialManagementList',
-      permissionCode: 'materialManagement'
+      permissionCode: 'raw_raw_lookup'
     }, ]
   },
   {
     menu: '合作单位',
-    defaultDock: true,
-    permissionCode: 'Subcontract',
-    icon: '&#xe915;',
+    defaultDock: false,
+    permissionCode: 'collaboration',
+    icon: '&#xe6a5;',
     subMenu: [{
       menu: '合作单位',
       route: '/Subcontract',
       key: 'Subcontract',
-      permissionCode: 'Subcontract'
+      permissionCode: 'collaboration_col_lookup'
+    }, ]
+  },
+  {
+    menu: '留言反馈',
+    defaultDock: false,
+    permissionCode: 'advise',
+    icon: '&#xe65f;',
+    subMenu: [{
+      menu: '留言反馈',
+      route: '/Feedback',
+      key: 'Feedback',
+      permissionCode: 'advise_list_lookup'
     }, ]
   },
   {
     menu: '系统配置',
-    defaultDock: true,
-    permissionCode: 'system',
-    icon: '&#xe915;',
+    defaultDock: false,
+    permissionCode: 'systemSet',
+    icon: '&#xe606;',
     subMenu: [{
         menu: '组织机构',
         route: '/Organization',
         key: 'organization',
-        permissionCode: 'organization'
+        permissionCode: 'system_org_lookup'
       },
       {
         menu: '模块自定义',
@@ -264,19 +192,19 @@ export default [{
         menu: '角色权限',
         route: '/Authority',
         key: 'authority',
-        permissionCode: 'authority'
+        permissionCode: 'system_role_list_lookup'
       }, {
         menu: '权限添加',
         route: '/Authority/AddAuthority',
-        key: 'addEmployee',
+        key: 'addAuthority',
         visible: true,
-        permissionCode: 'addEmployee'
+        permissionCode: 'system_role_add_lookup'
       }, {
         menu: '权限修改',
         routeReg: /^\/Authority\/EditAuthority\/\w{1,}$/i,
-        key: 'editEmployee',
+        key: 'editAuthority',
         visible: true,
-        permissionCode: 'editEmployee'
+        permissionCode: 'system_role_update_lookup'
       },
     ]
   }

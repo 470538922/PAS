@@ -5,33 +5,36 @@
 		</a-row>
 		<a-row>
 			<div class="content_case">
-				<a-form :form="form">
+				<a-form :form="form" @keyup.enter.native="handleSubmit">
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="姓名">
 						<a-input
 							v-decorator="[
 							'userName',
 							{rules: [{ required: true, message: '请填写姓名' }]}
 							]"
-							maxlength="50"
+							maxlength="20"
 						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="手机号码">
 						<a-input
+							maxlength="11"
+							oninput="if(value.length>11)value=value.slice(0,11)"
 							v-decorator="[
 							'phone',
-							{rules: [{ required: true, message: '请填写手机号码' }]}
+							{rules: [{ required: true, message: '请填写手机号码' },{validator: chickPhone}]}
 							]"
 							type="number"
 						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="初始密码">
 						<a-input
+							maxlength="20"
 							v-decorator="[
 							'password',
-							{rules: [{ required: true, message: '请填写初始密码' }]}
+							{rules: [{ required: true, message: '请填写初始密码' },{validator: chickPassword}]}
 							]"
 							type="password"
-							placeholder="6~20个字符组成，区分大小写（为空表示不修改密码）"
+							placeholder="6~20个字符组成，区分大小写"
 						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="所处班组">
@@ -83,7 +86,12 @@
 						</a-select>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="年龄">
-						<a-input addonAfter="岁" v-decorator="['age']"></a-input>
+						<a-input
+							type="number"
+							oninput="if(value.length>5)value=value.slice(0,5);if(value<0)value=null"
+							addonAfter="岁"
+							v-decorator="['age']"
+						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="性别">
 						<a-radio-group v-decorator="['gender']">
@@ -100,7 +108,12 @@
 						/>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="以往工作年限">
-						<a-input v-decorator="['workingYear']" addonAfter="年"></a-input>
+						<a-input
+							type="number"
+							oninput="if(value.length>5)value=value.slice(0,5);if(value<0)value=null"
+							v-decorator="['workingYear']"
+							addonAfter="年"
+						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="简历附件">
 						<a-upload
@@ -111,7 +124,7 @@
 							@change="handleChange"
 						>
 							<a-button>
-								<a-icon type="upload"/>Upload
+								<a-icon type="upload" />上传文件
 							</a-button>
 						</a-upload>
 					</a-form-item>
@@ -126,33 +139,7 @@
 <script>
 import md5 from "js-md5/src/md5.js";
 import CryptoJS from "crypto-js/crypto-js.js";
-const treeData = [
-	{
-		title: "Node1",
-		value: "0-0",
-		key: "0-0",
-		children: [
-			{
-				value: "0-0-1",
-				key: "0-0-1",
-				scopedSlots: {
-					// custom title
-					title: "title"
-				}
-			},
-			{
-				title: "Child Node2",
-				value: "0-0-2",
-				key: "0-0-2"
-			}
-		]
-	},
-	{
-		title: "Node2",
-		value: "0-1",
-		key: "0-1"
-	}
-];
+const treeData = [];
 export default {
 	data() {
 		return {
@@ -165,6 +152,37 @@ export default {
 		};
 	},
 	methods: {
+		chickPassword(rule, value, callback) {
+			var reg = new RegExp("[\\u4E00-\\u9FFF]+", "g");
+			if (
+				/^((?=.*[a-z])|(?=.*\d)|(?=.*[#@!~%^&*]))[a-z\d#@!$~%^&*]{6,20}$/i.test(
+					value
+				) === false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("请输入6到20位的密码"));
+			} else if (/(\w)*(\w)\2{5}(\w)*/g.test(value) === true) {
+				callback(
+					new Error("你的密码过于简单(不能含有连续6位相同的字符或者数字)")
+				);
+			} else if (reg.test(value) === true && value != "" && value != null) {
+				callback(new Error("密码中不能含有汉字"));
+			} else {
+				callback();
+			}
+		},
+		chickPhone(rule, value, callback) {
+			if (
+				/^1[23456789]\d{9}$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("请输入正确的电话号码"));
+			} else {
+				callback();
+			}
+		},
 		onChange(date, dateString) {
 			console.log(date, dateString);
 			this.dateValue = dateString;
@@ -224,7 +242,7 @@ export default {
 											docPosition: item.response.data
 										};
 								  })
-								: [{ docName: "", docPosition: "" }]
+								: []
 					};
 					this.Axios(
 						{
@@ -268,7 +286,8 @@ export default {
 								key: item.id,
 								value: item.id,
 								organizeCode: parseInt(item.organizeCode),
-								organizeParentCode: parseInt(item.organizeParentCode)
+								organizeParentCode: parseInt(item.organizeParentCode),
+								disabled: item.organizeParentCode == 0
 							};
 						});
 						let code = Math.min.apply(

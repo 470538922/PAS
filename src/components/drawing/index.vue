@@ -8,16 +8,18 @@
 						<div style="line-height:50px;">
 							<a-col :span="8">
 								<a-button @click="addVisible=true">
-									<a-icon style="color:#1890ff;" type="plus"/>新增
+									<a-icon style="color:#1890ff;" type="plus" />新增
 								</a-button>
-								<a-button @click="editVisible=true">
-									<a-icon style="color:#1890ff;" type="edit"/>修改
+								<a-button @click="showEdit" :disabled="selectedRowKeys.length!=1">
+									<a-icon style="color:#1890ff;" type="edit" />修改
 								</a-button>
-								<a-popconfirm title="确定删除吗?" @confirm="() => onDelete">
-									<a-button>
-										<a-icon style="color:#1890ff;" type="delete"/>删除
-									</a-button>
-								</a-popconfirm>
+								<!-- <a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+									<a-icon style="color:#1890ff;" type="delete" />删除
+								</a-button> -->
+							</a-col>
+							<a-col :span="16" style="text-align:right">
+								<a-input type="text" v-model="keyword" style="width:300px" placeholder="图纸号/图纸名称"></a-input>
+								<a-button type="primary" @click="getList">查询</a-button>
 							</a-col>
 						</div>
 					</a-row>
@@ -52,7 +54,7 @@
 			@cancel="handleCancel(1)"
 			:maskClosable="false"
 		>
-			<add></add>
+			<add ref="addChild" v-on:addModal="addModal"></add>
 		</a-modal>
 		<a-modal
 			title="修改图纸"
@@ -62,7 +64,7 @@
 			@cancel="handleCancel(2)"
 			:maskClosable="false"
 		>
-			<edit></edit>
+			<edit ref="editChild" v-on:editModal="editModal" :id="selectedRows[0]"></edit>
 		</a-modal>
 	</div>
 </template>
@@ -71,37 +73,38 @@ import add from "./Add";
 import edit from "./Edit";
 const columns = [
 	{
-		dataIndex: "enterpriseName",
+		dataIndex: "drawingNo",
 		title: "图纸号",
 		width: "25%",
-		key: "enterpriseName"
+		key: "drawingNo"
 	},
 	{
-		dataIndex: "contact",
-		key: "contact",
+		dataIndex: "name",
+		key: "name",
 		title: "图纸名称",
 		width: "25%"
 	},
 	{
-		dataIndex: "phone",
-		key: "phone",
+		dataIndex: "createdBy",
+		key: "createdBy",
 		title: "录入人",
 		width: "10%"
 	},
 	{
-		dataIndex: "account",
-		key: "account",
+		dataIndex: "remarks",
+		key: "remarks",
 		title: "备注",
 		width: "25%"
 	},
 	{
-		dataIndex: "gmtCreate",
-		key: "gmtCreate",
+		dataIndex: "gmtCreated",
+		key: "gmtCreated",
 		title: "创建时间",
 		width: "15%"
 	}
 ];
 export default {
+	inject: ["reload"],
 	data() {
 		return {
 			addVisible: false,
@@ -112,38 +115,135 @@ export default {
 			current: 1,
 			pageSize: 10,
 			total: 0,
-			selectedRowKeys: []
+			selectedRowKeys: [],
+			keyword: "",
+			selectedRows: []
 		};
 	},
 	methods: {
-		onDelete() {},
+		showEdit() {
+			this.editVisible = true;
+			// this.$refs.editChild.findOne();
+		},
+		showDeleteConfirm() {
+			let that = this;
+			this.$confirm({
+				title: "确定删除吗?",
+				content: "",
+				okText: "确定",
+				okType: "danger",
+				cancelText: "取消",
+				onOk: function() {
+					that.onDelete();
+				},
+				onCancel() {}
+			});
+		},
+		addModal(params) {
+			if (params.type == "取消") {
+				this.addVisible = params.value;
+				this.getList();
+			} else {
+				this.addVisible = params.value;
+				this.getList();
+				this.reload();
+			}
+		},
+		editModal(params) {
+			if (params.type == "Cancel") {
+				this.editVisible = params.value;
+			} else {
+				this.editVisible = params.value;
+				this.selectedRowKeys = [];
+				this.selectedRows = [];
+				this.getList();
+			}
+		},
+		onDelete() {
+			let qs = require("qs");
+			let data = qs.stringify({
+				drawingId: this.selectedRowKeys[0]
+			});
+			this.Axios(
+				{
+					url: "/api-workorder/drawing/lib/delDrawing",
+					params: data,
+					type: "post",
+					option: { successMsg: "删除成功！" }
+					// config: {
+					// 	headers: { "Content-Type": "application/json" }
+					// }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList();
+						this.selectedRowKeys = [];
+						this.selectedRows = [];
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
 		handleCancel(a) {
 			if (a == 1) {
 				this.addVisible = false;
+				this.$refs.addChild.resetForm();
 			}
 			if (a == 2) {
+				this.$refs.editChild.resetForm();
 				this.editVisible = false;
 			}
 		},
-		onSelectChange(selectedRowKeys) {
+		onSelectChange(selectedRowKeys, b) {
 			// console.log("selectedRowKeys changed: ", selectedRowKeys);
 			this.selectedRowKeys = selectedRowKeys;
 			console.log(this.selectedRowKeys);
+			this.selectedRows = b;
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
-			// this.getList();
+			this.current = 1;
+			this.getList();
 		},
 		onChange(current, pageNumber) {
 			console.log("Page: ", pageNumber);
 			console.log("第几页: ", current);
 			this.current = current;
-			// this.getList();
+			this.getList();
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-workorder/drawing/lib/listAll",
+					params: {
+						page: this.current,
+						size: this.pageSize,
+						param: this.keyword
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.data = result.data.data.content;
+						this.total = result.data.data.totalElement;
+					}
+				},
+				({ type, info }) => {}
+			);
 		}
 	},
 	components: {
 		add,
 		edit
+	},
+	created() {
+		this.getList();
 	}
 };
 </script>

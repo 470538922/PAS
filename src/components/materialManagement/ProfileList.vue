@@ -30,13 +30,13 @@
 		<a-modal
 			title="修改规格"
 			width="800px"
-			:visible="addStickVisible"
+			:visible="addBoardVisible"
 			@cancel="handleCancel()"
 			:maskClosable="false"
 			class="modal_form_style"
 			:footer="null"
 		>
-			<a-form :form="form" layout="inline" style="overflow:hidden" @keyup.enter.native="edit">
+			<a-form :form="form" layout="inline" style="overflow:hidden"  @keyup.enter.native="edit">
 				<a-col :span="12">
 					<a-form-item label="名称">
 						<a-input
@@ -52,35 +52,13 @@
 					</a-form-item>
 				</a-col>
 				<a-col :span="12">
-					<a-form-item label="半径">
+					<a-form-item label="长度">
 						<a-input
-							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写半径' },{validator: chickNumber}]}]"
+							v-decorator="['length',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumber}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
 							addonAfter="mm"
-						></a-input>
-					</a-form-item>
-				</a-col>
-				<a-col :span="12">
-					<a-form-item label="长">
-						<a-input
-							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber}]}]"
-							type="number"
-							oninput="if(value.length>10)value=value.slice(0,10)"
-							style="width:260px;"
-							addonAfter="mm"
-						></a-input>
-					</a-form-item>
-				</a-col>
-				<a-col :span="12">
-					<a-form-item label="密度">
-						<a-input
-							v-decorator="['density',{rules: [{ required: true, message: '请填写密度' },{validator: chickNumberFloat}]}]"
-							type="number"
-							oninput="if(value.length>10)value=value.slice(0,10)"
-							style="width:260px;"
-							addonAfter="g/cm³"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -91,7 +69,18 @@
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
-							addonAfter="元/kg"
+							addonAfter="元/m"
+						></a-input>
+					</a-form-item>
+				</a-col>
+				<a-col :span="12">
+					<a-form-item label="重量">
+						<a-input
+							v-decorator="['density',{rules: [{ required: true, message: '请填写重量' },{validator: chickNumberFloat}]}]"
+							type="number"
+							oninput="if(value.length>10)value=value.slice(0,10)"
+							style="width:260px;"
+							addonAfter="kg/m"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -127,27 +116,22 @@ const columns = [
 	{
 		dataIndex: "lengthOrRadius",
 		key: "lengthOrRadius",
-		title: "半径mm",
-		width: 70,
+		title: "长度mm",
+		width: 90,
 		scopedSlots: { customRender: "deviceState" }
-	},
-	{
-		dataIndex: "heightOrLength",
-		key: "heightOrLength",
-		title: "长mm",
-		width: 70
-	},
-	{
-		dataIndex: "density",
-		key: "density",
-		title: "密度g/cm³",
-		width: 100
 	},
 	{
 		dataIndex: "price",
 		key: "price",
-		title: "价格(元/kg)",
-		width: 100
+		title: "价格(元/m)",
+		width: 90,
+		scopedSlots: { customRender: "deviceState" }
+	},
+	{
+		dataIndex: "density",
+		key: "density",
+		title: "重量(kg/m)",
+		width: 90
 	},
 	{
 		dataIndex: "remark",
@@ -163,15 +147,16 @@ const columns = [
 		scopedSlots: { customRender: "operation" }
 	}
 ];
+
 export default {
 	data() {
 		return {
-			addStickVisible: false,
+			addBoardVisible: false,
 			columns,
 			data: [],
 			current: 1,
 			pageSize: 10,
-			total: 50,
+			total: 0,
 			form: this.$form.createForm(this),
 			rowId: ""
 		};
@@ -200,7 +185,7 @@ export default {
 			}
 		},
 		handleCancel() {
-			this.addStickVisible = false;
+			this.addBoardVisible = false;
 			this.form.resetFields();
 		},
 		onShowSizeChange(current, pageSize) {
@@ -216,8 +201,6 @@ export default {
 		},
 		handleEdit(row) {
 			console.log(row);
-			// this.addStickVisible = true;
-			this.rowId = row.id;
 			this.Axios(
 				{
 					url: "/api-workorder/rawMaterial/findOne",
@@ -232,12 +215,12 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result);
-						this.addStickVisible = true;
+						this.addBoardVisible = true;
 						this.rowId = result.data.data.id;
 						setTimeout(() => {
 							this.form.setFieldsValue({
 								name: result.data.data.name,
-								lengthOrRadius: result.data.data.lengthOrRadius,
+								length: result.data.data.lengthOrRadius,
 								number: result.data.data.number,
 								widthOrRadius: result.data.data.widthOrRadius,
 								remark: result.data.data.remark,
@@ -257,11 +240,9 @@ export default {
 					// console.log("Received values of form: ", values);
 					let qs = require("qs");
 					let data = {
-						type: 2,
+						type: 3,
 						id: this.rowId,
-						lengthOrRadius: values.lengthOrRadius,
-						widthOrRadius: values.lengthOrRadius,
-						heightOrLength: values.heightOrLength,
+						lengthOrRadius: values.length,
 						name: values.name,
 						remark: values.remark,
 						number: values.number,
@@ -283,7 +264,8 @@ export default {
 						result => {
 							if (result.data.code === 200) {
 								console.log(result);
-								this.addStickVisible = false;
+								this.addBoardVisible = false;
+								this.form.resetFields();
 								this.getList();
 							}
 						},
@@ -321,7 +303,7 @@ export default {
 					params: {
 						page: this.current,
 						size: this.pageSize,
-						type: 2
+						type: 3
 					},
 					type: "get",
 					option: { enableMsg: false }
@@ -347,3 +329,5 @@ export default {
 	}
 };
 </script>
+<style lang="less">
+</style>

@@ -8,13 +8,13 @@
 							<a-icon type="plus-circle"/>添加
 						</a-button>-->
 						<a-button @click="modalNewVisible=true">
-							<a-icon style="color:#1890ff;" type="plus"/>新增
+							<a-icon style="color:#1890ff;" type="plus" />新增
 						</a-button>
 						<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
-							<a-icon style="color:#1890ff;" type="edit"/>修改
+							<a-icon style="color:#1890ff;" type="edit" />修改
 						</a-button>
 						<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
-							<a-icon style="color:#1890ff;" type="delete"/>删除
+							<a-icon style="color:#1890ff;" type="delete" />删除
 						</a-button>
 					</a-col>
 					<a-col :span="16" style="text-align:right">
@@ -33,7 +33,7 @@
 					width="800px"
 					:footer="null"
 				>
-					<a-form :form="form">
+					<a-form :form="form" @keyup.enter.native="add">
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="类型">
 							<a-select
 								showSearch
@@ -46,19 +46,26 @@
 							</a-select>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="单位名称">
-							<a-input v-decorator="['name',{rules: [{ required: true, message: '请填写单位名称' }]}]"></a-input>
+							<a-input
+								maxlength="20"
+								v-decorator="['name',{rules: [{ required: true, message: '请填写单位名称' }]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人">
-							<a-input v-decorator="['contact',{rules: [{ required: true, message: '请填写联系人' }]}]"></a-input>
+							<a-input
+								maxlength="20"
+								v-decorator="['contact',{rules: [{ required: true, message: '请填写联系人' }]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人电话">
 							<a-input
 								type="number"
-								v-decorator="['phone',{rules: [{ required: true, message: '请填写联系人电话' }]}]"
+								oninput="if(value.length>11)value=value.slice(0,11)"
+								v-decorator="['phone',{rules: [{ required: true, message: '请填写联系人电话' },{validator: chickPhone}]}]"
 							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
-							<a-textarea v-decorator="['remark']" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+							<a-textarea maxlength="50" v-decorator="['remark']" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
 						</a-form-item>
 						<a-form-item :wrapper-col="{ span: 20,offset: 4 }" style="text-align: right;">
 							<a-button style="margin-right:12px;" @click="form.resetFields();modalNewVisible = false">取消</a-button>
@@ -76,7 +83,7 @@
 					@cancel="form.resetFields()"
 					width="800px"
 				>
-					<a-form :form="form">
+					<a-form :form="form" @keyup.enter.native="edit">
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="类型">
 							<a-select
 								showSearch
@@ -89,16 +96,26 @@
 							</a-select>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="单位名称">
-							<a-input v-decorator="['name',{rules: [{ required: true, message: '请填写单位名称' }]}]"></a-input>
+							<a-input
+								maxlength="20"
+								v-decorator="['name',{rules: [{ required: true, message: '请填写单位名称' }]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人">
-							<a-input v-decorator="['contact',{rules: [{ required: true, message: '请填写联系人' }]}]"></a-input>
+							<a-input
+								maxlength="20"
+								v-decorator="['contact',{rules: [{ required: true, message: '请填写联系人' }]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="联系人电话">
-							<a-input v-decorator="['phone',{rules: [{ required: true, message: '请填写联系人电话' }]}]"></a-input>
+							<a-input
+								type="number"
+								oninput="if(value.length>11)value=value.slice(0,11)"
+								v-decorator="['phone',{rules: [{ required: true, message: '请填写联系人电话' },{validator: chickPhone}]}]"
+							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
-							<a-textarea v-decorator="['remark']" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+							<a-textarea maxlength="50" v-decorator="['remark']" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
 						</a-form-item>
 						<a-form-item :wrapper-col="{ span: 20,offset: 4 }" style="text-align: right;">
 							<a-button style="margin-right:12px;" @click="form.resetFields();modalEditVisible = false">取消</a-button>
@@ -210,6 +227,17 @@ export default {
 		};
 	},
 	methods: {
+		chickPhone(rule, value, callback) {
+			if (
+				/^1[23456789]\d{9}$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("请输入正确的电话号码"));
+			} else {
+				callback();
+			}
+		},
 		onSelectChange(selectedRowKeys) {
 			this.selectedRowKeys = selectedRowKeys;
 			console.log(this.selectedRowKeys);
@@ -253,11 +281,14 @@ export default {
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
+			this.getList();
 		},
 		onChange(current, pageNumber) {
 			console.log("Page: ", pageNumber);
 			console.log("第几页: ", current);
 			this.current = current;
+			this.getList();
 		},
 		editShow() {
 			this.Axios(

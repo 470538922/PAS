@@ -1,302 +1,335 @@
 <template>
 	<div class="edit_work_order">
-		<a-form :form="form" layout="inline">
+		<a-form :form="form" layout="inline" @keyup.enter.native="update">
 			<a-tabs defaultActiveKey="1">
 				<a-tab-pane tab="基础信息" key="1">
 					<a-form-item label="工单号">
-						<a-input style="width:335px;"></a-input>
+						<a-input
+							v-decorator="['no',{rules: [{ required: true, message: '请填写工单号' }]}]"
+							style="width:335px;"
+							placeholder="保存后将无法修改"
+							read-only
+						></a-input>
 					</a-form-item>
 					<a-form-item label="工作令号">
-						<a-input style="width:335px;"></a-input>
+						<a-input
+							v-decorator="['gongzuolingNo',{rules: [{ required: true, message: '请填写工作令号' }]}]"
+							style="width:335px;"
+							placeholder="保存后将无法修改"
+							read-only
+						></a-input>
 					</a-form-item>
 					<a-form-item label="工单标题">
-						<a-input style="width:335px;"></a-input>
+						<a-input
+							maxlength="20"
+							v-decorator="['title',{rules: [{ required: true, message: '请填写工单标题' }]}]"
+							style="width:335px;"
+						></a-input>
 					</a-form-item>
 					<a-form-item label="客户名称">
-						<a-input style="width:335px;"></a-input>
+						<a-select
+							showSearch
+							v-decorator="['client']"
+							placeholder
+							optionFilterProp="children"
+							style="width: 335px"
+							:filterOption="filterOption"
+						>
+							<a-select-option
+								:value="item.name"
+								v-for="item in cooperatorList"
+								:key="item.id"
+							>{{item.name}}</a-select-option>
+						</a-select>
 					</a-form-item>
 					<a-form-item label="计划数量">
-						<a-input style="width:335px;"></a-input>
+						<a-input
+							v-decorator="['planAmount',{rules: [{validator: chickNumber}]}]"
+							type="number"
+							oninput="if(value.length>20)value=value.slice(0,20)"
+							style="width:335px;"
+						></a-input>
 					</a-form-item>
 					<a-form-item label="承制单位">
-						<a-input style="width:335px;"></a-input>
+						<a-select
+							showSearch
+							v-decorator="['contractingUnits']"
+							placeholder
+							optionFilterProp="children"
+							style="width: 335px"
+							:filterOption="filterOption"
+						>
+							<a-select-option
+								:value="item.name"
+								v-for="item in enterpriseList"
+								:key="item.id"
+							>{{item.name}}</a-select-option>
+						</a-select>
 					</a-form-item>
 					<a-form-item label="计划开工时间">
-						<a-input style="width:335px;"></a-input>
+						<a-date-picker
+							v-decorator="['gmtPlanStart',{rules: [{ required: true, message: '请填写计划开工时间' }]}]"
+							style="width:335px;"
+							@change="(a,b)=>onChangeDate(a,b,1)"
+							format="YYYY/MM/DD HH:mm:ss"
+							:showTime="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
+						/>
 					</a-form-item>
 					<a-form-item label="实际开工时间">
-						<a-input style="width:335px;"></a-input>
+						<a-input style="width:335px;" disabled></a-input>
 					</a-form-item>
 					<a-form-item label="计划完工时间">
-						<a-input style="width:335px;"></a-input>
+						<a-date-picker
+							v-decorator="['gmtPlanCompleted',{rules: [{ required: true, message: '请填写计划完工时间' }]}]"
+							style="width:335px;"
+							@change="(a,b)=>onChangeDate(a,b,2)"
+							format="YYYY/MM/DD HH:mm:ss"
+							:showTime="{ defaultValue: moment('00:00:00', 'HH:mm:ss') }"
+						/>
 					</a-form-item>
 					<a-form-item label="实际完工时间">
-						<a-input style="width:335px;"></a-input>
+						<a-input style="width:335px;" disabled></a-input>
 					</a-form-item>
 					<a-form-item label="优先级">
-						<a-radio-group v-model="radioValue">
-							<a-radio :value="1">正常</a-radio>
-							<a-radio :value="2">优先</a-radio>
+						<a-radio-group v-model="isPriority">
+							<a-radio :value="false">正常</a-radio>
+							<a-radio :value="true">优先</a-radio>
 						</a-radio-group>
 					</a-form-item>
 					<a-form-item label="备注">
-						<a-textarea style="width:809px;" :autosize="{ minRows: 4, maxRows: 4 }"></a-textarea>
+						<a-textarea
+							maxlength="50"
+							v-decorator="['remark']"
+							style="width:809px;"
+							:autosize="{ minRows: 4, maxRows: 4 }"
+						></a-textarea>
 					</a-form-item>
 				</a-tab-pane>
 				<a-tab-pane tab="工单明细" key="2" forceRender>
-					<div style="text-align:right;padding-bottom:12px;">
-						<a-button type="primary" @click="addVisible=true">批量导入</a-button>
-					</div>
-					<a-table :pagination="false" :columns="columns" :dataSource="data" bordered rowKey="id">
-						<template
-							v-for="col in ['deviceName', 'deviceState','organizeName','deviceModel', 'workerNames']"
-							:slot="col"
-							slot-scope="text, record, index"
-						>
-							<div :key="col">
-								<a-input
-									style="margin: -5px 0"
-									:value="text"
-									@change="e => handleChangeTable(e.target.value, record.id, col)"
-								/>
-							</div>
-						</template>
-						<template slot="deviceNo" slot-scope="text, record, index">
-							<span>{{index+1}}</span>
-						</template>
-						<template slot="deviceModel" slot-scope="text, record, index">
-							<div>
-								<a-date-picker
-									@change="(e,d)=>handleTime(e,d,index)"
-									format="YYYY/MM/DD"
-									style="width:100%"
-								/>
-							</div>
-						</template>
-						<template slot="operation" slot-scope="text, record, index">
-							<div class="editable-row-operations">
-								<span class="handle_style">
-									<a-popconfirm title="确定删除吗？" @confirm="onDelete(record.id)" okText="确定" cancelText="取消">
-										<a-popover placement="top">
-											<template slot="content">
-												<span>删除</span>
-											</template>
-											<a-icon type="delete" style="color:red;"/>
-										</a-popover>
-									</a-popconfirm>
-								</span>
-							</div>
-						</template>
-					</a-table>
-					<div
-						@click="handleAdd"
-						style=" cursor: pointer;color:#1890ff;margin-top:12px;"
-						class="handle_table"
-					>
-						<a-icon type="plus-circle"/>&nbsp;添加一行
+					<div>
+						如需查看或管理，请切换至
+						<span
+							style="cursor: pointer;color:#1890ff;text-decoration: underline;"
+							@click="$router.push({path:'/WorkOrderList/WorkOrderDetailsList/'+workOrderId});$emit('changeEditModal', false);"
+						>工单明细列表</span>
 					</div>
 				</a-tab-pane>
 			</a-tabs>
 
 			<a-form-item style="display:block;text-align:right;">
 				<a-button style="margin-right:12px;" @click="confirmCancel">取消</a-button>
-				<a-button type="primary">保存</a-button>
+				<a-button type="primary" @click="update">保存</a-button>
 			</a-form-item>
 		</a-form>
-		<a-modal
-			title="导入提示"
-			:footer="null"
-			width="420px"
-			:visible="addVisible"
-			@cancel="handleCancel(1)"
-			:maskClosable="false"
-		>
-			<div>
-				导入步骤：
-				<br>1、下载模板
-				<a href="javascript:">《工单明细模板.xls》</a>；
-				<br>2、按格式要求填写，请勿模板修改结构；
-				<br>3、点击下方“选择文件”按钮导入数据；
-				<br>4、校对并保存数据。
-				<br>
-				<span style="color:#999999">提示：重复导入时，已经有数据将会被清空。</span>
-			</div>
-			<div style="padding-top:12px;">
-				<a-upload
-					name="file"
-					:multiple="true"
-					:action="ApiSrc()"
-					@change="handleChangeUpload"
-					:headers="headers"
-				>
-					<a-button type="primary">
-						<a-icon type="upload"/>选择文件
-					</a-button>
-				</a-upload>
-			</div>
-		</a-modal>
 	</div>
 </template>
 <script>
+import moment from "moment";
 import OrderSelect from "../public/OrderSelect";
-const columns = [
-	{
-		dataIndex: "deviceNo",
-		title: "序号",
-		width: 60,
-		key: "deviceNo",
-		scopedSlots: { customRender: "deviceNo" }
-	},
-	{
-		dataIndex: "deviceName",
-		title: "图号",
-		width: 100,
-		key: "deviceName",
-		scopedSlots: { customRender: "deviceName" }
-	},
-	{
-		dataIndex: "deviceState",
-		key: "deviceState",
-		title: "名称",
-		width: 100,
-		scopedSlots: { customRender: "deviceState" }
-	},
-	{
-		dataIndex: "organizeName",
-		key: "organizeName",
-		title: "总数量",
-		width: 80,
-		scopedSlots: { customRender: "organizeName" }
-	},
-	{
-		dataIndex: "deviceModel",
-		key: "deviceModel",
-		title: "要求完成时间",
-		width: 140,
-		scopedSlots: { customRender: "deviceModel" }
-	},
-	{
-		dataIndex: "workerNames",
-		key: "workerNames",
-		title: "备注",
-		width: 160,
-		scopedSlots: { customRender: "workerNames" }
-	},
-	{
-		dataIndex: "operation",
-		key: "operation",
-		title: "操作",
-		width: 40,
-		align: "center",
-		scopedSlots: { customRender: "operation" }
-	}
-];
-const data = [
-	{
-		id: 0,
-		deviceNo: "",
-		deviceName: "",
-		deviceState: "",
-		organizeName: "",
-		locationNo: "",
-		deviceCategoryName: "",
-		deviceModel: null,
-		workerNames: ""
-	}
-];
 export default {
+	props: {
+		woekOrderId: {
+			default: null
+		}
+	},
 	data() {
 		return {
-			columns,
-			data,
 			count: 1,
 			radioValue: 1,
 			form: this.$form.createForm(this),
-			fileList: [],
-			addVisible: false,
-			headers: {
-				token: sessionStorage.getItem("token")
-			}
+			cooperatorList: [],
+			enterpriseList: [],
+			isPriority: false,
+			gmtPlanStart: "",
+			gmtPlanCompleted: "",
+			workOrderId: ""
 		};
 	},
 	methods: {
-		ApiSrc() {
-			return this.global.apiSrc + "/api-workorder/workOrderDes/import";
-		},
-		handleChangeUpload(info) {
-			console.log(info);
-			if (info.file.status !== "uploading") {
-				console.log(info.file, info.fileList);
-			}
-			if (info.file.status === "done") {
-				this.$message.success(`${info.file.name} file uploaded successfully`);
-			} else if (info.file.status === "error") {
-				this.$message.error(`${info.file.name} file upload failed.`);
+		chickNumber(rule, value, callback) {
+			if (
+				/^\+?[1-9]\d*$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("只能输入大于0的整数"));
+			} else {
+				callback();
 			}
 		},
-		handleTime(e, d, index) {
-			this.data[index].deviceModel = d;
-		},
-		handleChangeTable(value, key, column) {
-			const newData = [...this.data];
-			const target = newData.filter(item => key === item.id)[0];
-			if (target) {
-				target[column] = value;
-				this.data = newData;
+		onChangeDate(date, dateString, a) {
+			if (a == 1) {
+				this.gmtPlanStart = dateString;
 			}
+			if (a == 2) {
+				this.gmtPlanCompleted = dateString;
+			}
+			console.log(a);
 		},
-		handleAdd() {
-			const { count, data } = this;
-			const newData = {
-				id: count,
-				deviceNo: "",
-				deviceName: "",
-				deviceState: "",
-				organizeName: "",
-				locationNo: "",
-				deviceCategoryName: "",
-				deviceModel: "",
-				workerNames: ""
-			};
-			this.data = [...data, newData];
-			this.count = count + 1;
-		},
-		onDelete(key) {
-			// if (this.selectedRowKeys.length < 1) {
-			// 	this.$message.error("请选择要删除的项！");
-			// 	return;
-			// }
-			const dataSource = [...this.data];
-			this.data = dataSource.filter(item => item.id !== key);
-		},
-		handleCancel(a) {
-			this.addVisible = false;
-		},
-		showAddOrder() {
-			console.log("object");
-			this.addVisible = true;
-		},
+		moment,
 		confirmCancel() {
-			this.$emit("changeAddModal", false);
+			this.form.resetFields();
+			this.$emit("changeEditModal", false);
 		},
-		handleChange(info) {
-			let fileList = [...info.fileList];
-			// 1. Limit the number of uploaded files
-			//    Only to show two recent uploaded files, and old ones will be replaced by the new
-			fileList = fileList.slice(-2);
-			// 2. read from response and show file link
-			fileList = fileList.map(file => {
-				if (file.response) {
-					// Component will show file.url as link
-					file.url = file.response.url;
+		//单个查询
+		findOne() {
+			this.Axios(
+				{
+					url: "/api-workorder/workOrder/findOne",
+					params: {
+						workOrderId: this.woekOrderId
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.workOrderId = result.data.data.workOrder.id;
+						this.isPriority = result.data.data.workOrder.isPriority;
+						this.gmtPlanStart = result.data.data.workOrder.gmtPlanStart;
+						this.gmtPlanCompleted = result.data.data.workOrder.gmtPlanCompleted;
+						setTimeout(() => {
+							this.form.setFieldsValue({
+								no: result.data.data.workOrder.no,
+								gongzuolingNo: result.data.data.workOrder.gongzuolingNo,
+								title: result.data.data.workOrder.title,
+								client: result.data.data.workOrder.client,
+								planAmount: result.data.data.workOrder.planAmount,
+								contractingUnits: result.data.data.workOrder.contractingUnits,
+								gmtPlanStart: moment(
+									result.data.data.workOrder.gmtPlanStart,
+									"YYYY/MM/DD HH:mm:ss"
+								),
+								gmtPlanCompleted: moment(
+									result.data.data.workOrder.gmtPlanCompleted,
+									"YYYY/MM/DD HH:mm:ss"
+								),
+								remark: result.data.data.workOrder.remark
+							});
+						}, 100);
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		getSubcontractList() {
+			this.Axios(
+				{
+					url: "/api-platform/collaborationUnit/list",
+					params: {
+						page: 1,
+						size: -1
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						if (result.data.data.length < 1) {
+							this.cooperatorList = [];
+							this.enterpriseList = [];
+						} else {
+							if (
+								result.data.data.find(item => item.type == 1) == null ||
+								result.data.data.find(item => item.type == 1) == []
+							) {
+								this.cooperatorList = [];
+							} else {
+								this.cooperatorList = result.data.data.filter(
+									item => item.type == 1
+								);
+							}
+							if (
+								result.data.data.find(item => item.type == 2) == null ||
+								result.data.data.find(item => item.type == 2) == []
+							) {
+								this.enterpriseList = [];
+							} else {
+								this.enterpriseList = result.data.data.filter(
+									item => item.type == 2
+								);
+							}
+						}
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		filterOption(input, option) {
+			return (
+				option.componentOptions.children[0].text
+					.toLowerCase()
+					.indexOf(input.toLowerCase()) >= 0
+			);
+		},
+		//修改
+		update() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					console.log(values);
+					if (
+						Date.parse(this.gmtPlanStart) - Date.parse(this.gmtPlanCompleted) >=
+						0
+					) {
+						this.$message.error("计划完工时间不能小于计划开工时间");
+						return false;
+					}
+					let qs = require("qs");
+					let data = qs.stringify({
+						workOrderId: this.woekOrderId,
+						no: values.no,
+						gongzuolingNo: values.gongzuolingNo,
+						title: values.title,
+						client: values.client,
+						planAmount: values.planAmount,
+						contractingUnits: values.contractingUnits,
+						gmtPlanStart: this.gmtPlanStart,
+						gmtPlanCompleted: this.gmtPlanCompleted,
+						isPriority: this.isPriority,
+						remark: values.remark
+					});
+					this.Axios(
+						{
+							url: "/api-workorder/workOrder/update",
+							params: data,
+							type: "post",
+							option: { successMsg: "修改成功！" }
+							// config: {
+							// 	headers: { "Content-Type": "application/json" }
+							// }
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								this.$emit("changeEditModal", false);
+							}
+						},
+						({ type, info }) => {}
+					);
 				}
-				return file;
 			});
-			this.fileList = fileList;
 		}
 	},
 	components: {
 		OrderSelect
+	},
+	created() {
+		this.findOne();
+		this.getSubcontractList();
+	},
+	watch: {
+		woekOrderId() {
+			if (this.woekOrderId != "" && this.woekOrderId != null) {
+				this.findOne();
+			}
+		}
 	}
 };
 </script>

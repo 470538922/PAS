@@ -10,13 +10,13 @@
 								<a-icon type="plus-circle"/>新增
 							</a-button>-->
 							<a-button @click="$router.push({path:'/Authority/AddAuthority'})">
-								<a-icon style="color:#1890ff;" type="plus"/>新增
+								<a-icon style="color:#1890ff;" type="plus" />新增
 							</a-button>
 							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
-								<a-icon style="color:#1890ff;" type="edit"/>修改
+								<a-icon style="color:#1890ff;" type="edit" />修改
 							</a-button>
 							<a-button :disabled="selectedRowKeys.length!=1" @click="showDeleteConfirm">
-								<a-icon style="color:#1890ff;" type="delete"/>删除
+								<a-icon style="color:#1890ff;" type="delete" />删除
 							</a-button>
 						</a-col>
 					</div>
@@ -158,6 +158,7 @@ export default {
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
 			this.getList();
 		},
 		onChange(current, pageNumber) {

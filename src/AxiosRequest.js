@@ -110,7 +110,7 @@ export default ({
         } else if (res.status === 200 && res.data.code >= 300 && res.data.code < 400) {
           message.error(`登录失效，即将跳转至登录页`);
           window.setTimeout(() => {
-            window.location.href = "login.html"
+            window.location.href = "/login.html"
           }, 1000);
         } else {
           //faild && faild(res.data);

@@ -35,6 +35,14 @@ export default new Router({
       },
     },
     {
+      path: '/Feedback',
+      name: 'Feedback',
+      components: require('../components/feedback/Index.vue'),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: '/ModuleCustomization',
       name: 'ModuleCustomization',
       components: require('../components/system/moduleCustomization/ModuleCustomization.vue'),
@@ -53,7 +61,7 @@ export default new Router({
     {
       path: '/Dashboard',
       name: 'Dashboard',
-      components: require('../components/public/PersonnelAdd.vue'),
+      components: require('../components/Dashboard'),
       meta: {
         requireAuth: true,
       },
@@ -199,6 +207,30 @@ export default new Router({
       },
     },
     {
+      path: '/OrderPrice',
+      name: 'OrderPrice',
+      components: require('@/components/orderPrice/Index.vue'),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: '/HistoricalQuote',
+      name: 'HistoricalQuote',
+      components: require('@/components/orderPrice/HistoricalQuote.vue'),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: '/WorkingHours',
+      name: 'workingHours',
+      components: require('@/components/workingHours/index.vue'),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: '/WorkOrderList',
       name: 'WorkOrderList',
       components: require('@/components/workOrder/WorkOrderList.vue'),
@@ -217,6 +249,14 @@ export default new Router({
           path: 'WorkOrderDetailsList/:id/',
           name: 'WorkOrderDetailsList',
           components: require('../components/workOrder/workOrderDetails/Index.vue'),
+          meta: {
+            requireAuth: true,
+          },
+        },
+        {
+          path: 'Inventory/:id/',
+          name: 'Inventory',
+          components: require('../components/workOrder/inventory/index.vue'),
           meta: {
             requireAuth: true,
           },

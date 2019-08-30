@@ -25,6 +25,9 @@ body .canvasWrap {
 #login-layout .login-wrap {
   padding: 30px;
 }
+#login-layout .login-wrap .ant-card-head-title {
+  text-align: center;
+}
 #login-layout .ant-card {
   background: transparent;
   color: #fff;

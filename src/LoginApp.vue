@@ -2,31 +2,49 @@
 	<div>
 		<a-layout id="login-layout">
 			<div class="logo_case">
-				<img src="./assets/u8.png" title>
+				<img src="./assets/u8.png" title />
 			</div>
 			<div class="login-wrap">
-				<a-card title="生产排程系统-登录" :bordered="false">
+				<a-card title="长虹生产管理系统-登录" :bordered="false">
 					<p>
-						<a-input placeholder="请输入登录账号/手机号/指定账号" v-model="user.userName" ref="userNameInput" class>
-							<a-icon slot="prefix" type="user"/>
-							<a-icon v-if="user.userName" slot="suffix" type="close-circle"/>
-						</a-input>
-					</p>
-					<p>
-						<a-input type="password" placeholder="请输入密码" v-model="user.userPwd" ref="userNameInput">
-							<a-icon slot="prefix" type="lock"/>
-							<a-icon v-if="user.userPwd" slot="suffix" type="close-circle"/>
+						<a-input placeholder="账号/员工编号" v-model="user.userName" ref="userNameInput" class>
+							<a-icon slot="prefix" type="user" />
+							<a-icon
+								v-if="user.userName"
+								slot="suffix"
+								@click.stop="user.userName=''"
+								type="close-circle"
+								style="cursor: pointer;"
+							/>
 						</a-input>
 					</p>
 					<p>
 						<a-input
+							@keyup.enter.native="login()"
 							type="password"
-							placeholder="请输入验证码"
-							style="width:200px"
+							placeholder="请输入密码"
 							v-model="user.userPwd"
 							ref="userNameInput"
 						>
-							<a-icon slot="prefix" type="safety"/>
+							<a-icon slot="prefix" type="lock" />
+							<a-icon
+								v-if="user.userPwd"
+								slot="suffix"
+								@click.stop="user.userPwd=''"
+								style="cursor: pointer;"
+								type="close-circle"
+							/>
+						</a-input>
+					</p>
+					<p>
+						<a-input
+							placeholder="请输入验证码"
+							style="width:200px"
+							v-model="user.identifyCode"
+							ref="userNameInput"
+							@keyup.enter.native="login()"
+						>
+							<a-icon slot="prefix" type="safety" />
 						</a-input>
 						<span @click="refreshCode" class="verifyCode_case">
 							<Identify :identifyCode="identifyCode" :contentWidth="160" class="identify"></Identify>
@@ -40,6 +58,10 @@
 			</div>
 		</a-layout>
 		<div class="text_style">Sichuang Changhong Intelligent Manufacturing Technology Co. Ltd.</div>
+		<div class="erweima">
+			<img src="./assets/PMSAPP.png" alt />
+			<p style="font-size:14px;color:#40a9ff;text-align:center;line-height:36px;">浏览器扫一扫</p>
+		</div>
 	</div>
 </template>
 <script>
@@ -56,6 +78,7 @@ import {
 	Card,
 	Input,
 	Icon,
+	message,
 	Button
 } from "ant-design-vue";
 Vue.component(Layout.name, Layout);
@@ -70,6 +93,7 @@ Vue.component(Card.name, Card);
 Vue.component(Input.name, Input);
 Vue.component(Icon.name, Icon);
 Vue.component(Button.name, Button);
+Vue.prototype.$message = message;
 
 export default {
 	data() {
@@ -78,7 +102,8 @@ export default {
 			identifyCode: "",
 			user: {
 				userName: "",
-				userPwd: ""
+				userPwd: "",
+				identifyCode: ""
 			}
 		};
 	},
@@ -97,6 +122,7 @@ export default {
 					this.randomNum(0, this.identifyCodes.length)
 				];
 			}
+			// this.user.identifyCode = this.identifyCode;
 		},
 		refreshCode() {
 			this.identifyCode = "";
@@ -112,6 +138,18 @@ export default {
 		},
 		login() {
 			// this.submitForm('loginList')
+			if (this.user.userName == "" || this.user.userPwd == "") {
+				this.$message.error("账号密码不能为空！");
+				return false;
+			}
+			if (this.user.identifyCode == "") {
+				this.$message.error("验证码不能为空！");
+				return false;
+			}
+			if (this.user.identifyCode !== this.identifyCode) {
+				this.$message.error("验证码输入错误！");
+				return false;
+			}
 			let pass = this.user.userPwd;
 			pass = md5(pass);
 			let key = "*chang_hong_device_cloud";
@@ -137,7 +175,22 @@ export default {
 						console.log(result.data.data);
 						// this.$router.replace("/Dashboard");
 						sessionStorage.token = result.data.data.token;
-						window.location.href = "/Dashboard";
+						let permissionUrl = result.data.data.user.role.permissionLookups.map(
+							item => {
+								return {
+									module: item.permissionUrl,
+									permissionItem: []
+								};
+							}
+						);
+						sessionStorage.permissionUrl = JSON.stringify(permissionUrl);
+						sessionStorage.user = JSON.stringify(result.data.data.user);
+						if (result.data.data.user.userType == 1) {
+							window.location.href = "/Dashboard";
+						}
+						if (result.data.data.user.userType == 0) {
+							window.location.href = "/Enterprise";
+						}
 					}
 				},
 				({ type, info }) => {
@@ -202,5 +255,20 @@ export default {
 	bottom: 40px;
 	width: 100%;
 	text-align: center;
+}
+.erweima {
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	width: 200px;
+	height: 230px;
+	font-size: 0;
+	background-color: white;
+	z-index: 100;
+	margin-top: -115px;
+	padding: 5px 5px 0;
+	img {
+		width: 190px;
+	}
 }
 </style>

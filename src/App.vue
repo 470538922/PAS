@@ -3,35 +3,35 @@
 		<a-layout id="components-layout">
 			<a-layout-header class="header">
 				<a-row>
-					<a-col :span="20">
+					<a-col :span="12">
 						<div class="logo">
-							<p>生产计划排程系统</p>Changhong
+							<p>生产管理系统</p>Changhong
 						</div>
 						<a-menu theme="dark" mode="horizontal" class="header-menu" :selectable="false">
 							<a-menu-item
 								v-for="(item,index) in headerMenuGroup"
 								:key="index"
 								@click="switchTab(item.key)"
+								v-if="userType==1"
 							>
 								<span>
 									<i class="iconfont anticon" v-html="item.icon"></i>
-									<br>
+									<br />
 									{{item.menu}}
 								</span>
 							</a-menu-item>
 						</a-menu>
 					</a-col>
-					<a-col :span="4" class="header-user">
-						<router-link to="user/profile">Administrator</router-link>
+					<a-col :span="12" class="header-user">
+						<router-link to><{{enterpriseName}}></router-link>
+						<router-link to>你好，{{userName}}</router-link>
 
-						<router-link to="user/msg">
+						<router-link to>
 							<a-tooltip placement="bottom">
 								<template slot="title">
-									<span>您有20条待办事项</span>
+									<span>修改密码</span>
 								</template>
-								<a-badge dot>
-									<a-icon class="weak" type="notification"/>
-								</a-badge>
+								<i class="iconfont">&#xe604;</i>
 							</a-tooltip>
 						</router-link>
 						<router-link to>
@@ -39,7 +39,7 @@
 								<template slot="title">
 									<span>退出系统</span>
 								</template>
-								<a-icon type="logout" @click="toLogin"/>
+								<a-icon type="logout" @click="toLogin" />
 							</a-tooltip>
 						</router-link>
 					</a-col>
@@ -78,20 +78,20 @@
 								:key="index"
 							>
 								<span>{{item.title}}</span>
-								<a-icon @click.stop="closeTab(item.key)" type="close"/>
+								<a-icon @click.stop="closeTab(item.key)" type="close" />
 							</li>
 						</ul>
-						<a-button style="float:right;margin-top:8px" shape="circle" @click="reload" icon="redo"/>
+						<a-button style="float:right;margin-top:8px" shape="circle" @click="reload" icon="redo" />
 					</div>
 
 					<a-layout-content
 						:style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
 					>
 						<center v-if="!isShow">
-							<a-spin/>
+							<a-spin />
 						</center>
 						<keep-alive :include="cachedViews">
-							<router-view v-if="isShow"/>
+							<router-view v-if="isShow" />
 						</keep-alive>
 					</a-layout-content>
 				</a-layout>
@@ -153,28 +153,31 @@ export default {
 			cachedViews: [],
 			version: versionInfo,
 			node_dev: process.env.NODE_ENV,
-			tabsList: [
-				{
-					key: "dashboard",
-					title: "工作台",
-					route: "/Dashboard",
-					active: true
-				}
-			],
-			headerMenu: [
-				"dashboard",
-				"orderList",
-				"workOrderList",
-				"myDevice",
-				"drawingsList",
-				"processCardList"
-			],
-			headerMenuGroup: []
+			tabsList:
+				JSON.parse(sessionStorage.getItem("user")).userType == 0
+					? []
+					: [
+							{
+								key: "dashboard",
+								title: "首页",
+								route: "/Dashboard",
+								active: true
+							}
+					  ],
+			headerMenu: ["dashboard"],
+			headerMenuGroup: [],
+			userType: JSON.parse(sessionStorage.getItem("user")).userType,
+			userName: JSON.parse(sessionStorage.getItem("user")).userName,
+			enterpriseName: JSON.parse(sessionStorage.getItem("user")).enterpriseName
 		};
 	},
 	methods: {
 		toLogin() {
-			window.location.href = "login.html";
+			window.location.href = "/login.html";
+			sessionStorage.removeItem("token");
+			sessionStorage.removeItem("user");
+			sessionStorage.removeItem("priview");
+			sessionStorage.removeItem("priviewType");
 		},
 		switchTab(key, path) {
 			//先检查tabsList
@@ -228,15 +231,22 @@ export default {
 			}, 100);
 		},
 		initPermission() {
-			const permissionUrl = [];
+			const permissionUrl = JSON.parse(
+				sessionStorage.getItem("permissionUrl") || "[]"
+			);
 			let _menuSource = [];
 			clone(menuSourceMap).forEach(per => {
 				if (per.defaultDock) {
 					_menuSource.push(per);
 				} else {
 					const willShowMenu = per.subMenu.filter(m => {
-						if (m.visible) return false;
-						return true;
+						if (m.visible) {
+							return false;
+						}
+						// return true;
+						return permissionUrl.find(p => p.module === m.permissionCode)
+							? true
+							: false;
 					});
 					if (willShowMenu.length !== 0) {
 						per.subMenu = willShowMenu;

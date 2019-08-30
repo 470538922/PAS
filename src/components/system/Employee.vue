@@ -10,18 +10,18 @@
 								<a-icon type="plus-circle"/>添加
 							</a-button>-->
 							<a-button @click="$router.push({path:'/Employee/AddEmployee'})">
-								<a-icon style="color:#1890ff;" type="plus"/>新增
+								<a-icon style="color:#1890ff;" type="plus" />新增
 							</a-button>
 							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
-								<a-icon style="color:#1890ff;" type="edit"/>修改
+								<a-icon style="color:#1890ff;" type="edit" />修改
 							</a-button>
-							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+							<a-button @click="resetPwd" :disabled="selectedRowKeys.length!=1">
 								<i style="color:#1890ff;margin-right:6px;display:inline-block;" class="iconfont">&#xe6b6;</i>
 								重置密码
 							</a-button>
-							<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
-								<a-icon style="color:#1890ff;" type="delete"/>删除
-							</a-button>
+							<!-- <a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+								<a-icon style="color:#1890ff;" type="delete" />删除
+							</a-button>-->
 						</a-col>
 
 						<a-col :span="16" style="text-align:right">
@@ -118,7 +118,7 @@ const columns = [
 	{
 		dataIndex: "workTypeName",
 		key: "workTypeName",
-		title: "只能/工种",
+		title: "职能/工种",
 		width: "10%"
 	},
 	{
@@ -129,7 +129,6 @@ const columns = [
 		scopedSlots: { customRender: "state" }
 	}
 ];
-
 export default {
 	data() {
 		return {
@@ -153,6 +152,37 @@ export default {
 		};
 	},
 	methods: {
+		resetPwd() {
+			let qs = require("qs");
+			let data = qs.stringify({
+				employeeId: this.selectedRowKeys[0]
+			});
+			this.Axios(
+				{
+					url: "/api-sso/simpleUserAction/resetPwd",
+					params: data,
+					type: "post",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.$success({
+							title: "密码重置成功！",
+							// JSX support
+							content: (
+								<div>
+									密码已重置为：<span style="color:red;">123456</span>
+									<p>请通知相关人员登录并修改</p>
+								</div>
+							)
+						});
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
 		onSelectChange(selectedRowKeys) {
 			this.selectedRowKeys = selectedRowKeys;
 			console.log(this.selectedRowKeys);
@@ -197,6 +227,7 @@ export default {
 
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
 			this.getList();
 		},
 		onChange(current, pageNumber) {
@@ -273,6 +304,7 @@ export default {
 	},
 	created() {
 		this.getList();
+		console.log(this.$route);
 		let a = this.$route.matched.find(item => item.name === "AddEmployee")
 			? true
 			: false;

@@ -6,6 +6,7 @@
 			</a-form-item>
 			<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 18 }" label="联系人">
 				<a-input
+					maxlength="20"
 					placeholder="填写姓名"
 					v-decorator="[
                     'contact',
@@ -15,10 +16,11 @@
 			</a-form-item>
 			<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 18 }" label="手机号">
 				<a-input
+					maxlength="11"
 					placeholder="填写手机号（用于接收通知、找回密码等）"
 					v-decorator="[
                     'phone',
-                    {rules: [{ required: true, message: '填写手机号' }]}
+                    {rules: [{ required: true, message: '填写手机号' },{validator: chickPhone}]}
                     ]"
 				></a-input>
 			</a-form-item>
@@ -48,12 +50,12 @@
                     ]"
 				>
 					<div v-if="fileList.length < 1">
-						<a-icon type="plus"/>
+						<a-icon type="plus" />
 						<div class="ant-upload-text">Upload</div>
 					</div>
 				</a-upload>
 				<a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel" width="50%">
-					<img alt="example" style="width: 100%" :src="previewImage">
+					<img alt="example" style="width: 100%" :src="previewImage" />
 				</a-modal>
 			</a-form-item>
 			<a-form-item :wrapper-col="{ span: 18,offset: 4 }" style="text-align: right;">
@@ -80,6 +82,17 @@ export default {
 		msg: {}
 	},
 	methods: {
+		chickPhone(rule, value, callback) {
+			if (
+				/^1[23456789]\d{9}$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("请输入正确的电话号码"));
+			} else {
+				callback();
+			}
+		},
 		moment,
 		onChange(date, dateString) {
 			console.log(date, dateString);
@@ -139,64 +152,61 @@ export default {
 				},
 				({ type, info }) => {}
 			);
+		},
+		findOne(id) {
+			this.Axios(
+				{
+					url: "/api-platform/enterprise/findOne",
+					params: {
+						id: id
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.fileList = [
+							{
+								uid: "-1",
+								status: "done",
+								businessLicense: result.data.data.businessLicense,
+								url: result.data.data.businessLicenseTrueUrl,
+								name: result.data.data.businessLicense.substring(
+									result.data.data.businessLicense.lastIndexOf("/") + 1
+								)
+							}
+						];
+						setTimeout(() => {
+							this.form.setFieldsValue({
+								enterpriseName: result.data.data.enterpriseName,
+								contact: result.data.data.contact,
+								phone: result.data.data.phone,
+								businessLicense: result.data.data.businessLicense,
+								expireDate: [
+									moment(result.data.data.startData, "YYYY/MM/DD"),
+									moment(result.data.data.expireDate, "YYYY/MM/DD")
+								]
+							});
+						}, 100);
+					}
+				},
+				({ type, info }) => {}
+			);
 		}
 	},
 	created() {
 		this.getOneMsg = { ...this.msg };
-		this.fileList = [
-			{
-				uid: "-1",
-				status: "done",
-				url:
-					this.global.imgPath +
-					this.getOneMsg.businessLicense.replace("img:", ""),
-				name: this.getOneMsg.businessLicense.substring(
-					this.getOneMsg.businessLicense.lastIndexOf("/") + 1
-				)
-			}
-		];
-		setTimeout(() => {
-			this.form.setFieldsValue({
-				enterpriseName: this.getOneMsg.enterpriseName,
-				contact: this.getOneMsg.contact,
-				phone: this.getOneMsg.phone,
-				businessLicense: this.getOneMsg.businessLicense,
-				expireDate: [
-					moment(this.getOneMsg.startData, "YYYY/MM/DD"),
-					moment(this.getOneMsg.expireDate, "YYYY/MM/DD")
-				]
-			});
-		}, 100);
+		this.findOne(this.getOneMsg.id);
 	},
 
 	watch: {
 		msg() {
 			if (this.msg != "" && this.msg != null) {
 				this.getOneMsg = { ...this.msg };
-				this.fileList = [
-					{
-						uid: "-1",
-						status: "done",
-						url:
-							this.global.imgPath +
-							this.getOneMsg.businessLicense.replace("img:", ""),
-						name: this.getOneMsg.businessLicense.substring(
-							this.getOneMsg.businessLicense.lastIndexOf("/") + 1
-						)
-					}
-				];
-				setTimeout(() => {
-					this.form.setFieldsValue({
-						enterpriseName: this.getOneMsg.enterpriseName,
-						contact: this.getOneMsg.contact,
-						phone: this.getOneMsg.phone,
-						businessLicense: this.getOneMsg.businessLicense,
-						expireDate: [
-							moment(this.getOneMsg.startData, "YYYY/MM/DD"),
-							moment(this.getOneMsg.expireDate, "YYYY/MM/DD")
-						]
-					});
-				}, 100);
+				this.findOne(this.getOneMsg.id);
 			}
 		}
 	}

@@ -11,9 +11,9 @@
 			<template slot="operation" slot-scope="text, record, index">
 				<div>
 					<span style="cursor: pointer;color:#1890ff;" @click="handleEdit(record)">修改</span>&nbsp;
-					<a-popconfirm title="确定删除吗?" @confirm="() => onDelete(record)">
+					<!-- <a-popconfirm title="确定删除吗?" @confirm="() => onDelete(record)">
 						<span style="cursor: pointer;color:#1890ff">删除</span>
-					</a-popconfirm>
+					</a-popconfirm>-->
 				</div>
 			</template>
 		</a-table>
@@ -36,53 +36,79 @@
 			class="modal_form_style"
 			:footer="null"
 		>
-			<a-form :form="form" layout="inline" style="overflow:hidden">
+			<a-form :form="form" layout="inline" style="overflow:hidden"  @keyup.enter.native="edit">
 				<a-col :span="12">
 					<a-form-item label="名称">
 						<a-input
+							maxlength="20"
 							v-decorator="['name',{rules: [{ required: true, message: '请填写名称' }]}]"
 							style="width:260px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
 				<a-col :span="12">
-					<a-form-item label="长">
-						<a-input
-							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写长' }]}]"
-							type="number"
-							style="width:260px;"
-							addonAfter="mm"
-						></a-input>
+					<a-form-item label="编号">
+						<a-input maxlength="20" v-decorator="['number']" style="width:260px;"></a-input>
 					</a-form-item>
 				</a-col>
 				<a-col :span="12">
-					<a-form-item label="编号">
-						<a-input v-decorator="['number']" style="width:260px;"></a-input>
+					<a-form-item label="长">
+						<a-input
+							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber}]}]"
+							type="number"
+							oninput="if(value.length>10)value=value.slice(0,10)"
+							style="width:260px;"
+							addonAfter="mm"
+						></a-input>
 					</a-form-item>
 				</a-col>
 				<a-col :span="12">
 					<a-form-item label="宽">
 						<a-input
-							v-decorator="['widthOrRadius',{rules: [{ required: true, message: '请填写宽' }]}]"
+							v-decorator="['widthOrRadius',{rules: [{ required: true, message: '请填写宽' },{validator: chickNumber}]}]"
 							type="number"
+							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
 							addonAfter="mm"
+						></a-input>
+					</a-form-item>
+				</a-col>
+				<a-col :span="12">
+					<a-form-item label="厚">
+						<a-input
+							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写厚' },{validator: chickNumber}]}]"
+							type="number"
+							oninput="if(value.length>10)value=value.slice(0,10)"
+							style="width:260px;"
+							addonAfter="mm"
+						></a-input>
+					</a-form-item>
+				</a-col>
+				<a-col :span="12">
+					<a-form-item label="密度">
+						<a-input
+							v-decorator="['density',{rules: [{ required: true, message: '请填写密度' },{validator: chickNumberFloat}]}]"
+							type="number"
+							oninput="if(value.length>10)value=value.slice(0,10)"
+							style="width:260px;"
+							addonAfter="g/cm³"
+						></a-input>
+					</a-form-item>
+				</a-col>
+				<a-col :span="12">
+					<a-form-item label="价格">
+						<a-input
+							v-decorator="['price',{rules: [{ required: true, message: '请填写价格' },{validator: chickNumberFloat}]}]"
+							type="number"
+							oninput="if(value.length>10)value=value.slice(0,10)"
+							style="width:260px;"
+							addonAfter="元/kg"
 						></a-input>
 					</a-form-item>
 				</a-col>
 				<a-col :span="12">
 					<a-form-item label="备注">
-						<a-input v-decorator="['remark']" style="width:260px;"></a-input>
-					</a-form-item>
-				</a-col>
-				<a-col :span="12">
-					<a-form-item label="厚度">
-						<a-input
-							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写厚度' }]}]"
-							type="number"
-							style="width:260px;"
-							addonAfter="mm"
-						></a-input>
+						<a-input maxlength="50" v-decorator="['remark']" style="width:260px;"></a-input>
 					</a-form-item>
 				</a-col>
 				<a-col :span="24">
@@ -106,7 +132,7 @@ const columns = [
 	{
 		dataIndex: "number",
 		title: "编号",
-		width: 120,
+		width: 100,
 		key: "number"
 	},
 	{
@@ -129,10 +155,22 @@ const columns = [
 		width: 70
 	},
 	{
+		dataIndex: "density",
+		key: "density",
+		title: "密度g/cm³",
+		width: 100
+	},
+	{
+		dataIndex: "price",
+		key: "price",
+		title: "价格(元/kg)",
+		width: 100
+	},
+	{
 		dataIndex: "remark",
 		key: "remark",
 		title: "备注",
-		width: 120
+		width: 100
 	},
 	{
 		dataIndex: "operation",
@@ -157,17 +195,42 @@ export default {
 		};
 	},
 	methods: {
+		chickNumber(rule, value, callback) {
+			if (
+				/^\+?[1-9]\d*$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("只能输入大于0的整数"));
+			} else {
+				callback();
+			}
+		},
+		chickNumberFloat(rule, value, callback) {
+			if (
+				(/^\d+(\.\d{0,2})?$/.test(value) == false || value <= 0) &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("只能输入大于0,且只能保留两位小数"));
+			} else {
+				callback();
+			}
+		},
 		handleCancel() {
 			this.addBoardVisible = false;
 			this.form.resetFields();
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
+			this.getList();
 		},
 		onChange(current, pageNumber) {
 			console.log("Page: ", pageNumber);
 			console.log("第几页: ", current);
 			this.current = current;
+			this.getList();
 		},
 		handleEdit(row) {
 			console.log(row);
@@ -194,7 +257,9 @@ export default {
 								number: result.data.data.number,
 								widthOrRadius: result.data.data.widthOrRadius,
 								remark: result.data.data.remark,
-								heightOrLength: result.data.data.heightOrLength
+								heightOrLength: result.data.data.heightOrLength,
+								density: result.data.data.density / 100,
+								price: result.data.data.price
 							});
 						}, 100);
 					}
@@ -215,7 +280,9 @@ export default {
 						heightOrLength: values.heightOrLength,
 						name: values.name,
 						remark: values.remark,
-						number: values.number
+						number: values.number,
+						density: values.density * 100,
+						price: values.price
 					};
 					this.Axios(
 						{
@@ -283,6 +350,9 @@ export default {
 						console.log(result);
 						this.data = result.data.data.content;
 						this.total = result.data.data.totalElement;
+						for (let i = 0; i < this.data.length; i++) {
+							this.data[i].density = this.data[i].density / 100;
+						}
 					}
 				},
 				({ type, info }) => {}

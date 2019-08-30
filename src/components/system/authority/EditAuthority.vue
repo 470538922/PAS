@@ -5,14 +5,14 @@
 		</a-row>
 		<a-row>
 			<div class="content_case">
-				<a-form :form="form">
+				<a-form :form="form" @keyup.enter.native="updata">
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="角色名称">
 						<a-input
 							v-decorator="[
 							'name',
 							{rules: [{ required: true, message: '请填写角色名称' }]}
 							]"
-							maxlength="50"
+							maxlength="20"
 						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="备注">

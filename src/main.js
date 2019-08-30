@@ -170,7 +170,7 @@ router.beforeEach((to, from, next) => {
         message.error("抱歉，您无权访问该页面！")
       }
     } else { // 没登录则跳转到登录界面
-      window.location.href = "login.html"
+      window.location.href = "/login.html"
       // next({
       //   path: 'login.html',
       //   query: {

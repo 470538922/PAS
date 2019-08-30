@@ -5,14 +5,14 @@
 		</a-row>
 		<a-row>
 			<div class="content_case">
-				<a-form :form="form">
+				<a-form :form="form" @keyup.enter.native="handleSubmit">
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="员工编号">
 						<a-input
 							v-decorator="[
 							'employeeNo',
 							{rules: [{ required: true, message: '请填写姓名' }]}
 							]"
-							read-only
+							disabled
 						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="姓名">
@@ -21,14 +21,15 @@
 							'userName',
 							{rules: [{ required: true, message: '请填写姓名' }]}
 							]"
-							maxlength="50"
+							maxlength="20"
 						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="手机号码">
 						<a-input
+							oninput="if(value.length>11)value=value.slice(0,11)"
 							v-decorator="[
 							'phone',
-							{rules: [{ required: true, message: '请填写手机号码' }]}
+							{rules: [{ required: true, message: '请填写手机号码' },{validator: chickPhone}]}
 							]"
 							type="number"
 						></a-input>
@@ -82,7 +83,12 @@
 						</a-select>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="年龄">
-						<a-input addonAfter="岁" v-decorator="['age']"></a-input>
+						<a-input
+							type="number"
+							oninput="if(value.length>5)value=value.slice(0,5);if(value<0)value=null"
+							addonAfter="岁"
+							v-decorator="['age']"
+						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="性别">
 						<a-radio-group v-decorator="['gender']">
@@ -99,7 +105,12 @@
 						/>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="以往工作年限">
-						<a-input v-decorator="['workingYear']" addonAfter="年"></a-input>
+						<a-input
+							type="number"
+							oninput="if(value.length>5)value=value.slice(0,5);if(value<0)value=null"
+							v-decorator="['workingYear']"
+							addonAfter="年"
+						></a-input>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="简历附件">
 						<a-upload
@@ -110,7 +121,7 @@
 							@change="handleChange"
 						>
 							<a-button>
-								<a-icon type="upload"/>Upload
+								<a-icon type="upload" />上传文件
 							</a-button>
 						</a-upload>
 					</a-form-item>
@@ -163,6 +174,17 @@ export default {
 		};
 	},
 	methods: {
+		chickPhone(rule, value, callback) {
+			if (
+				/^1[23456789]\d{9}$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("请输入正确的电话号码"));
+			} else {
+				callback();
+			}
+		},
 		onChange(date, dateString) {
 			this.dateValue = dateString;
 		},
@@ -266,7 +288,8 @@ export default {
 								key: item.id,
 								value: item.id,
 								organizeCode: parseInt(item.organizeCode),
-								organizeParentCode: parseInt(item.organizeParentCode)
+								organizeParentCode: parseInt(item.organizeParentCode),
+								disabled: item.organizeParentCode == 0
 							};
 						});
 						let code = Math.min.apply(
@@ -355,13 +378,14 @@ export default {
 					if (result.data.code === 200) {
 						console.log(result.data.data);
 						this.dateValue = result.data.data.entryTime;
+						console.log(result.data.data.employeeDocs);
 						this.fileList = result.data.data.employeeDocs.map(item => {
 							return {
 								uid: item.id,
 								name: item.docName,
 								status: "done",
 								docPosition: item.docPosition,
-								url: this.global.imgPath + item.docPosition.replace("img:", "")
+								url: item.docPositionTrueUrl
 							};
 						});
 						setTimeout(() => {
@@ -374,7 +398,10 @@ export default {
 								workTypeId: result.data.data.workType.id,
 								age: result.data.data.age,
 								gender: result.data.data.gender,
-								entryTime: moment(result.data.data.entryTime, "YYYY/MM/DD"),
+								entryTime:
+									result.data.data.entryTime == null
+										? undefined
+										: moment(result.data.data.entryTime, "YYYY/MM/DD"),
 								workingYear: result.data.data.workingYear,
 								EmployeeDocDTO: result.data.data.employeeDocs
 							});

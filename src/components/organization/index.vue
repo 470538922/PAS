@@ -21,7 +21,7 @@
 							<template slot="content">
 								<span>添加子级</span>
 							</template>
-							<a-icon class="icon_style" type="plus-circle" @click="modalSublevelShow(item)"/>
+							<a-icon class="icon_style" type="plus-circle" @click="modalSublevelShow(item)" />
 						</a-popover>&nbsp;&nbsp;
 						<a-popover placement="top">
 							<template slot="content">
@@ -39,7 +39,7 @@
 								<template slot="content">
 									<span>删除</span>
 								</template>
-								<a-icon class="icon_style" v-if="item.organizeParentCode!=0" type="delete"/>
+								<a-icon class="icon_style" v-if="item.organizeParentCode!=0" type="delete" />
 							</a-popover>
 						</a-popconfirm>
 					</span>
@@ -56,7 +56,10 @@
 		>
 			<a-form :form="form">
 				<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="分类名称">
-					<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写分类名称' }]}]"></a-input>
+					<a-input
+						maxlength="20"
+						v-decorator="['processName',{rules: [{ required: true, message: '请填写分类名称' }]}]"
+					></a-input>
 				</a-form-item>
 			</a-form>
 		</a-modal>
@@ -68,9 +71,12 @@
 			@ok="() => handleSubmit(1)"
 			@cancel="form.resetFields()"
 		>
-			<a-form :form="form">
+			<a-form :form="form" @keyup.enter.native="handleSubmit(1)">
 				<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="分类名称">
-					<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写分类名称' }]}]"></a-input>
+					<a-input
+						maxlength="20"
+						v-decorator="['processName',{rules: [{ required: true, message: '请填写分类名称' }]}]"
+					></a-input>
 				</a-form-item>
 			</a-form>
 		</a-modal>
@@ -82,9 +88,12 @@
 			@ok="() => handleSubmit(2)"
 			@cancel="form.resetFields()"
 		>
-			<a-form :form="form">
+			<a-form :form="form" @keyup.enter.native="handleSubmit(2)">
 				<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="分类名称">
-					<a-input v-decorator="['processName',{rules: [{ required: true, message: '请填写分类名称' }]}]"></a-input>
+					<a-input
+						maxlength="20"
+						v-decorator="['processName',{rules: [{ required: true, message: '请填写分类名称' }]}]"
+					></a-input>
 				</a-form-item>
 			</a-form>
 		</a-modal>

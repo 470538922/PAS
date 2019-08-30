@@ -8,10 +8,10 @@
 						<div style="line-height:50px;">
 							<a-col :span="8">
 								<a-button @click="addVisible=true">
-									<a-icon style="color:#1890ff;" type="plus"/>新增
+									<a-icon style="color:#1890ff;" type="plus" />新增
 								</a-button>
-								<a-button @click="edit">
-									<a-icon style="color:#1890ff;" type="edit"/>修改
+								<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+									<a-icon style="color:#1890ff;" type="edit" />修改
 								</a-button>
 								<!-- <a-popconfirm title="确定删除吗?" @confirm="() => onDelete">
 									<a-button>
@@ -61,7 +61,7 @@
 			@cancel="handleCancel(1)"
 			:maskClosable="false"
 		>
-			<add-enterprise v-on:changeAddModal="changeAddModal"></add-enterprise>
+			<add-enterprise v-on:changeAddModal="changeAddModal" ref="addEnterprise"></add-enterprise>
 		</a-modal>
 		<a-modal
 			title="修改企业"
@@ -71,7 +71,7 @@
 			@cancel="handleCancel(2)"
 			:maskClosable="false"
 		>
-			<edit-enterprise v-on:changeEditModal="changeEditModal" :msg="getOneMsg"></edit-enterprise>
+			<edit-enterprise v-on:changeEditModal="changeEditModal" :msg="getOneMsg" ref="editEnterprise"></edit-enterprise>
 		</a-modal>
 	</div>
 </template>
@@ -182,6 +182,7 @@ const rowSelection = {
 import AddEnterprise from "./Add";
 import EditEnterprise from "./edit";
 export default {
+	inject: ["reload"],
 	name: "orderList",
 	data() {
 		return {
@@ -217,10 +218,12 @@ export default {
 		},
 		handleCancel(a) {
 			if (a == 1) {
-				this.addVisible = false;
+				// this.addVisible = false;
+				this.$refs.addEnterprise.confirmCancel();
 			}
 			if (a == 2) {
-				this.editVisible = false;
+				// this.editVisible = false;
+				this.$refs.editEnterprise.confirmCancel();
 			}
 		},
 		changeState(row, index) {
@@ -261,6 +264,7 @@ export default {
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
 			this.getList();
 		},
 		onChange(current, pageNumber) {
@@ -337,7 +341,7 @@ export default {
 					if (result.data.code === 200) {
 						console.log(result);
 						this.addVisible = params.visible;
-						this.getList();
+						this.reload();
 					}
 				},
 				({ type, info }) => {

@@ -8,112 +8,109 @@
 						<div style="line-height:50px;">
 							<a-col :span="12">
 								<a-button @click="addVisible=true">
-									<a-icon style="color:#1890ff;" type="plus"/>新增
+									<a-icon style="color:#1890ff;" type="plus" />新增
 								</a-button>
-								<a-button @click="editVisible=true">
-									<a-icon style="color:#1890ff;" type="edit"/>修改
+								<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
+									<a-icon style="color:#1890ff;" type="edit" />修改
 								</a-button>
-								<a-popconfirm title="确定删除吗?" @confirm="() => onDelete">
-									<a-button>
-										<a-icon style="color:#1890ff;" type="delete"/>删除
-									</a-button>
-								</a-popconfirm>
-								<a-button @click>
-									<a-icon style="color:#1890ff;" type="edit"/>投产
+								<a-button @click="showDeleteConfirm" :disabled="selectedRows.length==0">
+									<a-icon style="color:#1890ff;" type="delete" />删除
 								</a-button>
-								<a-button @click>
+								<a-button @click="goIntoOperation" :disabled="selectedRows.length==0">
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6fd;</i>投产
+								</a-button>
+								<a-button @click="regain" :disabled="selectedRows.length==0">
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe625;</i>恢复
 								</a-button>
-								<a-button @click>
+								<a-button @click="pauseShow" :disabled="selectedRows.length!=1">
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe62d;</i>暂停
 								</a-button>
-								<a-button @click>
+								<a-button @click="terminationShow" :disabled="selectedRows.length!=1">
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6aa;</i>终止
 								</a-button>
-								<!-- <a-button @click="toTransferOrder">
-									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60b;</i>移交单
-								</a-button>-->
+								<a-button @click="toInventory" :disabled="selectedRowKeys.length!=1">
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>物资清单
+								</a-button>
 							</a-col>
 
 							<a-col :span="12" style="text-align:right">
-								<a-select placeholder="请选择" optionFilterProp="children" style="width:100px;">
-									<a-select-option value="1">全部</a-select-option>
-									<a-select-option value="2">待生产</a-select-option>
-									<a-select-option value="3">生产中</a-select-option>
-									<a-select-option value="4">暂停中</a-select-option>
-									<a-select-option value="5">已终止</a-select-option>
-									<a-select-option value="6">完成</a-select-option>
+								<a-select
+									placeholder="请选择"
+									optionFilterProp="children"
+									v-model="state"
+									style="width:100px;"
+								>
+									<a-select-option :value="-1">全部</a-select-option>
+									<a-select-option :value="0">待产</a-select-option>
+									<a-select-option :value="1">生产中</a-select-option>
+									<a-select-option :value="2">暂停中</a-select-option>
+									<a-select-option :value="3">已终止</a-select-option>
+									<a-select-option :value="4">完成</a-select-option>
 								</a-select>
-								<a-input type="text" style="width:300px" placeholder="工作令号/订单号/名称"></a-input>
-								<a-button type="primary">查询</a-button>
+								<a-input type="text" v-model="keyword" style="width:300px" placeholder="工单号/工单标题/客户名称"></a-input>
+								<a-button type="primary" @click="getList">查询</a-button>
 							</a-col>
 						</div>
 					</a-row>
 					<a-row style="padding-top:10px;">
 						<a-table
-							rowKey="id"
+							rowKey="workOrderId"
 							:columns="columns"
 							:pagination="false"
 							:dataSource="data"
-							:rowSelection="rowSelection"
+							:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
 						>
-							<template slot="deviceModel" slot-scope="text, record, index">
+							<template slot="workOrderState" slot-scope="text, record, index">
 								<div>
-									<template slot="content">
-										<span>生产中</span>
-									</template>
-									<i v-if="text==0" class="iconfont" style="color:#10CF0C;">
-										&#xe61d;
-										<span style="font-size:14px;">生产中</span>
-									</i>
-
-									<template slot="content">
-										<span>待生产</span>
-									</template>
-									<i v-if="text==1" class="iconfont" style="color:#F59A23;">
-										&#xe600;
-										<span style="font-size:14px;">待生产</span>
-									</i>
-
-									<template slot="content">
-										<span>暂停</span>
-									</template>
-									<i v-if="text==2" class="iconfont" style="color:#027DB4;">
-										&#xe6b4;
-										<span style="font-size:14px;">暂停</span>
-									</i>
-
-									<template slot="content">
-										<span>终止</span>
-									</template>
-									<i v-if="text==3" class="iconfont" style="color:#E02D2D;">
-										&#xe61a;
-										<span style="font-size:14px;">终止</span>
-									</i>
-
-									<template slot="content">
-										<span>完成</span>
-									</template>
-									<i v-if="text==4" class="iconfont" style="color:#D8D8D8;">
-										&#xe624;
-										<span style="font-size:14px;">完成</span>
-									</i>
+									<span v-if="text==1" style="font-size:14px;color:#027DB4;">生产中</span>
+									<span v-if="text==0" style="font-size:14px;color:#999999;">待产</span>
+									<a-popover title placement="right">
+										<template slot="content">
+											<span>原因：{{record.reason}}</span>
+										</template>
+										<span v-if="text==2" style="font-size:14px;color:#F59A23;">暂停</span>
+									</a-popover>
+									<a-popover title placement="right">
+										<template slot="content">
+											<span>原因：{{record.reason}}</span>
+										</template>
+										<span v-if="text==3" style="font-size:14px;color:#E02D2D;">终止</span>
+									</a-popover>
+									<span v-if="text==4" style="font-size:14px;color:#10CF0C;">完成</span>
 								</div>
 							</template>
 							<template slot="priority" slot-scope="text, record, index">
 								<div>
-									<i class="iconfont" style="color:#F59A23;">&#xe649;</i>
+									<i class="iconfont" style="color:#F59A23;" v-if="text==true">&#xe649;</i>
 								</div>
 							</template>
 							<template slot="schedule" slot-scope="text, record, index">
 								<div>
-									<!-- <a-progress :percent="50" status="active"/>
-									<a-progress :percent="70" status="exception"/>-->
-									<a-progress :percent="100"/>
+									<a-progress
+										v-if="record.workOrderState==1"
+										:percent="text==null?0:parseInt(text*100)"
+										status="active"
+									/>
+									<a-progress v-if="record.workOrderState==0" :percent="text==null?0:parseInt(text*100)" />
+									<a-progress
+										v-if="record.workOrderState==2"
+										:percent="text==null?0:parseInt(text*100)"
+										strokeColor="#F59A23"
+									/>
+									<a-progress
+										v-if="record.workOrderState==3"
+										:percent="text==null?0:parseInt(text*100)"
+										status="exception"
+									/>
+									<a-progress
+										v-if="record.workOrderState==4"
+										:percent="text==null?0:parseInt(text*100)"
+										strokeColor="#10CF0C"
+									/>
 								</div>
 							</template>
 							<template slot="detail" slot-scope="text, record, index">
-								<span style="color:#1890ff;cursor: pointer;" @click="toWorkOrderDetailsList">工单明细</span>
+								<span style="color:#1890ff;cursor: pointer;" @click="toWorkOrderDetailsList(record)">工单明细</span>
 							</template>
 						</a-table>
 						<a-pagination
@@ -139,7 +136,7 @@
 			@cancel="handleCancel(1)"
 			:maskClosable="false"
 		>
-			<add-work-order v-on:changeAddModal="changeAddModal"></add-work-order>
+			<add-work-order v-on:changeAddModal="changeAddModal" ref="newWorkOrder"></add-work-order>
 		</a-modal>
 		<a-modal
 			title="修改工单"
@@ -149,60 +146,97 @@
 			@cancel="handleCancel(2)"
 			:maskClosable="false"
 		>
-			<edit-work-order v-on:changeEditModal="changeEditModal"></edit-work-order>
+			<edit-work-order
+				v-on:changeEditModal="changeEditModal"
+				ref="editWorkOrder"
+				:woekOrderId="selectedRowKeys[0]"
+			></edit-work-order>
+		</a-modal>
+		<a-modal
+			title="暂停操作"
+			:footer="null"
+			width="600px"
+			:visible="pauseVisible"
+			@cancel="handleCancel(3)"
+			:maskClosable="false"
+		>
+			<a-form :form="form" layout="inline">
+				<a-form-item label="暂停原因" style="margin-bottom:20px;">
+					<a-textarea
+						maxlength="50"
+						v-decorator="['reason',{rules: [{ required: true, message: '请填写暂停原因' }]}]"
+						style="width:454px;"
+						:autosize="{ minRows: 6, maxRows: 6 }"
+					></a-textarea>
+				</a-form-item>
+				<a-form-item style="display:block;text-align:right;">
+					<a-button style="margin-right:12px;" @click="handleCancel(3)">取消</a-button>
+					<a-button type="primary" @click="pause">保存</a-button>
+				</a-form-item>
+			</a-form>
+		</a-modal>
+		<a-modal
+			title="终止操作"
+			:footer="null"
+			width="600px"
+			:visible="terminationVisible"
+			@cancel="handleCancel(4)"
+			:maskClosable="false"
+		>
+			<a-form :form="form" layout="inline">
+				<a-form-item label="终止原因" style="margin-bottom:20px;">
+					<a-textarea
+						maxlength="50"
+						v-decorator="['reason',{rules: [{ required: true, message: '请填写终止原因' }]}]"
+						style="width:454px;"
+						:autosize="{ minRows: 6, maxRows: 6 }"
+					></a-textarea>
+					<p style="color:red;">注：工单终止后，无法再恢复生产。</p>
+				</a-form-item>
+				<a-form-item style="display:block;text-align:right;">
+					<a-button style="margin-right:12px;" @click="handleCancel(4)">取消</a-button>
+					<a-button type="primary" @click="termination">保存</a-button>
+				</a-form-item>
+			</a-form>
 		</a-modal>
 	</div>
 </template>
 <script>
 import AddWorkOrder from "./AddWorkOrder";
 import EditWorkOrder from "./EditWorkOrder";
-const rowSelection = {
-	onChange: (selectedRowKeys, selectedRows) => {
-		console.log(
-			`selectedRowKeys: ${selectedRowKeys}`,
-			"selectedRows: ",
-			selectedRows
-		);
-	},
-	onSelect: (record, selected, selectedRows) => {
-		console.log(record, selected, selectedRows);
-	},
-	onSelectAll: (selected, selectedRows, changeRows) => {
-		console.log(selected, selectedRows, changeRows);
-	}
-};
+
 const columns = [
 	{
-		dataIndex: "deviceNo",
+		dataIndex: "workOrderNo",
 		title: "工单号",
 		width: 100,
-		key: "deviceNo"
+		key: "workOrderNo"
 	},
 	{
-		dataIndex: "deviceName",
+		dataIndex: "workOrderTitle",
 		title: "工单标题",
 		width: 100,
-		key: "deviceName"
+		key: "workOrderTitle"
 	},
 	{
-		dataIndex: "deviceCategoryName",
-		key: "deviceCategoryName",
+		dataIndex: "clientName",
+		key: "clientName",
 		title: "客户名称",
-		width: 160
+		width: 120
 	},
 	{
-		dataIndex: "priority",
-		key: "priority",
+		dataIndex: "workOrderIsPriority",
+		key: "workOrderIsPriority",
 		title: "优先级",
 		width: 80,
 		scopedSlots: { customRender: "priority" }
 	},
 	{
-		dataIndex: "locationNo",
-		key: "locationNo",
+		dataIndex: "workOrderState",
+		key: "workOrderState",
 		title: "生产状态",
 		width: 80,
-		scopedSlots: { customRender: "deviceModel" }
+		scopedSlots: { customRender: "workOrderState" }
 	},
 	{
 		dataIndex: "schedule",
@@ -212,15 +246,15 @@ const columns = [
 		scopedSlots: { customRender: "schedule" }
 	},
 	{
-		dataIndex: "comment",
-		key: "comment",
+		dataIndex: "workOrderRemark",
+		key: "workOrderRemark",
 		title: "备注",
-		width: 80,
+		width: 120,
 		scopedSlots: { customRender: "comment" }
 	},
 	{
-		dataIndex: "deviceModel",
-		key: "deviceModel",
+		dataIndex: "createTime",
+		key: "createTime",
 		title: "创建时间",
 		width: 120
 	},
@@ -232,77 +266,297 @@ const columns = [
 		scopedSlots: { customRender: "detail" }
 	}
 ];
-const data = [
-	{
-		id: "0",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		locationNo: "1",
-		deviceCategoryName: "11",
-		deviceModel: "1",
-		workerNames: "0"
-	},
-	{
-		id: "1",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		locationNo: "0",
-		deviceCategoryName: "11",
-		deviceModel: "3",
-		workerNames: "2"
-	},
-	{
-		id: "2",
-		deviceNo: "111",
-		deviceName: "11",
-		deviceState: "11",
-		organizeName: "11",
-		location: "11",
-		locationNo: "2",
-		deviceCategoryName: "11",
-		deviceModel: "0",
-		workerNames: "1"
-	}
-];
 export default {
+	inject: ["reload"],
 	name: "orderList",
 	data() {
 		return {
-			rowSelection,
 			form: this.$form.createForm(this),
 			isHideList: this.$route.params.id !== undefined ? true : false,
 			columns,
-			data,
+			data: [],
 			current: 1,
 			pageSize: 10,
 			total: 50,
 			editVisible: false,
-			addVisible: false
+			addVisible: false,
+			state: -1,
+			keyword: "",
+			selectedRowKeys: [],
+			selectedRows: [],
+			pauseVisible: false,
+			terminationVisible: false
 		};
 	},
 	methods: {
-		toWorkOrderDetailsList() {
-			this.$router.push({ path: "/WorkOrderList/WorkOrderDetailsList/" + 1 });
+		toInventory() {
+			this.$router.push({
+				path: "/WorkOrderList/Inventory/" + this.selectedRows[0].workOrderId
+			});
 		},
-		onDelete() {},
+		//修改逻辑判断
+		editShow() {
+			if (this.selectedRows[0].workOrderState != 0) {
+				this.$message.error(`只能对待产状态的订单进行修改！`);
+			} else {
+				this.editVisible = true;
+			}
+		},
+		showDeleteConfirm() {
+			let that = this;
+			this.$confirm({
+				title: "只能删除待产的工单,确定删除吗?",
+				content: "",
+				okText: "确定",
+				okType: "danger",
+				cancelText: "取消",
+				onOk: function() {
+					that.onDelete();
+				},
+				onCancel() {}
+			});
+		},
+		onSelectChange(selectedRowKeys, a) {
+			console.log(selectedRowKeys, a);
+			this.selectedRowKeys = selectedRowKeys;
+			this.selectedRows = a;
+		},
+		toWorkOrderDetailsList(row) {
+			this.$router.push({
+				path: "/WorkOrderList/WorkOrderDetailsList/" + row.workOrderId
+			});
+		},
+		//删除
+		onDelete() {
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.workOrderState == 0;
+					})
+					.find(item => item == false) == undefined
+			) {
+				this.Axios(
+					{
+						url: "/api-workorder/workOrder/del",
+						params: this.selectedRowKeys,
+						type: "post",
+						option: { successMsg: "删除成功！" },
+						config: {
+							headers: { "Content-Type": "application/json" }
+						}
+					},
+					this
+				).then(
+					result => {
+						if (result.data.code === 200) {
+							this.getList();
+							this.selectedRowKeys = [];
+							this.selectedRows = [];
+						}
+					},
+					({ type, info }) => {}
+				);
+			} else {
+				this.$message.error("只能删除待产状态的工单，请重新选择！");
+			}
+		},
+		//投产
+		goIntoOperation() {
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.isShooting == true;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("没有完成工艺排配，不能进行投产！");
+			} else if (
+				this.selectedRows
+					.map(item => {
+						return item.workOrderState == 0;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("只能对待产状态下的工单进行投产，请重新选择！");
+			} else {
+				this.Axios(
+					{
+						url: "/api-workorder/workOrder/goIntoOperation",
+						params: this.selectedRowKeys,
+						type: "post",
+						option: { successMsg: "投产成功！" },
+						config: {
+							headers: { "Content-Type": "application/json" }
+						}
+					},
+					this
+				).then(
+					result => {
+						if (result.data.code === 200) {
+							this.getList();
+							this.selectedRowKeys = [];
+							this.selectedRows = [];
+						}
+					},
+					({ type, info }) => {}
+				);
+			}
+		},
+		//恢复
+		regain() {
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.workOrderState == 2;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("只能对暂停状态下的工单进行恢复，请重新选择！");
+			} else {
+				this.Axios(
+					{
+						url: "/api-workorder/workOrder/regain",
+						params: this.selectedRowKeys,
+						type: "post",
+						option: { successMsg: "恢复成功！" },
+						config: {
+							headers: { "Content-Type": "application/json" }
+						}
+					},
+					this
+				).then(
+					result => {
+						if (result.data.code === 200) {
+							this.getList();
+							this.selectedRowKeys = [];
+							this.selectedRows = [];
+						}
+					},
+					({ type, info }) => {}
+				);
+			}
+		},
+		//暂停
+		pause() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				console.log(values);
+				if (!err) {
+					let qs = require("qs");
+					let data = qs.stringify({
+						workOrderId: this.selectedRowKeys[0],
+						reason: values.reason
+					});
+					this.Axios(
+						{
+							url: "/api-workorder/workOrder/pause",
+							params: data,
+							type: "post",
+							option: { successMsg: "暂停成功！" }
+							// config: {
+							// 	headers: { "Content-Type": "application/json" }
+							// }
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								this.pauseVisible = false;
+								this.getList();
+								this.selectedRowKeys = [];
+								this.selectedRows = [];
+								this.form.resetFields();
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
+		},
+		//终止
+		termination() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				console.log(values);
+				if (!err) {
+					let qs = require("qs");
+					let data = qs.stringify({
+						workOrderId: this.selectedRowKeys[0],
+						reason: values.reason
+					});
+					this.Axios(
+						{
+							url: "/api-workorder/workOrder/termination",
+							params: data,
+							type: "post",
+							option: { successMsg: "终止成功！" }
+							// config: {
+							// 	headers: { "Content-Type": "application/json" }
+							// }
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								this.terminationVisible = false;
+								this.getList();
+								this.selectedRowKeys = [];
+								this.selectedRows = [];
+								this.form.resetFields();
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
+		},
+		pauseShow() {
+			if (this.selectedRows[0].workOrderState != 1) {
+				this.$message.error(`只能对生产中的订单进行暂停！`);
+			} else {
+				this.pauseVisible = true;
+			}
+		},
+		terminationShow() {
+			if (
+				this.selectedRows[0].workOrderState != 1 &&
+				this.selectedRows[0].workOrderState != 2
+			) {
+				this.$message.error(`只能对生产中或者暂停的订单进行终止！`);
+			} else {
+				this.terminationVisible = true;
+			}
+		},
 		changeEditModal(params) {
 			this.editVisible = params;
+			this.getList();
+			this.selectedRowKeys = [];
+			this.selectedRows = [];
 		},
 		changeAddModal(params) {
-			this.addVisible = params;
+			if (params.type == "Cancel") {
+				this.addVisible = params.value;
+			} else {
+				this.addVisible = params.value;
+				this.getList();
+			}
 		},
 		handleCancel(a) {
 			if (a == 1) {
-				this.addVisible = false;
+				// this.addVisible = false;
+				this.$refs.newWorkOrder.confirmCancel();
+				// this.reload();
 			}
 			if (a == 2) {
-				this.editVisible = false;
+				this.$refs.editWorkOrder.confirmCancel();
+				// this.editVisible = false;
+				// this.reload();
+			}
+			if (a == 3) {
+				this.pauseVisible = false;
+				this.form.resetFields();
+			}
+			if (a == 4) {
+				this.terminationVisible = false;
+				this.form.resetFields();
 			}
 		},
 		moreOperation({ key }) {
@@ -318,17 +572,46 @@ export default {
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
+			this.current = 1;
+			this.getList();
 		},
 		onChange(current, pageNumber) {
 			console.log("Page: ", pageNumber);
 			console.log("第几页: ", current);
 			this.current = current;
+			this.getList();
 		},
 		edit(record, text, index) {
 			this.$router.push({ path: "/OrderList/OrderEdit/" + record.id });
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-workorder/workOrder/list",
+					params: {
+						page: this.current,
+						size: this.pageSize,
+						state: this.state,
+						keyword: this.keyword
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.data = result.data.data.data;
+						this.total = result.data.data.totalElement;
+					}
+				},
+				({ type, info }) => {}
+			);
 		}
 	},
 	created() {
+		this.getList();
 		let a = this.$route.matched.find(item => item.name === "OrderAdd")
 			? true
 			: false;
@@ -337,6 +620,7 @@ export default {
 	},
 	watch: {
 		$route() {
+			this.getList();
 			let a = this.$route.matched.find(item => item.name === "OrderAdd")
 				? true
 				: false;
