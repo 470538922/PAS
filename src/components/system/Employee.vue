@@ -49,6 +49,9 @@
 								/>
 							</div>
 						</template>
+						<template slot="userName" slot-scope="text, record, index">
+							<a href="javascript:" @click="showDetails(record)">{{text}}</a>
+						</template>
 					</a-table>
 					<a-pagination
 						style="padding-top:12px;text-align: right;"
@@ -64,6 +67,65 @@
 				</a-row>
 			</a-col>
 		</div>
+		<a-modal
+			title="员工详情"
+			:footer="null"
+			width="600px"
+			:visible="detailsVisible"
+			@cancel="handleCancel()"
+			:maskClosable="false"
+		>
+			<a-row>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">员工编号：</span>
+					<span>{{employeeDetails.employeeNo}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">姓名：</span>
+					<span>{{employeeDetails.userName}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">手机号：</span>
+					<span>{{employeeDetails.phone}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">所处班组：</span>
+					<span>{{employeeDetails.organizeName}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">分配角色：</span>
+					<span>{{employeeDetails.roleName}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">工种：</span>
+					<span>{{employeeDetails.workTypeName}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">年龄：</span>
+					<span>{{employeeDetails.age}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">性别：</span>
+					<span>{{employeeDetails.gender==0?'女':'男'}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">入职时间：</span>
+					<span>{{employeeDetails.entryTime}}</span>
+				</a-col>
+				<a-col :span="12" style="margin-bottom:12px;">
+					<span class="label_right">以往工作年限：</span>
+					<span>{{employeeDetails.workingYear}}</span>
+				</a-col>
+				<a-col :span="24" style="margin-bottom:12px;">
+					<span class="label_right">相关附件：</span>
+					<span style="display:inline-block;vertical-align:top">
+						<p v-for="(item,index) in employeeDetails.employeeDocs" :key="index">
+							<a :href="item.docPositionTrueUrl" target="_blank">{{item.docName}}</a>
+						</p>
+					</span>
+				</a-col>
+			</a-row>
+		</a-modal>
 	</div>
 </template>
 <script>
@@ -94,14 +156,14 @@ const columns = [
 		dataIndex: "userName",
 		title: "姓名",
 		width: "10%",
-		key: "userName"
+		key: "userName",
+		scopedSlots: { customRender: "userName" }
 	},
 	{
 		dataIndex: "phone",
 		key: "phone",
 		title: "手机号",
-		width: "15%",
-		scopedSlots: { customRender: "deviceState" }
+		width: "15%"
 	},
 	{
 		dataIndex: "organizeName",
@@ -132,6 +194,7 @@ const columns = [
 export default {
 	data() {
 		return {
+			detailsVisible: false,
 			param: "",
 			rowSelection,
 			visible: false,
@@ -148,10 +211,19 @@ export default {
 			current: 1,
 			pageSize: 10,
 			total: 0,
-			selectedRowKeys: []
+			selectedRowKeys: [],
+			employeeDetails: {}
 		};
 	},
 	methods: {
+		handleCancel() {
+			this.detailsVisible = false;
+		},
+		showDetails(row) {
+			this.employeeDetails = row;
+			this.detailsVisible = true;
+			console.log(this.employeeDetails);
+		},
 		resetPwd() {
 			let qs = require("qs");
 			let data = qs.stringify({
@@ -324,3 +396,10 @@ export default {
 	}
 };
 </script>
+<style lang="less">
+.label_right {
+	display: inline-block;
+	width: 120px;
+	text-align: right;
+}
+</style>

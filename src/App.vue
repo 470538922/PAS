@@ -7,7 +7,7 @@
 						<div class="logo">
 							<p>生产管理系统</p>Changhong
 						</div>
-						<a-menu theme="dark" mode="horizontal" class="header-menu" :selectable="false">
+						<!-- <a-menu theme="dark" mode="horizontal" class="header-menu" :selectable="false">
 							<a-menu-item
 								v-for="(item,index) in headerMenuGroup"
 								:key="index"
@@ -20,7 +20,7 @@
 									{{item.menu}}
 								</span>
 							</a-menu-item>
-						</a-menu>
+						</a-menu> -->
 					</a-col>
 					<a-col :span="12" class="header-user">
 						<router-link to><{{enterpriseName}}></router-link>
@@ -64,7 +64,7 @@
 								:key="sub_menu.key"
 								v-for="(sub_menu,index2) in menu.subMenu"
 								@click="switchTab(sub_menu.key)"
-							>{{sub_menu.menu}}</a-menu-item>
+							>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{sub_menu.menu}}</a-menu-item>
 						</a-sub-menu>
 					</a-menu>
 				</a-layout-sider>

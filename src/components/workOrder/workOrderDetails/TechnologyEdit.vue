@@ -272,7 +272,7 @@
 							>
 								<a-select-option
 									:value="item.id"
-									v-for="(item, index) in employeeList[index]"
+									v-for="(item, index) in employeeList"
 									:key="index"
 								>{{item.userName}}</a-select-option>
 							</a-select>
@@ -378,6 +378,9 @@ export default {
 		},
 		chicker: {
 			default: null
+		},
+		employeeList: {
+			default: null
 		}
 	},
 	data() {
@@ -402,8 +405,8 @@ export default {
 				// 	employee: []
 				// }
 			],
-			count: 1000,
-			employeeList: []
+			count: 1000
+			// employeeList: []
 		};
 	},
 	methods: {
@@ -436,7 +439,6 @@ export default {
 					if (result.data.code === 200) {
 						console.log(result.data.data);
 						this.profileList = result.data.data;
-						this.materialList = this.materialList.concat(result.data.data);
 					}
 				},
 				({ type, info }) => {}
@@ -690,6 +692,9 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result);
+						if (result.data.data.rawMaterialDOS != null) {
+							this.materialList = result.data.data.rawMaterialDOS;
+						}
 						if (result.data.data.process.length > 0) {
 							for (let i = 0; i < result.data.data.process.length; i++) {
 								result.data.data.process[i].employeeId =
@@ -701,85 +706,41 @@ export default {
 							}
 						}
 
-						if (result.data.data.rawMaterialDO != null) {
-							this.handleMaterial(result.data.data.rawMaterialDO.type);
-							if (
-								this.handleMaterial(result.data.data.rawMaterialDO.type) ==
-								false
-							) {
-								setTimeout(() => {
-									this.form.setFieldsValue({
-										profileLength: result.data.data.lengthOrRadius,
-										profileLengthError: result.data.data.lengthOrRadiusError,
-										length: result.data.data.lengthOrRadius,
-										lengthError: result.data.data.lengthOrRadiusError,
-										width: result.data.data.widthOrRadius,
-										widthError: result.data.data.widthOrRadiusError,
-										height: result.data.data.heightOrLength,
-										heightError: result.data.data.heightOrLengthError,
-										remarks: result.data.data.remarks,
-										radius: result.data.data.lengthOrRadius,
-										radiusError: result.data.data.lengthOrRadiusError,
-										stickLength: result.data.data.heightOrLength,
-										stickLengthError: result.data.data.heightOrLengthError,
-										rawMaterialId:
-											result.data.data.rawMaterialDO != null
-												? result.data.data.rawMaterialDO.id
-												: "",
-										type:
-											result.data.data.rawMaterialDO != null
-												? result.data.data.rawMaterialDO.type
-												: "",
-										inTheEmbryoComponents:
-											result.data.data.inTheEmbryoComponents != null
-												? result.data.data.inTheEmbryoComponents
-												: 1,
-										embryoNum: Math.ceil(
-											this.formMsg.num /
-												(result.data.data.inTheEmbryoComponents != null
-													? result.data.data.inTheEmbryoComponents
-													: 1)
-										)
-									});
-								}, 100);
-							}
-						} else {
-							setTimeout(() => {
-								this.form.setFieldsValue({
-									profileLength: result.data.data.lengthOrRadius,
-									profileLengthError: result.data.data.lengthOrRadiusError,
-									length: result.data.data.lengthOrRadius,
-									lengthError: result.data.data.lengthOrRadiusError,
-									width: result.data.data.widthOrRadius,
-									widthError: result.data.data.widthOrRadiusError,
-									height: result.data.data.heightOrLength,
-									heightError: result.data.data.heightOrLengthError,
-									remarks: result.data.data.remarks,
-									radius: result.data.data.lengthOrRadius,
-									radiusError: result.data.data.lengthOrRadiusError,
-									length: result.data.data.heightOrLength,
-									lengthError: result.data.data.heightOrLengthError,
-									rawMaterialId:
-										result.data.data.rawMaterialDO != null
-											? result.data.data.rawMaterialDO.id
-											: "",
-									type:
-										result.data.data.rawMaterialDO != null
-											? result.data.data.rawMaterialDO.type
-											: "",
-									inTheEmbryoComponents:
-										result.data.data.inTheEmbryoComponents != null
+						setTimeout(() => {
+							this.form.setFieldsValue({
+								profileLength: result.data.data.lengthOrRadius,
+								profileLengthError: result.data.data.lengthOrRadiusError,
+								length: result.data.data.lengthOrRadius,
+								lengthError: result.data.data.lengthOrRadiusError,
+								width: result.data.data.widthOrRadius,
+								widthError: result.data.data.widthOrRadiusError,
+								height: result.data.data.heightOrLength,
+								heightError: result.data.data.heightOrLengthError,
+								remarks: result.data.data.remarks,
+								radius: result.data.data.lengthOrRadius,
+								radiusError: result.data.data.lengthOrRadiusError,
+								stickLength: result.data.data.heightOrLength,
+								stickLengthError: result.data.data.heightOrLengthError,
+								rawMaterialId:
+									result.data.data.rawMaterialDO != null
+										? result.data.data.rawMaterialDO.id
+										: "",
+								type:
+									result.data.data.rawMaterialDO != null
+										? result.data.data.rawMaterialDO.type
+										: "",
+								inTheEmbryoComponents:
+									result.data.data.inTheEmbryoComponents != null
+										? result.data.data.inTheEmbryoComponents
+										: 1,
+								embryoNum: Math.ceil(
+									this.formMsg.num /
+										(result.data.data.inTheEmbryoComponents != null
 											? result.data.data.inTheEmbryoComponents
-											: 1,
-									embryoNum: Math.ceil(
-										this.formMsg.num /
-											(result.data.data.inTheEmbryoComponents != null
-												? result.data.data.inTheEmbryoComponents
-												: 1)
-									)
-								});
-							}, 100);
-						}
+											: 1)
+								)
+							});
+						}, 100);
 					}
 				},
 				({ type, info }) => {}
@@ -802,7 +763,6 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						this.bordList = result.data.data;
-						this.materialList = this.materialList.concat(result.data.data);
 					}
 				},
 				({ type, info }) => {}
@@ -825,7 +785,6 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						this.stickList = result.data.data;
-						this.materialList = this.materialList.concat(result.data.data);
 					}
 				},
 				({ type, info }) => {}
@@ -927,7 +886,6 @@ export default {
 			};
 			this.data = [...data, newData];
 			this.count = count + 1;
-			this.employeeList[this.data.length - 1] = [];
 		},
 		onDelete(key) {
 			this.data.splice(key, 1);
@@ -950,9 +908,9 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						// console.log(result);
-						this.employeeList[index] = result.data.data;
-						if (this.employeeList[index][0] != undefined) {
-							this.data[index].employeeId = this.employeeList[index][0].id;
+						// this.employeeList[index] = result.data.data;
+						if (result.data.data[0] != undefined) {
+							this.data[index].employeeId = result.data.data[0].id;
 						}
 						let abc = [...this.data];
 						this.data = abc;
@@ -968,30 +926,6 @@ export default {
 			this.data[index].employeeId = a;
 			let abc = [...this.data];
 			this.data = abc;
-		},
-		getEmployeeList() {
-			this.Axios(
-				{
-					url: "/api-platform/employee/list",
-					params: {
-						page: 1,
-						size: -1
-					},
-					type: "get",
-					option: { enableMsg: false }
-				},
-				this
-			).then(
-				result => {
-					if (result.data.code === 200) {
-						for (let i = 0; i < 50; i++) {
-							this.employeeList[i] = result.data.data;
-						}
-						// console.log(this.employeeList);
-					}
-				},
-				({ type, info }) => {}
-			);
 		}
 	},
 	created() {
@@ -1000,10 +934,7 @@ export default {
 			this.getOneDetails(this.formMsg.workOrderDesId);
 			this.getBordList();
 			this.getStickList();
-			// this.findOneDrawing();
 			this.getProcessTypesList();
-			this.getEmployeeList();
-			// this.findChicker();
 			this.getProfileList();
 		}
 	},
@@ -1014,10 +945,7 @@ export default {
 				this.getOneDetails(this.formMsg.workOrderDesId);
 				this.getBordList();
 				this.getStickList();
-				// this.findOneDrawing();
 				this.getProcessTypesList();
-				this.getEmployeeList();
-				// this.findChicker();
 				this.getProfileList();
 			}
 		}

@@ -29,21 +29,48 @@
 					centered
 					v-model="modalNewVisible"
 					@ok="addProcessTypes"
-					@cancel="form.resetFields()"
+					@cancel="cancel(1)"
 				>
 					<a-form :form="form" @keyup.enter.native="addProcessTypes">
-						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工种名称">
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="分类">
+							<!-- <a-input v-decorator="['workType',{rules: [{ required: true, message: '请选择分类' }]}]"></a-input> -->
+							<a-select
+								@change="getSelectValue"
+								v-decorator="['workType',{rules: [{ required: true, message: '请选择分类' }],initialValue:'MACHINING'}]"
+							>
+								<a-select-option value="MACHINING">机加</a-select-option>
+								<a-select-option value="SURFACE">表处</a-select-option>
+								<a-select-option value="CHECK">检验</a-select-option>
+								<a-select-option value="STORAGE">入库</a-select-option>
+								<a-select-option value="WELDING">交焊</a-select-option>
+							</a-select>
+						</a-form-item>
+						<a-form-item
+							:label-col=" { span: 4 }"
+							:wrapper-col="{ span: 20 }"
+							label="类型"
+							v-if="selectValue=='SURFACE'"
+						>
+							<a-radio-group
+								@change="getRadioValue"
+								v-decorator="['priceType',{rules: [{ required: true, message: '请选择类型' }]}]"
+							>
+								<a-radio value="BYSURFACE">按面积</a-radio>
+								<a-radio value="BYWEIGHT">按重量</a-radio>
+							</a-radio-group>
+						</a-form-item>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="名称">
 							<a-input
 								maxlength="20"
-								v-decorator="['typeName',{rules: [{ required: true, message: '请填写工种名称' }]}]"
+								v-decorator="['typeName',{rules: [{ required: true, message: '请填写名称' }]}]"
 							></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工时单价">
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="单价">
 							<a-input
 								type="number"
 								oninput="if(value.length>10)value=value.slice(0,10)"
-								v-decorator="['price',{rules: [{ required: true, message: '请填写工时单价' },{validator: chickNumber}]}]"
-								addonAfter="元/时"
+								v-decorator="['price',{rules: [{ required: true, message: '请填写单价' },{validator: chickNumber}]}]"
+								:addonAfter="radioValue=='BYTIME'?'元/时':radioValue=='BYSURFACE'?'元/㎡':'元/kg'"
 							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
@@ -57,21 +84,48 @@
 					centered
 					v-model="modalEditVisible"
 					@ok="editProcessTypes"
-					@cancel="form.resetFields()"
+					@cancel="cancel(2)"
 				>
 					<a-form :form="form" @keyup.enter.native="editProcessTypes">
-						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工种名称">
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="分类">
+							<!-- <a-input v-decorator="['workType',{rules: [{ required: true, message: '请选择分类' }]}]"></a-input> -->
+							<a-select
+								@change="getSelectValue"
+								v-decorator="['workType',{rules: [{ required: true, message: '请选择分类' }]}]"
+							>
+								<a-select-option value="MACHINING">机加</a-select-option>
+								<a-select-option value="SURFACE">表处</a-select-option>
+								<a-select-option value="CHECK">检验</a-select-option>
+								<a-select-option value="STORAGE">入库</a-select-option>
+								<a-select-option value="WELDING">交焊</a-select-option>
+							</a-select>
+						</a-form-item>
+						<a-form-item
+							:label-col=" { span: 4 }"
+							:wrapper-col="{ span: 20 }"
+							label="类型"
+							v-if="selectValue=='SURFACE'"
+						>
+							<a-radio-group
+								@change="getRadioValue"
+								v-decorator="['priceType',{rules: [{ required: true, message: '请选择类型' }],initialValue:radioValue}]"
+							>
+								<a-radio value="BYSURFACE">按面积</a-radio>
+								<a-radio value="BYWEIGHT">按重量</a-radio>
+							</a-radio-group>
+						</a-form-item>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="名称">
 							<a-input
 								maxlength="20"
-								v-decorator="['typeName',{rules: [{ required: true, message: '请填写工种名称' }]}]"
+								v-decorator="['typeName',{rules: [{ required: true, message: '请填写名称' }]}]"
 							></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="工时单价">
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="单价">
 							<a-input
 								type="number"
 								oninput="if(value.length>10)value=value.slice(0,10)"
-								v-decorator="['price',{rules: [{ required: true, message: '请填写工时单价' },{validator: chickNumber}]}]"
-								addonAfter="元/时"
+								v-decorator="['price',{rules: [{ required: true, message: '请填写单价' },{validator: chickNumber}]}]"
+								:addonAfter="radioValue=='BYTIME'?'元/时':radioValue=='BYSURFACE'?'元/㎡':'元/kg'"
 							></a-input>
 						</a-form-item>
 						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
@@ -200,10 +254,24 @@ export default {
 			data: [],
 			current: 1,
 			pageSize: 10,
-			total: 0
+			total: 0,
+			radioValue: "BYTIME",
+			selectValue: ""
 		};
 	},
 	methods: {
+		cancel(a) {
+			if (a == 1) {
+				this.form.resetFields();
+				this.radioValue = "BYTIME";
+				this.selectValue = "";
+			}
+			if (a == 2) {
+				this.form.resetFields();
+				this.radioValue = "BYTIME";
+				this.selectValue = "";
+			}
+		},
 		// chickNumber(rule, value, callback) {
 		// 	if (
 		// 		(/^\d+(\.\d{0,2})?$/.test(value) == false || value <= 0) &&
@@ -215,10 +283,7 @@ export default {
 		// 	}
 		// },
 		chickNumber(rule, value, callback) {
-			if (
-				(/^\d+?$/.test(value) == false || value <= 0) &&
-				(value != null) & (value != "")
-			) {
+			if (/^\d+?$/.test(value) == false && (value != null) & (value != "")) {
 				callback(new Error("只能输入大于0的整数"));
 			} else {
 				callback();
@@ -238,6 +303,20 @@ export default {
 				onCancel() {}
 			});
 		},
+		getSelectValue(value) {
+			// console.log(value);
+			if (value != "SURFACE") {
+				this.radioValue = "BYTIME";
+			}
+			if (value == "SURFACE") {
+				this.radioValue = "BYSURFACE";
+			}
+			this.selectValue = value;
+		},
+		getRadioValue(e) {
+			this.radioValue = e.target.value;
+			// console.log(e.target.value);
+		},
 		onSelectChange(a, b) {
 			console.log(b);
 			this.selectedRows = b;
@@ -248,12 +327,15 @@ export default {
 			if (this.selectedRows.length != 1) {
 				this.$message.error("只能修改一条数据！");
 			} else {
+				this.selectValue = this.selectedRows[0].workType;
+				this.radioValue = this.selectedRows[0].priceType;
 				this.modalEditVisible = true;
 				setTimeout(() => {
 					this.form.setFieldsValue({
 						typeName: this.selectedRows[0].workTypeName,
 						price: this.selectedRows[0].price,
-						remarks: this.selectedRows[0].remarks
+						remarks: this.selectedRows[0].remarks,
+						workType: this.selectedRows[0].workType
 					});
 				}, 100);
 			}
@@ -281,10 +363,6 @@ export default {
 				},
 				({ type, info }) => {}
 			);
-		},
-		cancel(e) {
-			console.log(e);
-			this.$message.error("Click on No");
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;
@@ -329,17 +407,22 @@ export default {
 				if (!err) {
 					console.log(values);
 					let qs = require("qs");
-					let data = qs.stringify({
+					let data = {
 						typeName: values.typeName,
 						price: values.price,
-						remarks: values.remarks
-					});
+						remarks: values.remarks,
+						priceType: this.radioValue,
+						workType: values.workType
+					};
 					this.Axios(
 						{
 							url: "/api-platform/workType/add",
 							params: data,
 							type: "post",
-							option: { successMsg: "添加成功！" }
+							option: { successMsg: "添加成功！" },
+							config: {
+								headers: { "Content-Type": "application/json" }
+							}
 						},
 						this
 					).then(
@@ -349,6 +432,9 @@ export default {
 								this.form.resetFields();
 								this.getList();
 								this.selectedRowKeys = [];
+								this.selectedRows = [];
+								this.radioValue = "BYTIME";
+								this.selectValue = "";
 							}
 						},
 						({ type, info }) => {}
@@ -361,18 +447,23 @@ export default {
 			this.form.validateFieldsAndScroll((err, values) => {
 				if (!err) {
 					let qs = require("qs");
-					let data = qs.stringify({
+					let data = {
 						workTypeId: this.selectedRows[0].id,
-						workTypeName: values.typeName,
+						typeName: values.typeName,
 						price: values.price,
-						remarks: values.remarks
-					});
+						remarks: values.remarks,
+						priceType: this.radioValue,
+						workType: values.workType
+					};
 					this.Axios(
 						{
 							url: "/api-platform/workType/update",
 							params: data,
 							type: "post",
-							option: { successMsg: "修改成功！" }
+							option: { successMsg: "修改成功！" },
+							config: {
+								headers: { "Content-Type": "application/json" }
+							}
 						},
 						this
 					).then(
@@ -383,6 +474,8 @@ export default {
 								this.getList();
 								this.selectedRowKeys = [];
 								this.selectedRows = [];
+								this.radioValue = "BYTIME";
+								this.selectValue = "";
 							}
 						},
 						({ type, info }) => {}

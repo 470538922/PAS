@@ -34,7 +34,7 @@
 			@cancel="handleCancel()"
 			:maskClosable="false"
 		>
-			<EmployeeHoursDetails :employeeId="employeeId"></EmployeeHoursDetails>
+			<EmployeeHoursDetails :employeeId="employeeId" ref="workHoursDetails"></EmployeeHoursDetails>
 		</a-modal>
 	</div>
 </template>
@@ -97,6 +97,7 @@ export default {
 		handleCancel() {
 			this.detailsVisible = false;
 			this.employeeId = null;
+			this.$refs.workHoursDetails.current = 1;
 		},
 		onShowSizeChange(current, pageSize) {
 			this.pageSize = pageSize;

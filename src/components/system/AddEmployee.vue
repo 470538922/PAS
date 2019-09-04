@@ -6,6 +6,15 @@
 		<a-row>
 			<div class="content_case">
 				<a-form :form="form" @keyup.enter.native="handleSubmit">
+					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="员工编号">
+						<a-input
+							v-decorator="[
+							'employeeNo',
+							{rules: [{ required: true, message: '请填写员工编号' },{validator: chickNo}]}
+							]"
+							maxlength="10"
+						></a-input>
+					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="姓名">
 						<a-input
 							v-decorator="[
@@ -152,6 +161,17 @@ export default {
 		};
 	},
 	methods: {
+		chickNo(rule, value, callback) {
+			if (
+				/^[a-zA-Z0-9]{1,10}$/.test(value) == false &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("请输入1到10位字母或数字的员工编号"));
+			} else {
+				callback();
+			}
+		},
 		chickPassword(rule, value, callback) {
 			var reg = new RegExp("[\\u4E00-\\u9FFF]+", "g");
 			if (
@@ -223,6 +243,7 @@ export default {
 					values.password = this.encryptByDES(values.password, key);
 					let qs = require("qs");
 					let data = {
+						employeeNo: values.employeeNo,
 						userName: values.userName,
 						phone: values.phone,
 						password: values.password,

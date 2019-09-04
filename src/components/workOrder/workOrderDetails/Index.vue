@@ -225,7 +225,12 @@
 			:maskClosable="false"
 			:footer="null"
 		>
-			<technology-add :drawingMsg="drawingMsg" v-on:addTechnology="addTechnology" :chicker="chicker"></technology-add>
+			<technology-add
+				:drawingMsg="drawingMsg"
+				v-on:addTechnology="addTechnology"
+				:chicker="chicker"
+				:employeeList="employeeList"
+			></technology-add>
 		</a-modal>
 		<a-modal
 			title="修改工艺排配"
@@ -239,7 +244,18 @@
 				:drawingMsg="drawingEditMsg"
 				v-on:editTechnology="editTechnology"
 				:chicker="chicker"
+				:employeeList="employeeList"
 			></technology-edit>
+		</a-modal>
+		<a-modal
+			title="工艺排配详情"
+			:footer="null"
+			width="800px"
+			:visible="technologyDetailsVisible"
+			@cancel="handleCancel(5)"
+			:maskClosable="false"
+		>
+			<Details :drawingDetails="drawingDetails"></Details>
 		</a-modal>
 	</div>
 </template>
@@ -247,7 +263,14 @@
 import moment from "moment";
 import TechnologyAdd from "./TechnologyAdd";
 import TechnologyEdit from "./TechnologyEdit";
+import Details from "./Details";
 const columns = [
+	{
+		dataIndex: "planCode",
+		title: "计划编号",
+		width: 60,
+		key: "planCode"
+	},
 	{
 		dataIndex: "drawingNo",
 		title: "图号",
@@ -312,6 +335,7 @@ export default {
 			editVisible: false,
 			technologyAddVisible: false,
 			technologyEditVisible: false,
+			technologyDetailsVisible: false,
 			form: this.$form.createForm(this),
 			selectedRowKeys: [],
 			selectedRows: [],
@@ -320,7 +344,9 @@ export default {
 			workOrderDesId: "",
 			drawingMsg: "",
 			drawingEditMsg: "",
-			chicker: {}
+			chicker: {},
+			employeeList: [],
+			drawingDetails: {}
 		};
 	},
 	methods: {
@@ -357,16 +383,19 @@ export default {
 		technologyModalShow(row) {
 			console.log(row);
 			if (row.state != 0) {
-				this.$message.error(`只能修改待产状态下的工艺排配！`);
+				this.technologyDetailsVisible = true;
+				this.drawingDetails = row;
 				return false;
 			}
 			if (row.isShooting == false) {
 				this.technologyAddVisible = true;
 				this.drawingMsg = row;
+				return false;
 			}
 			if (row.isShooting == true) {
 				this.technologyEditVisible = true;
 				this.drawingEditMsg = row;
+				return false;
 			}
 		},
 		onDelete() {
@@ -539,6 +568,9 @@ export default {
 			if (a == 4) {
 				this.technologyEditVisible = false;
 			}
+			if (a == 5) {
+				this.technologyDetailsVisible = false;
+			}
 		},
 		toPriview() {
 			if (
@@ -655,7 +687,7 @@ export default {
 			).then(
 				result => {
 					if (result.data.code === 200) {
-						console.log(result.data.data);
+						// console.log(result.data.data);
 						if (result.data.data == null) {
 							// this.$message.warning("请先添加检验人员后再操作。", 5);
 						} else {
@@ -665,15 +697,41 @@ export default {
 				},
 				({ type, info }) => {}
 			);
+		},
+		findAllLeader() {
+			this.Axios(
+				{
+					url: "/api-platform/employee/allLeader",
+					params: {},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result.data.data);
+						this.employeeList = result.data.data;
+						// if (result.data.data == null) {
+						// 	// this.$message.warning("请先添加检验人员后再操作。", 5);
+						// } else {
+						// 	this.chicker = result.data.data;
+						// }
+					}
+				},
+				({ type, info }) => {}
+			);
 		}
 	},
 	components: {
 		TechnologyAdd,
-		TechnologyEdit
+		TechnologyEdit,
+		Details
 	},
 	created() {
 		this.getList(this.$route.params.id);
 		this.findChicker();
+		this.findAllLeader();
 	}
 };
 </script>

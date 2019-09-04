@@ -84,6 +84,11 @@
 									<i class="iconfont" style="color:#F59A23;" v-if="text==true">&#xe649;</i>
 								</div>
 							</template>
+							<template slot="workOrderTitle" slot-scope="text, record, index">
+								<div>
+									<a href="jsvascript:" @click="showDetails(record)">{{text}}</a>
+								</div>
+							</template>
 							<template slot="schedule" slot-scope="text, record, index">
 								<div>
 									<a-progress
@@ -199,11 +204,22 @@
 				</a-form-item>
 			</a-form>
 		</a-modal>
+		<a-modal
+			title="工单详情"
+			:footer="null"
+			width="800px"
+			:visible="detailsVisible"
+			@cancel="handleCancel(5)"
+			:maskClosable="false"
+		>
+			<WorkOrderListDetails :detailsMsg="detailsMsg"></WorkOrderListDetails>
+		</a-modal>
 	</div>
 </template>
 <script>
 import AddWorkOrder from "./AddWorkOrder";
 import EditWorkOrder from "./EditWorkOrder";
+import WorkOrderListDetails from "./WorkOrderListDetails";
 
 const columns = [
 	{
@@ -216,7 +232,8 @@ const columns = [
 		dataIndex: "workOrderTitle",
 		title: "工单标题",
 		width: 100,
-		key: "workOrderTitle"
+		key: "workOrderTitle",
+		scopedSlots: { customRender: "workOrderTitle" }
 	},
 	{
 		dataIndex: "clientName",
@@ -285,10 +302,17 @@ export default {
 			selectedRowKeys: [],
 			selectedRows: [],
 			pauseVisible: false,
-			terminationVisible: false
+			terminationVisible: false,
+			detailsVisible: false,
+			detailsMsg: {}
 		};
 	},
 	methods: {
+		showDetails(row) {
+			this.detailsVisible = true;
+			this.detailsMsg = row;
+			console.log(row);
+		},
 		toInventory() {
 			this.$router.push({
 				path: "/WorkOrderList/Inventory/" + this.selectedRows[0].workOrderId
@@ -558,6 +582,9 @@ export default {
 				this.terminationVisible = false;
 				this.form.resetFields();
 			}
+			if (a == 5) {
+				this.detailsVisible = false;
+			}
 		},
 		moreOperation({ key }) {
 			console.log(key);
@@ -630,7 +657,8 @@ export default {
 	},
 	components: {
 		AddWorkOrder,
-		EditWorkOrder
+		EditWorkOrder,
+		WorkOrderListDetails
 	}
 };
 </script>

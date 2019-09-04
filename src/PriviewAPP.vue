@@ -6,73 +6,85 @@
 					<table class="table_style">
 						<tr>
 							<td colspan="2" style="width:20%">工作令号</td>
-							<td style="width:10%">计划编号</td>
-							<td style="width:10%">计划数量</td>
+							<td style="width:15%">计划编号</td>
+							<td style="width:15%">计划数量</td>
 							<td rowspan="2" style="width:20%">
 								<h3>加工工艺过程卡片</h3>
 							</td>
-							<td colspan="2" style="width:20%">名称</td>
-							<td colspan="2" style="width:20%">图号</td>
+							<td colspan="3" style="width:30%">
+								<tr style="display: block;">
+									<td class="td_style" style="border-left:none;">名称</td>
+									<td class="td_style" style="border-left:1px solid #dde2eb;">图号</td>
+								</tr>
+							</td>
+							<!-- <td colspan="2" style="width:20%">图号</td> -->
 						</tr>
 						<tr>
 							<td colspan="2" style="width:20%">{{item.drawingDO.workOrder.gongzuolingNo}}</td>
-							<td style="width:10%"></td>
-							<td style="width:10%">{{item.workOrderDesDO.amount}}</td>
-							<td colspan="2" style="width:20%">{{item.workOrderDesDO.name}}</td>
-							<td colspan="2" style="width:20%">{{item.workOrderDesDO.drawingNo}}</td>
+							<td style="width:15%">{{item.workOrderDesDO.planCode}}</td>
+							<td style="width:15%">{{item.workOrderDesDO.amount}}</td>
+							<td colspan="3" style="width:30%">
+								<tr style="display: block;">
+									<td class="td_style" style="border-left:none;">{{item.workOrderDesDO.name}}</td>
+									<td
+										class="td_style"
+										style="border-left:1px solid #dde2eb;"
+									>{{item.workOrderDesDO.drawingNo}}</td>
+								</tr>
+							</td>
+							<!-- <td colspan="2" style="width:20%">{{item.workOrderDesDO.drawingNo}}</td> -->
 						</tr>
 						<tr>
 							<td colspan="2" style="width:20%">材料名称、牌号</td>
-							<td colspan="2" style="width:20%">毛坯外形尺寸</td>
+							<td colspan="2" style="width:30%">毛坯外形尺寸</td>
 							<td style="width:20%">每毛坯件数</td>
-							<td colspan="4" style="width:40%">备注</td>
+							<td colspan="4" style="width:30%">备注</td>
 						</tr>
 						<tr>
 							<td
 								colspan="2"
 								style="width:20%"
 							>{{(item.drawingDO.rawMaterialDO.type==1?"板料":item.drawingDO.rawMaterialDO.type==2?"棒料":"型材")+' '+item.drawingDO.rawMaterialDO.name}}</td>
-							<td colspan="2" style="width:20%">{{item.dimensions}}</td>
+							<td colspan="2" style="width:30%">{{item.dimensions}}</td>
 							<td style="width:20%">{{item.drawingDO.inTheEmbryoComponents}}</td>
-							<td colspan="4" style="width:40%">{{item.workOrderDesDO.remark}}</td>
+							<td colspan="4" style="width:30%">{{item.workOrderDesDO.remark}}</td>
 						</tr>
 						<tr>
 							<td style="width:10%">序号</td>
 							<td style="width:10%">工序</td>
-							<td colspan="3" style="width:40%">工序内容</td>
-							<td style="width:10%">设备、工装</td>
+							<td colspan="3" style="width:50%">工序内容</td>
 							<td style="width:10%">合格数</td>
 							<td style="width:10%">加工者</td>
 							<td style="width:10%">检验</td>
 						</tr>
 						<tr v-for="(i,j) in item.drawingDO.process" :key="j+111">
-							<td style="width:10%">{{j+1}}</td>
-							<td style="width:10%">{{i.workTypeName}}</td>
-							<td colspan="3" style="width:40%">{{i.processInfo}}</td>
-							<td style="width:10%"></td>
-							<td style="width:10%">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
+							<td style="width:10%;height:45px;">{{j+1}}</td>
+							<td style="width:10%;height:45px;">{{i.workTypeName}}</td>
+							<td colspan="3" style="width:50%;height:45px;text-align:left;">{{i.processInfo}}</td>
+							<!-- <td style="width:10%;height:45px;"></td> -->
+							<td style="width:10%;height:45px;">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
 							<td
-								style="width:10%"
-							>{{i.executives.lentgth>0?i.executives.find(item=>{return item.isExecution==true}).employeeName:""}}</td>
-							<td style="width:10%">{{i.checkerName}}</td>
+								style="width:10%;height:45px;"
+							>{{i.executives.length>0?i.executives.find(item=>{return item.isExecution==true}).employeeName:""}}</td>
+							<td style="width:10%;height:45px;"></td>
 						</tr>
 						<tr
-							v-for="(z,k) in 26-(item.drawingDO.process.length!=0?item.drawingDO.process.length:0)"
+							v-for="(z,k) in 15-(item.drawingDO.process.length!=0?item.drawingDO.process.length:0)"
 							:key="k+22222"
 						>
-							<td style="width:10%">{{z+item.drawingDO.process.length}}</td>
-							<td style="width:10%"></td>
+							<td style="width:10%;height:45px;">{{z+item.drawingDO.process.length}}</td>
+							<td style="width:10%;height:45px;"></td>
 							<td colspan="3" style="width:40%"></td>
-							<td style="width:10%"></td>
-							<td style="width:10%"></td>
-							<td style="width:10%"></td>
-							<td style="width:10%"></td>
+							<!-- <td style="width:10%;height:45px;"></td> -->
+							<td style="width:10%;height:45px;"></td>
+							<td style="width:10%;height:45px;"></td>
+							<td style="width:10%;height:45px;"></td>
 						</tr>
 					</table>
 					<div style="margin-top:20px;">
 						<a-col :span="6">
 							<div>
-								<img :src="item.qrCode" alt style="width:80px;" />
+								<img :src="item.qrCode" alt style="width:120px;" />
 							</div>
 						</a-col>
 						<a-col :span="10" style="line-height:24px;">
@@ -432,6 +444,13 @@ export default {
 			display: inline-block;
 			width: 60%;
 		}
+	}
+	.td_style {
+		display: inline-block;
+		border-right: none !important;
+		border-top: none !important;
+		border-bottom: none !important;
+		width: 49%;
 	}
 }
 </style>

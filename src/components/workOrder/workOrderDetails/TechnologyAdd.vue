@@ -265,7 +265,7 @@
 							>
 								<a-select-option
 									:value="item.id"
-									v-for="(item, index) in employeeList[index]"
+									v-for="(item, index) in employeeList"
 									:key="index"
 								>{{item.userName}}</a-select-option>
 							</a-select>
@@ -371,6 +371,9 @@ export default {
 		},
 		chicker: {
 			default: null
+		},
+		employeeList: {
+			default: null
 		}
 	},
 	data() {
@@ -385,8 +388,8 @@ export default {
 			processTypesList: [],
 			materialList: [],
 			data: [],
-			count: 1000,
-			employeeList: []
+			count: 1000
+			// employeeList: []
 		};
 	},
 	methods: {
@@ -714,86 +717,44 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result);
-						if (result.data.data.rawMaterialDO != null) {
-							this.handleMaterial(result.data.data.rawMaterialDO.type);
-							console.log(
-								this.handleMaterial(result.data.data.rawMaterialDO.type)
-							);
-							if (
-								this.handleMaterial(result.data.data.rawMaterialDO.type) ==
-								false
-							) {
-								setTimeout(() => {
-									this.form.setFieldsValue({
-										profileLength: result.data.data.lengthOrRadius,
-										profileLengthError: result.data.data.lengthOrRadiusError,
-										length: result.data.data.lengthOrRadius,
-										lengthError: result.data.data.lengthOrRadiusError,
-										width: result.data.data.widthOrRadius,
-										widthError: result.data.data.widthOrRadiusError,
-										height: result.data.data.heightOrLength,
-										heightError: result.data.data.heightOrLengthError,
-										remarks: result.data.data.remarks,
-										radius: result.data.data.lengthOrRadius,
-										radiusError: result.data.data.lengthOrRadiusError,
-										stickLength: result.data.data.heightOrLength,
-										stickLengthError: result.data.data.heightOrLengthError,
-										rawMaterialId:
-											result.data.data.rawMaterialDO != null
-												? result.data.data.rawMaterialDO.id
-												: "",
-										type:
-											result.data.data.rawMaterialDO != null
-												? result.data.data.rawMaterialDO.type
-												: "",
-										inTheEmbryoComponents:
-											result.data.data.inTheEmbryoComponents != null
-												? result.data.data.inTheEmbryoComponents
-												: 1,
-										embryoNum: Math.ceil(
-											this.formMsg.num /
-												(result.data.data.inTheEmbryoComponents != null
-													? result.data.data.inTheEmbryoComponents
-													: 1)
-										)
-									});
-								}, 100);
-							}
-						} else {
-							setTimeout(() => {
-								this.form.setFieldsValue({
-									length: result.data.data.lengthOrRadius,
-									lengthError: result.data.data.lengthOrRadiusError,
-									width: result.data.data.widthOrRadius,
-									widthError: result.data.data.widthOrRadiusError,
-									height: result.data.data.heightOrLength,
-									heightError: result.data.data.heightOrLengthError,
-									remarks: result.data.data.remarks,
-									radius: result.data.data.lengthOrRadius,
-									radiusError: result.data.data.lengthOrRadiusError,
-									length: result.data.data.heightOrLength,
-									lengthError: result.data.data.heightOrLengthError,
-									rawMaterialId:
-										result.data.data.rawMaterialDO != null
-											? result.data.data.rawMaterialDO.id
-											: "",
-									type:
-										result.data.data.rawMaterialDO != null
-											? result.data.data.rawMaterialDO.type
-											: "",
-									inTheEmbryoComponents:
-										result.data.data.inTheEmbryoComponents != null
-											? result.data.data.inTheEmbryoComponents
-											: 1,
-									embryoNum: Math.ceil(
-										this.formMsg.num /
-											(result.data.data.inTheEmbryoComponents != null
-												? result.data.data.inTheEmbryoComponents
-												: 1)
-									)
-								});
-							}, 100);
+						if (result.data.data.rawMaterialDOS != null) {
+							this.materialList = result.data.data.rawMaterialDOS;
 						}
+
+						setTimeout(() => {
+							this.form.setFieldsValue({
+								length: result.data.data.lengthOrRadius,
+								lengthError: result.data.data.lengthOrRadiusError,
+								width: result.data.data.widthOrRadius,
+								widthError: result.data.data.widthOrRadiusError,
+								height: result.data.data.heightOrLength,
+								heightError: result.data.data.heightOrLengthError,
+								remarks: result.data.data.remarks,
+								radius: result.data.data.lengthOrRadius,
+								radiusError: result.data.data.lengthOrRadiusError,
+								length: result.data.data.heightOrLength,
+								lengthError: result.data.data.heightOrLengthError,
+								rawMaterialId:
+									result.data.data.rawMaterialDO != null
+										? result.data.data.rawMaterialDO.id
+										: "",
+								type:
+									result.data.data.rawMaterialDO != null
+										? result.data.data.rawMaterialDO.type
+										: "",
+								inTheEmbryoComponents:
+									result.data.data.inTheEmbryoComponents != null
+										? result.data.data.inTheEmbryoComponents
+										: 1,
+								embryoNum: Math.ceil(
+									this.formMsg.num /
+										(result.data.data.inTheEmbryoComponents != null
+											? result.data.data.inTheEmbryoComponents
+											: 1)
+								)
+							});
+						}, 100);
+
 						if (result.data.data.process != null) {
 							this.data = result.data.data.process;
 							console.log(result.data.data.process);
@@ -827,7 +788,7 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						this.bordList = result.data.data;
-						this.materialList = this.materialList.concat(result.data.data);
+						
 					}
 				},
 				({ type, info }) => {}
@@ -850,7 +811,7 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						this.stickList = result.data.data;
-						this.materialList = this.materialList.concat(result.data.data);
+			
 					}
 				},
 				({ type, info }) => {}
@@ -874,7 +835,7 @@ export default {
 					if (result.data.code === 200) {
 						console.log(result.data.data);
 						this.profileList = result.data.data;
-						this.materialList = this.materialList.concat(result.data.data);
+						
 					}
 				},
 				({ type, info }) => {}
@@ -942,9 +903,9 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result);
-						this.employeeList[index] = result.data.data;
-						if (this.employeeList[index][0] != undefined) {
-							this.data[index].employeeId = this.employeeList[index][0].id;
+						// this.employeeList[index] = result.data.data;
+						if (result.data.data[0] != undefined) {
+							this.data[index].employeeId = result.data.data[0].id;
 						}
 						let abc = [...this.data];
 						this.data = abc;

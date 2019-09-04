@@ -59,7 +59,7 @@
 		</a-layout>
 		<div class="text_style">Sichuang Changhong Intelligent Manufacturing Technology Co. Ltd.</div>
 		<div class="erweima">
-			<img src="./assets/PMSAPP.png" alt />
+			<img src="./assets/TGX3%ND]III)@IKUQ@(V_CT.png" alt />
 			<p style="font-size:14px;color:#40a9ff;text-align:center;line-height:36px;">浏览器扫一扫</p>
 		</div>
 	</div>
@@ -175,14 +175,15 @@ export default {
 						console.log(result.data.data);
 						// this.$router.replace("/Dashboard");
 						sessionStorage.token = result.data.data.token;
-						let permissionUrl = result.data.data.user.role.permissionLookups.map(
-							item => {
-								return {
-									module: item.permissionUrl,
-									permissionItem: []
-								};
-							}
-						);
+						let permissionUrl =
+							result.data.data.user.role != null&&result.data.data.user.role != ""
+								? result.data.data.user.role.permissionLookups.map(item => {
+										return {
+											module: item.permissionUrl,
+											permissionItem: []
+										};
+								  })
+								: [];
 						sessionStorage.permissionUrl = JSON.stringify(permissionUrl);
 						sessionStorage.user = JSON.stringify(result.data.data.user);
 						if (result.data.data.user.userType == 1) {
