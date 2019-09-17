@@ -1,0 +1,240 @@
+<template>
+	<div class="work_hours_handle">
+		<a-row style="padding:0 20px;">
+			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
+			<a-button @click="save">
+				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
+			</a-button>
+		</a-row>
+		<a-row style="padding:20px 20px 0;" v-for="(item,index) in allMsg" :key="index">
+			<div class="item_case">
+				<a-col :span="24" class="item_title">{{item.workOrderDesDO.name}}</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">工作令号：</span>
+					<span>{{item.drawingDO.workOrder.gongzuolingNo}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">图号：</span>
+					<span>{{item.workOrderDesDO.drawingNo}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">计划编号：</span>
+					<span>{{item.workOrderDesDO.planCode}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">名称：</span>
+					<span>{{item.workOrderDesDO.name}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">计划数量：</span>
+					<span>{{item.workOrderDesDO.amount}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">每毛坯件数：</span>
+					<span>{{item.drawingDO.inTheEmbryoComponents}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">材料名称：</span>
+					<span>{{(item.drawingDO.rawMaterialDO.type==1?"板料":item.drawingDO.rawMaterialDO.type==2?"棒料":"型材")+' '+item.drawingDO.rawMaterialDO.name}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
+					<span class="item_label">毛坯外形尺寸：</span>
+					<span>{{item.dimensions}}</span>
+				</a-col>
+				<a-col :span="24" class="item_content">
+					<span class="item_label">备注：</span>
+					<span>{{item.workOrderDesDO.remark}}</span>
+				</a-col>
+				<a-col :span="24" style="padding:20px 12px;">
+					<table class="table_style">
+						<tr>
+							<th>序号</th>
+							<th>工种</th>
+							<th>工序内容</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>单件工时(分)
+							</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>准备工时(分)
+							</th>
+							<th>合格数</th>
+							<th>加工者</th>
+							<th>检验</th>
+						</tr>
+						<tr v-for="(i, index1) in tableData[index]" :key="index1">
+							<td style="width:5%">{{index1+1}}</td>
+							<td style="width:10%">{{i.workTypeName}}</td>
+							<td style="width:25%">{{i.processInfo}}</td>
+							<td style="width:15%;padding:4px;">
+								<a-input type="number" v-model="i.itemWorkTime"></a-input>
+							</td>
+							<td style="width:15%;padding:4px;">
+								<a-input type="number" v-model="i.preparationTime"></a-input>
+							</td>
+							<td style="width:10%">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
+							<td
+								style="width:10%"
+							>{{i.executives.length>0?i.executives.find(item=>{return item.isExecution==true}).employeeName:""}}</td>
+							<td style="width:10%"></td>
+						</tr>
+					</table>
+				</a-col>
+			</div>
+		</a-row>
+		<a-row style="padding:20px 20px 0;">
+			<a-button @click="save">
+				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
+			</a-button>
+		</a-row>
+	</div>
+</template>
+<script>
+export default {
+	data() {
+		return {
+			allMsg: [],
+			tableData: [],
+			getData: []
+		};
+	},
+	methods: {
+		getPreviewList() {
+			this.Axios(
+				{
+					url: "/api-workorder/workOrderDes/preview",
+					params: this.$route.params.id.split(","),
+					type: "post",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.allMsg = result.data.data;
+						console.log(this.allMsg);
+						this.tableData = this.allMsg.map(item => {
+							return item.drawingDO.process;
+						});
+
+						console.log(this.tableData);
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		save() {
+			console.log(this.tableData);
+			let value = new Array();
+			this.getData = this.tableData.map(item => {
+				return item.map(i => {
+					return {
+						processId: i.id,
+						itemWorkTime: i.itemWorkTime,
+						preparationTime: i.preparationTime
+					};
+				});
+			});
+			value = this.getData.reduce(function(a, b) {
+				return a.concat(b);
+			});
+			if (
+				value
+					.map(item => {
+						return (
+							/^[0-9]([0-9])*$/.test(item.itemWorkTime) &&
+							/^[0-9]([0-9])*$/.test(item.preparationTime)
+						);
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("单件工时、准备工时只能是正整数");
+			} else if (
+				value
+					.map(item => {
+						return (
+							item.itemWorkTime !== "" &&
+							item.itemWorkTime !== null &&
+							(item.preparationTime !== "" && item.preparationTime !== null)
+						);
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("单件工时、准备工时不能为空");
+			} else {
+				this.Axios(
+					{
+						url: "/api-workorder/WorkLoadManage/save",
+						params: value,
+						type: "post",
+						option: { successMsg: "保存成功！" },
+						config: {
+							headers: { "Content-Type": "application/json" }
+						}
+					},
+					this
+				).then(
+					result => {
+						if (result.data.code === 200) {
+							console.log(result);
+							this.$router.back(-1);
+							// this.data = [];
+							// let params = {
+							// 	type: "affirm",
+							// 	value: false
+							// };
+							// this.$emit("addTechnology", params);
+						}
+					},
+					({ type, info }) => {}
+				);
+			}
+		}
+	},
+	created() {
+		this.getPreviewList();
+	}
+};
+</script>
+<style lang="less">
+.work_hours_handle {
+	overflow: hidden;
+	.item_case {
+		border: 1px solid #e8e8e8;
+		width: 80%;
+		overflow: hidden;
+		.item_title {
+			background-color: #f2f2f2;
+			line-height: 40px;
+			padding: 0 12px;
+			font-weight: 600;
+			font-size: 16px;
+		}
+		.item_label {
+			display: inline-block;
+			width: 120px;
+			text-align: right;
+		}
+		.item_content {
+			line-height: 32px;
+		}
+		.table_style {
+			width: 100%;
+			border: 1px solid #dde2eb;
+			border-collapse: collapse;
+			tr {
+				width: 100%;
+				th {
+					text-align: center;
+					border: 1px solid #dde2eb;
+					line-height: 28px;
+				}
+				td {
+					text-align: center;
+					border: 1px solid #dde2eb;
+					line-height: 28px;
+				}
+			}
+		}
+	}
+}
+</style>
