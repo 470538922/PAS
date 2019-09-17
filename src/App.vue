@@ -7,6 +7,39 @@
 						<div class="logo">
 							<p>生产管理系统</p>Changhong
 						</div>
+						<a-modal
+							title="修改密码"
+							:footer="null"
+							width="500px"
+							:visible="changePassword"
+							@cancel="changePassword=false;form.resetFields();"
+							:maskClosable="false"
+						>
+							<a-form :form="form">
+								<a-form-item :label-col=" { span: 5 }" :wrapper-col="{ span: 18 }" label="原密码">
+									<a-input
+										type="password"
+										v-decorator="['old',{rules: [{ required: true, message: '请填写原密码' }]}]"
+									></a-input>
+								</a-form-item>
+								<a-form-item :label-col=" { span: 5 }" :wrapper-col="{ span: 18 }" label="新密码">
+									<a-input
+										type="password"
+										v-decorator="['newPassword',{rules: [{ required: true, message: '请填写新密码' }]}]"
+									></a-input>
+								</a-form-item>
+								<a-form-item :label-col=" { span: 5 }" :wrapper-col="{ span: 18 }" label="确认新密码">
+									<a-input
+										type="password"
+										v-decorator="['affirmNew',{rules: [{ required: true, message: '请填写确认新密码' }]}]"
+									></a-input>
+								</a-form-item>
+								<a-form-item :wrapper-col="{ span:18,offset: 5 }" style="text-align:right">
+									<a-button @click="changePassword=false;form.resetFields();" style="margin-right:12px;">取消</a-button>
+									<a-button type="primary" @click="toChengePassword">确定</a-button>
+								</a-form-item>
+							</a-form>
+						</a-modal>
 						<!-- <a-menu theme="dark" mode="horizontal" class="header-menu" :selectable="false">
 							<a-menu-item
 								v-for="(item,index) in headerMenuGroup"
@@ -20,7 +53,7 @@
 									{{item.menu}}
 								</span>
 							</a-menu-item>
-						</a-menu> -->
+						</a-menu>-->
 					</a-col>
 					<a-col :span="12" class="header-user">
 						<router-link to><{{enterpriseName}}></router-link>
@@ -31,7 +64,7 @@
 								<template slot="title">
 									<span>修改密码</span>
 								</template>
-								<i class="iconfont">&#xe604;</i>
+								<i class="iconfont" @click="changePassword=true">&#xe604;</i>
 							</a-tooltip>
 						</router-link>
 						<router-link to>
@@ -96,11 +129,13 @@
 					</a-layout-content>
 				</a-layout>
 			</a-layout>
-			<a-layout-footer>Production planning and scheduling system (V1.1.1_{{version?(new Date(version).format("yyMMdd")):'0'}}_{{node_dev}}) ©2019 Created by Changhong Intelligent Manufacturing</a-layout-footer>
+			<a-layout-footer>PMS (V1.2_beta（内测版）) ©2019 Created by Changhong Intelligent Manufacturing</a-layout-footer>
 		</a-layout>
 	</a-locale-provider>
 </template>
 <script>
+import md5 from "js-md5/src/md5.js";
+import CryptoJS from "crypto-js/crypto-js.js";
 import zh_CN from "ant-design-vue/lib/locale-provider/zh_CN";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -146,6 +181,8 @@ export default {
 	},
 	data() {
 		return {
+			form: this.$form.createForm(this),
+			changePassword: false,
 			zh_CN,
 			collapsed: false,
 			menuSource: [],
@@ -172,6 +209,66 @@ export default {
 		};
 	},
 	methods: {
+		encryptByDES(message, key) {
+			const keyHex = CryptoJS.enc.Utf8.parse(key);
+			const encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+				mode: CryptoJS.mode.ECB,
+				padding: CryptoJS.pad.Pkcs7
+			});
+			return encrypted.toString();
+		},
+		toChengePassword() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					// console.log(values);
+					let key = "*chang_hong_device_cloud";
+					let old = values.old;
+					let affirmNew = values.affirmNew;
+					let newPassword = values.newPassword;
+					old = md5(old);
+					old = this.encryptByDES(old, key);
+					affirmNew = md5(affirmNew);
+					affirmNew = this.encryptByDES(affirmNew, key);
+					newPassword = md5(newPassword);
+					newPassword = this.encryptByDES(newPassword, key);
+					let data = {
+						oldPwd: old,
+						newPwd: newPassword,
+						confirmPwd: affirmNew
+					};
+					this.Axios(
+						{
+							url: "/api-sso/adminInfo/updatePwd",
+							params: data,
+							type: "post",
+							option: { enableMsg: false },
+							config: {
+								headers: { "Content-Type": "application/json" }
+							}
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								console.log(result);
+								this.form.resetFields();
+								this.changePassword = false;
+
+								this.$info({
+									title: "温馨提示",
+									content: "密码修改成功，即将跳转至登录页面",
+									onOk() {
+										sessionStorage.clear();
+										window.location.href = "/login.html";
+									}
+								});
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
+		},
 		toLogin() {
 			window.location.href = "/login.html";
 			sessionStorage.removeItem("token");

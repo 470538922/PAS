@@ -87,7 +87,7 @@
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
-							v-decorator="['length',{rules: [{ required: true, message: '请填写长' }]}]"
+							v-decorator="['length1',{rules: [{ required: true, message: '请填写长' }]}]"
 							style="width:104px;"
 						></a-input>&nbsp;±
 						<a-input
@@ -196,7 +196,7 @@
 			</a-col>
 			<a-col :span="24">
 				<a-form-item label="备注">
-					<a-input v-decorator="['remarks']" maxlength="50" style="width:600px;"></a-input>
+					<a-input v-decorator="['remarks']" maxlength="50" style="width:800px;"></a-input>
 				</a-form-item>
 			</a-col>
 			<a-col :span="24">
@@ -206,11 +206,7 @@
 			</a-col>
 			<a-col :span="24">
 				<a-table :pagination="false" :columns="columns" :dataSource="data" bordered rowKey="id">
-					<template
-						v-for="col in [ 'processInfo', 'remarks']"
-						:slot="col"
-						slot-scope="text, record, index"
-					>
+					<template v-for="col in ['remarks']" :slot="col" slot-scope="text, record, index">
 						<div :key="col">
 							<a-input
 								maxlength="20"
@@ -220,7 +216,18 @@
 							/>
 						</div>
 					</template>
-					<template slot="workingHours" slot-scope="text, record, index">
+					<template slot="processInfo" slot-scope="text, record, index">
+						<div>
+							<a-textarea
+								:autosize="{ minRows: 2, maxRows: 2 }"
+								style="margin: -5px 0"
+								:value="text"
+								@change="e => handleChangeTable(e.target.value, record.id, 'processInfo')"
+								maxlength="100"
+							></a-textarea>
+						</div>
+					</template>
+					<!-- <template slot="workingHours" slot-scope="text, record, index">
 						<div>
 							<a-input
 								type="number"
@@ -230,7 +237,7 @@
 								@change="e => handleChangeTable(e.target.value, record.id, 'workingHours')"
 							/>
 						</div>
-					</template>
+					</template>-->
 					<template slot="chick" slot-scope="text, record, index">
 						<div>
 							<a-input maxlength="20" style="margin: -5px 0" :value="record.checkerName" disabled />
@@ -255,27 +262,22 @@
 					</template>
 					<template slot="employeeId" slot-scope="text, record, index">
 						<div>
-							<!-- <a-input
-								v-show="true"
-								read-only
-								style="margin: -5px 0"
-								:value="record.principalEmployeeName"
-							/>-->
-							<!-- <div v-show="true">{{record.principalEmployeeName}}</div> -->
-							<a-select
+							<a-input maxlength="20" style="margin: -5px 0" :value="record.employeeName" disabled />
+							<!-- <a-select
 								style
 								:value="text"
 								@change="(a,b)=>getEmployeeId(a,b,record,index)"
 								placeholder="请选择"
 								showSearch
 								:filterOption="filterOption"
+								disabled
 							>
 								<a-select-option
 									:value="item.id"
 									v-for="(item, index) in employeeList"
 									:key="index"
 								>{{item.userName}}</a-select-option>
-							</a-select>
+							</a-select>-->
 						</div>
 					</template>
 					<template slot="operation" slot-scope="text, record, index">
@@ -322,8 +324,8 @@ const columns = [
 	},
 	{
 		dataIndex: "workTypeId",
-		title: "工序",
-		width: 60,
+		title: "工种",
+		width: 100,
 		key: "workTypeId",
 		scopedSlots: { customRender: "workTypeId" }
 	},
@@ -331,28 +333,28 @@ const columns = [
 		dataIndex: "processInfo",
 		key: "processInfo",
 		title: "工序内容",
-		width: 120,
+		width: 200,
 		scopedSlots: { customRender: "processInfo" }
 	},
-	{
-		dataIndex: "workingHours",
-		key: "workingHours",
-		title: "工时(h)",
-		width: 50,
-		scopedSlots: { customRender: "workingHours" }
-	},
+	// {
+	// 	dataIndex: "workingHours",
+	// 	key: "workingHours",
+	// 	title: "工时(h)",
+	// 	width: 50,
+	// 	scopedSlots: { customRender: "workingHours" }
+	// },
 	{
 		dataIndex: "employeeId",
 		key: "employeeId",
 		title: "班组长",
-		width: 80,
+		width: 60,
 		scopedSlots: { customRender: "employeeId" }
 	},
 	{
 		dataIndex: "checkerName",
 		key: "checkerName",
 		title: "检验人",
-		width: 80,
+		width: 60,
 		scopedSlots: { customRender: "chick" }
 	},
 	{
@@ -506,39 +508,39 @@ export default {
 						this.$message.error(`排配信息中有未选择工种`);
 						return false;
 					}
-					if (
-						this.data
-							.map(item => {
-								return item.processInfo != "";
-							})
-							.find(item => item == false) != undefined
-					) {
-						this.$message.error(`排配信息中有未填写工序内容`);
-						return false;
-					}
-					if (
-						this.data
-							.map(item => {
-								return item.workingHours != "";
-							})
-							.find(item => item == false) != undefined
-					) {
-						this.$message.error(`排配信息中有未填写工时`);
-						return false;
-					}
-					if (
-						this.data
-							.map(item => {
-								return (
-									/^\d+(\.\d{0,2})?$/.test(item.workingHours) &&
-									item.workingHours > 0
-								);
-							})
-							.find(item => item == false) != undefined
-					) {
-						this.$message.error(`排配信息中工时必须大于0,且只能保留两位小数`);
-						return false;
-					}
+					// if (
+					// 	this.data
+					// 		.map(item => {
+					// 			return item.processInfo != "";
+					// 		})
+					// 		.find(item => item == false) != undefined
+					// ) {
+					// 	this.$message.error(`排配信息中有未填写工序内容`);
+					// 	return false;
+					// }
+					// if (
+					// 	this.data
+					// 		.map(item => {
+					// 			return item.workingHours != "";
+					// 		})
+					// 		.find(item => item == false) != undefined
+					// ) {
+					// 	this.$message.error(`排配信息中有未填写工时`);
+					// 	return false;
+					// }
+					// if (
+					// 	this.data
+					// 		.map(item => {
+					// 			return (
+					// 				/^\d+(\.\d{0,2})?$/.test(item.workingHours) &&
+					// 				item.workingHours > 0
+					// 			);
+					// 		})
+					// 		.find(item => item == false) != undefined
+					// ) {
+					// 	this.$message.error(`排配信息中工时必须大于0,且只能保留两位小数`);
+					// 	return false;
+					// }
 					if (
 						this.data
 							.map(item => {
@@ -551,6 +553,7 @@ export default {
 					}
 					let qs = require("qs");
 					let data;
+					console.log(values);
 					if (values.type == 1) {
 						data = {
 							workOrderDesId: this.formMsg.workOrderDesId,
@@ -561,7 +564,7 @@ export default {
 									? 0
 									: values.heightError,
 							inTheEmbryoComponents: values.inTheEmbryoComponents,
-							lengthOrRadius: values.length,
+							lengthOrRadius: values.length1,
 							lengthOrRadiusError:
 								values.lengthError == null || values.lengthError == ""
 									? 0
@@ -579,8 +582,8 @@ export default {
 									employeeId: item.employeeId,
 									processInfo: item.processInfo,
 									remarks: item.remarks,
-									workTypeId: item.workTypeId,
-									workingHours: item.workingHours
+									workTypeId: item.workTypeId
+									// workingHours: item.workingHours
 								};
 							})
 						};
@@ -613,8 +616,8 @@ export default {
 									employeeId: item.employeeId,
 									processInfo: item.processInfo,
 									remarks: item.remarks,
-									workTypeId: item.workTypeId,
-									workingHours: item.workingHours
+									workTypeId: item.workTypeId
+									// workingHours: item.workingHours
 								};
 							})
 						};
@@ -643,8 +646,8 @@ export default {
 									processInfo: item.processInfo,
 									remarks: item.remarks,
 									workTypeId: item.workTypeId,
-									checkerId: item.checkerId,
-									workingHours: item.workingHours
+									checkerId: item.checkerId
+									// workingHours: item.workingHours
 								};
 							})
 						};
@@ -699,18 +702,23 @@ export default {
 							for (let i = 0; i < result.data.data.process.length; i++) {
 								result.data.data.process[i].employeeId =
 									result.data.data.process[i].principalEmployeeId;
+								result.data.data.process[i].employeeName =
+									result.data.data.process[i].principalEmployeeName;
 							}
 							console.log(result.data.data.process[0].employeeId);
 							if (result.data.data.process[0].employeeId) {
 								this.data = result.data.data.process;
 							}
 						}
-
+						this.materialVlaue =
+							result.data.data.rawMaterialDO != null
+								? result.data.data.rawMaterialDO.type
+								: null;
 						setTimeout(() => {
 							this.form.setFieldsValue({
 								profileLength: result.data.data.lengthOrRadius,
 								profileLengthError: result.data.data.lengthOrRadiusError,
-								length: result.data.data.lengthOrRadius,
+								length1: result.data.data.lengthOrRadius,
 								lengthError: result.data.data.lengthOrRadiusError,
 								width: result.data.data.widthOrRadius,
 								widthError: result.data.data.widthOrRadiusError,
@@ -806,6 +814,14 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						this.processTypesList = result.data.data;
+						this.processTypesList = this.processTypesList.map(item => {
+							return {
+								workTypeName:
+									item.workTypeName +
+									(item.remarks != null ? " (" + item.remarks + ")" : ""),
+								id: item.id
+							};
+						});
 					}
 				},
 				({ type, info }) => {}
@@ -830,7 +846,7 @@ export default {
 						rawMaterialId: "",
 						radius: "",
 						radiusError: "",
-						length: "",
+						length1: "",
 						lengthError: ""
 					});
 				}, 100);
@@ -841,7 +857,7 @@ export default {
 				setTimeout(() => {
 					this.form.setFieldsValue({
 						rawMaterialId: "",
-						length: "",
+						length1: "",
 						lengthError: "",
 						width: "",
 						widthError: "",
@@ -856,7 +872,7 @@ export default {
 				setTimeout(() => {
 					this.form.setFieldsValue({
 						rawMaterialId: "",
-						length: "",
+						length1: "",
 						lengthError: "",
 						width: "",
 						widthError: "",
@@ -879,6 +895,7 @@ export default {
 				processInfo: "",
 				workingHours: "",
 				employeeId: "",
+				employeeName: "",
 				remarks: "",
 				employee: [],
 				checkerId: this.chicker.id,
@@ -894,6 +911,7 @@ export default {
 			console.log(a, index);
 			this.data[index].workTypeId = a;
 			this.data[index].employeeId = "";
+			this.data[index].employeeName = "";
 			this.Axios(
 				{
 					url: "/api-platform/employee/byWorkTypeRoleCode",
@@ -907,10 +925,11 @@ export default {
 			).then(
 				result => {
 					if (result.data.code === 200) {
-						// console.log(result);
+						console.log(result);
 						// this.employeeList[index] = result.data.data;
 						if (result.data.data[0] != undefined) {
 							this.data[index].employeeId = result.data.data[0].id;
+							this.data[index].employeeName = result.data.data[0].userName;
 						}
 						let abc = [...this.data];
 						this.data = abc;
@@ -959,7 +978,7 @@ export default {
 		width: 134px;
 	}
 	.ant-form-inline .ant-form-item {
-		margin-bottom: 20px;
+		margin-bottom: 12px;
 	}
 	.ant-input-number-handler-wrap {
 		display: none;

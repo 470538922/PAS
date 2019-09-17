@@ -1,7 +1,7 @@
 <template>
 	<div class="add_work_order">
 		<a-form :form="form" layout="inline" @keyup.enter.native="add">
-			<a-tabs defaultActiveKey="1">
+			<a-tabs v-model="tabsDefaultValue">
 				<a-tab-pane tab="基础信息" key="1">
 					<a-form-item label="工单号">
 						<a-input
@@ -42,7 +42,7 @@
 							>{{item.name}}</a-select-option>
 						</a-select>
 					</a-form-item>
-					<a-form-item label="计划数量">
+					<a-form-item label="总数量">
 						<a-input
 							v-decorator="['planAmount',{rules: [{validator: chickNumber}]}]"
 							type="number"
@@ -244,7 +244,7 @@ const columns = [
 	{
 		dataIndex: "amount",
 		key: "amount",
-		title: "总数量",
+		title: "数量",
 		width: 80,
 		scopedSlots: { customRender: "amount" }
 	},
@@ -275,6 +275,7 @@ export default {
 	inject: ["reload"],
 	data() {
 		return {
+			tabsDefaultValue: "1",
 			columns,
 			data: [],
 			count: 200000,
@@ -419,6 +420,7 @@ export default {
 							if (result.data.code === 200) {
 								console.log(result);
 								this.form.resetFields();
+								this.tabsDefaultValue = "1";
 								this.data = [];
 								let params = {
 									type: "affirm",

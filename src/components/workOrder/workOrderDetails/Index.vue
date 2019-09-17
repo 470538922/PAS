@@ -1,69 +1,75 @@
 <template>
 	<div class="work_order_details_list">
-		<a-row>
-			<a-col :span="24" style="padding:0 20px;">
-				<a-row>
-					<div style="line-height:50px;">
-						<a-col :span="12">
-							<a-button @click="$router.back(-1)" icon="left" style="margin-right:20px;">返回</a-button>
-							<a-button @click="addShow">
-								<a-icon style="color:#1890ff;" type="plus" />新增
-							</a-button>
-							<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
-								<a-icon style="color:#1890ff;" type="edit" />修改
-							</a-button>
+		<router-view></router-view>
+		<div :class="[{hide:isHideList}]">
+			<a-row>
+				<a-col :span="24" style="padding:0 20px;">
+					<a-row>
+						<div style="line-height:50px;">
+							<a-col :span="12">
+								<a-button @click="$router.back(-1)" icon="left" style="margin-right:20px;">返回</a-button>
+								<a-button @click="addShow">
+									<a-icon style="color:#1890ff;" type="plus" />新增
+								</a-button>
+								<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
+									<a-icon style="color:#1890ff;" type="edit" />修改
+								</a-button>
 
-							<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
-								<a-icon style="color:#1890ff;" type="delete" />删除
-							</a-button>
-
-							<a-button @click="toPriview" :disabled="selectedRowKeys.length<1">
-								<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>预览
-							</a-button>
-						</a-col>
-					</div>
-				</a-row>
-				<a-row style="padding-top:10px;">
-					<a-table
-						rowKey="workOrderDesId"
-						:columns="columns"
-						:pagination="false"
-						:dataSource="data"
-						:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
-					>
-						<template slot="isShooting" slot-scope="text, record, index">
-							<div>
-								<a-icon type="close" v-if="text==false" style="color:red;font-size: 16px;" />
-								<a-icon type="check" v-if="text==true" style="color:green;font-size: 16px;" />
-							</div>
-						</template>
-						<template slot="schedule" slot-scope="text, record, index">
-							<div>
-								<a-popover title placement="right">
-									<template slot="content">
-										<span>当前进度：{{record.scheduleName}}</span>
-									</template>
+								<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+									<a-icon style="color:#1890ff;" type="delete" />删除
+								</a-button>
+								<a-button @click="toworkHoursHandle" :disabled="selectedRowKeys.length<1">
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xea06;</i>工时管理
+								</a-button>
+								<a-button @click="toPriview" :disabled="selectedRowKeys.length<1">
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>预览
+								</a-button>
+							</a-col>
+						</div>
+					</a-row>
+					<a-row style="padding-top:10px;">
+						<a-table
+							rowKey="workOrderDesId"
+							:columns="columns"
+							:pagination="false"
+							:dataSource="data"
+							:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
+						>
+							<template slot="isShooting" slot-scope="text, record, index">
+								<div>
+									<a-icon type="close" v-if="text==false" style="color:red;font-size: 16px;" />
+									<a-icon type="check" v-if="text==true" style="color:green;font-size: 16px;" />
+								</div>
+							</template>
+							<template slot="schedule" slot-scope="text, record, index">
+								<div>
+									<a-popover title placement="right">
+										<template slot="content">
+											<span>当前进度：{{record.scheduleName}}</span>
+										</template>
+										<a-progress
+											:percent="text==null?0:parseInt(text*100)"
+											v-if="record.schedule!=1"
+											status="active"
+										/>
+									</a-popover>
 									<a-progress
 										:percent="text==null?0:parseInt(text*100)"
-										v-if="record.schedule!=1"
-										status="active"
+										strokeColor="#10CF0C"
+										v-if="record.schedule==1"
 									/>
-								</a-popover>
-								<a-progress
-									:percent="text==null?0:parseInt(text*100)"
-									strokeColor="#10CF0C"
-									v-if="record.schedule==1"
-								/>
-							</div>
-						</template>
-						<template slot="detail" slot-scope="text, record, index">
-							<span style="color:#1890ff;cursor: pointer;" @click="technologyModalShow(record)">工艺排配</span>
-						</template>
-					</a-table>
-				</a-row>
-			</a-col>
-			<a-col :span="24" style="padding-top:12px;padding-left:20px;">提示：以上信息全部完成排配后，工单才能投产。</a-col>
-		</a-row>
+								</div>
+							</template>
+							<template slot="detail" slot-scope="text, record, index">
+								<span style="color:#1890ff;cursor: pointer;" @click="technologyModalShow(record)">工艺排配</span>
+							</template>
+						</a-table>
+					</a-row>
+				</a-col>
+				<a-col :span="24" style="padding-top:12px;padding-left:20px;">提示：以上信息全部完成排配后，工单才能投产。</a-col>
+			</a-row>
+		</div>
+
 		<a-modal
 			title="新增工单明细"
 			width="800px"
@@ -73,7 +79,13 @@
 			class="modal_form_style"
 			:footer="null"
 		>
-			<a-form :form="form" layout="inline" style="overflow:hidden" @keyup.enter.native="add">
+			<a-form
+				:form="form"
+				layout="inline"
+				style="overflow:hidden"
+				@keyup.enter.native="add"
+				size="small"
+			>
 				<a-col :span="12">
 					<a-form-item label="图纸号">
 						<a-input
@@ -219,7 +231,7 @@
 		</a-modal>
 		<a-modal
 			title="新增工艺排配"
-			width="800px"
+			width="1200px"
 			:visible="technologyAddVisible"
 			@cancel="handleCancel(3)"
 			:maskClosable="false"
@@ -235,7 +247,7 @@
 		<a-modal
 			title="修改工艺排配"
 			:footer="null"
-			width="800px"
+			width="1200px"
 			:visible="technologyEditVisible"
 			@cancel="handleCancel(4)"
 			:maskClosable="false"
@@ -329,6 +341,7 @@ const columns = [
 export default {
 	data() {
 		return {
+			isHideList: this.$route.params.id !== undefined ? false : true,
 			columns,
 			data: [],
 			addVisible: false,
@@ -721,6 +734,24 @@ export default {
 				},
 				({ type, info }) => {}
 			);
+		},
+		toworkHoursHandle() {
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.isShooting == true;
+					})
+					.find(item => item == false) == undefined
+			) {
+				this.$router.push({
+					path:
+						this.$router.history.current.path +
+						"/WorkHoursHandle/" +
+						this.selectedRowKeys.join(",")
+				});
+			} else {
+				this.$message.error("有未完成工艺排配的图纸，不能进行工时管理");
+			}
 		}
 	},
 	components: {
@@ -732,12 +763,32 @@ export default {
 		this.getList(this.$route.params.id);
 		this.findChicker();
 		this.findAllLeader();
+		// console.log(this.$router.history.current.path);
+		let a = this.$route.matched.find(item => item.name === "WorkHoursHandle")
+			? true
+			: false;
+		let b = this.$route.params.id !== undefined ? false : true;
+		this.isHideList = a || b ? true : false;
+	},
+	watch: {
+		$route() {
+			this.getList(this.$route.params.id);
+			let a = this.$route.matched.find(item => item.name === "WorkHoursHandle")
+				? true
+				: false;
+			let b = this.$route.params.id !== undefined ? false : true;
+			this.isHideList = a || b ? true : false;
+		}
 	}
 };
 </script>
 
 <style lang="less">
 .work_order_details_list {
+	.ant-table-thead > tr > th,
+	.ant-table-tbody > tr > td {
+		padding: 6px 16px;
+	}
 }
 .modal_form_style {
 	.ant-form-inline .ant-form-item > .ant-form-item-label {

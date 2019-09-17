@@ -1,11 +1,10 @@
 body {
   color: #fff;
-  background-color: #363636;
-}
-body .canvasWrap {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  background: url(LoginPic.png) no-repeat;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-size: cover;
 }
 #login-layout {
   position: absolute;

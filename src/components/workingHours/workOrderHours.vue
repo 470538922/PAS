@@ -31,7 +31,7 @@
 			<div class="work_order_hours_details">
 				<p v-for="(item,index) in oneWorkOrderHours" :key="index">
 					<span class="label_right">{{item.workTypeName}}：</span>
-					<span>{{item.workLoad}}小时</span>
+					<span>{{item.workLoad}}分钟</span>
 				</p>
 			</div>
 		</a-modal>

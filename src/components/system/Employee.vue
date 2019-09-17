@@ -169,7 +169,7 @@ const columns = [
 		dataIndex: "organizeName",
 		key: "organizeName",
 		title: "所处班组",
-		width: "25%"
+		width: "20%"
 	},
 	{
 		dataIndex: "roleName",
@@ -181,7 +181,7 @@ const columns = [
 		dataIndex: "workTypeName",
 		key: "workTypeName",
 		title: "职能/工种",
-		width: "10%"
+		width: "15%"
 	},
 	{
 		dataIndex: "state",
@@ -333,9 +333,13 @@ export default {
 						this.data = result.data.data.content;
 
 						for (let i = 0; i < this.data.length; i++) {
-							this.data[i].workTypeName = this.data[i].workType.workTypeName;
+							this.data[i].workTypeName = "";
+							for (let j = 0; j < this.data[i].workType.length; j++) {
+								this.data[i].workTypeName +=
+									this.data[i].workType[j].workTypeName +
+									(j == this.data[i].workType.length - 1 ? "" : "、");
+							}
 						}
-
 						this.total = result.data.data.totalElement;
 					}
 				},

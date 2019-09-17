@@ -40,8 +40,7 @@
 					<a-col :span="8">
 						<a-form-item label="申请日期">
 							<a-date-picker
-								:defaultValue="moment(date, 'YYYY/MM/DD')"
-								v-decorator="['filing']"
+								v-decorator="['filing',{initialValue:moment(date, 'YYYY/MM/DD')}]"
 								style="width:280px;"
 								@change="(a,b)=>onChangeDate(a,b)"
 								format="YYYY/MM/DD"

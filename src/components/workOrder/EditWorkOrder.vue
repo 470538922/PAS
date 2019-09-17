@@ -8,7 +8,7 @@
 							v-decorator="['no',{rules: [{ required: true, message: '请填写工单号' }]}]"
 							style="width:335px;"
 							placeholder="保存后将无法修改"
-							read-only
+							disabled
 						></a-input>
 					</a-form-item>
 					<a-form-item label="工作令号">
@@ -16,7 +16,7 @@
 							v-decorator="['gongzuolingNo',{rules: [{ required: true, message: '请填写工作令号' }]}]"
 							style="width:335px;"
 							placeholder="保存后将无法修改"
-							read-only
+							disabled
 						></a-input>
 					</a-form-item>
 					<a-form-item label="工单标题">
@@ -42,7 +42,7 @@
 							>{{item.name}}</a-select-option>
 						</a-select>
 					</a-form-item>
-					<a-form-item label="计划数量">
+					<a-form-item label="总数量">
 						<a-input
 							v-decorator="['planAmount',{rules: [{validator: chickNumber}]}]"
 							type="number"

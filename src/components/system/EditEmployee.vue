@@ -54,24 +54,26 @@
 							placeholder="请选择"
 							optionFilterProp="children"
 							v-decorator="[
-							'roleId',
+							'roleCode',
 							{rules: [{ required: true, message: '请选择角色' }]}
 							]"
+							@change="getRoleId"
 						>
 							<a-select-option
 								v-for="(item, index) in roleList"
 								:key="index"
-								:value="item.id"
+								:value="item.roleCode"
 							>{{item.name}}</a-select-option>
 						</a-select>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="工种">
 						<a-select
+							mode="multiple"
 							showSearch
 							placeholder="请选择"
 							optionFilterProp="children"
 							v-decorator="[
-							'workTypeId',
+							'workTypeIds',
 							{rules: [{ required: true, message: '请选择工种' }]}
 							]"
 						>
@@ -170,7 +172,8 @@ export default {
 			fileList: [],
 			roleList: [],
 			ProcessTypesList: [],
-			dateValue: ""
+			dateValue: "",
+			roleCode: ""
 		};
 	},
 	methods: {
@@ -226,8 +229,8 @@ export default {
 						userName: values.userName,
 						phone: values.phone,
 						organizeId: values.organizeId,
-						roleId: values.roleId,
-						workTypeId: values.workTypeId,
+						roleCode: values.roleCode,
+						workTypeIds: values.workTypeIds,
 						age: values.age,
 						gender: values.gender,
 						entryTime: this.dateValue,
@@ -341,27 +344,7 @@ export default {
 				({ type, info }) => {}
 			);
 		},
-		getProcessTypesList() {
-			this.Axios(
-				{
-					url: "/api-platform/workType/list",
-					params: {
-						page: 1,
-						size: -1
-					},
-					type: "get",
-					option: { enableMsg: false }
-				},
-				this
-			).then(
-				result => {
-					if (result.data.code === 200) {
-						this.ProcessTypesList = result.data.data;
-					}
-				},
-				({ type, info }) => {}
-			);
-		},
+
 		findOne(id) {
 			this.Axios(
 				{
@@ -378,7 +361,8 @@ export default {
 					if (result.data.code === 200) {
 						console.log(result.data.data);
 						this.dateValue = result.data.data.entryTime;
-						console.log(result.data.data.employeeDocs);
+						this.roleCode = result.data.data.roleCode;
+						this.getProcessTypesList();
 						this.fileList = result.data.data.employeeDocs.map(item => {
 							return {
 								uid: item.id,
@@ -394,8 +378,8 @@ export default {
 								userName: result.data.data.userName,
 								phone: result.data.data.phone,
 								organizeId: result.data.data.organizeId,
-								roleId: result.data.data.roleId,
-								workTypeId: result.data.data.workType.id,
+								roleCode: result.data.data.roleCode,
+								workTypeIds: result.data.data.workType.map(item => item.id),
 								age: result.data.data.age,
 								gender: result.data.data.gender,
 								entryTime:
@@ -410,12 +394,44 @@ export default {
 				},
 				({ type, info }) => {}
 			);
+		},
+		getProcessTypesList() {
+			this.Axios(
+				{
+					url: "/api-platform/workType/listOnAddEmp",
+					params: {
+						page: 1,
+						size: -1,
+						roleCode: this.roleCode,
+						employeeId: this.$route.params.id
+					},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.ProcessTypesList = result.data.data;
+						console.log(this.ProcessTypesList);
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		getRoleId(id) {
+			this.roleCode = id;
+			this.form.setFieldsValue({
+				workTypeIds: []
+			});
+			this.getProcessTypesList();
 		}
 	},
 	created() {
 		this.getTreeDataList();
 		this.getRoleList();
-		this.getProcessTypesList();
+		// this.getProcessTypesList();
 		this.findOne(this.$route.params.id);
 	}
 };

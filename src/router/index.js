@@ -252,6 +252,14 @@ export default new Router({
           meta: {
             requireAuth: true,
           },
+          children: [{
+            path: 'WorkHoursHandle/:id/',
+            name: 'WorkHoursHandle',
+            components: require('../components/workOrder/workHoursHandle/index.vue'),
+            meta: {
+              requireAuth: true,
+            },
+          }]
         },
         {
           path: 'Inventory/:id/',
@@ -260,7 +268,15 @@ export default new Router({
           meta: {
             requireAuth: true,
           },
-        }
+        },
+        {
+          path: 'OrderPrice/:id',
+          name: 'OrderPrice',
+          components: require('@/components/orderPrice/Index.vue'),
+          meta: {
+            requireAuth: true,
+          },
+        },
       ]
     },
     {

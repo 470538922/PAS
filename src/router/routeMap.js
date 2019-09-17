@@ -44,12 +44,26 @@ export default [{
         permissionCode: 'workorder_item_lookup'
       },
       {
+        menu: '工时管理',
+        routeReg: /^\/WorkOrderList\/WorkOrderDetailsList\/\w{1,}\/WorkHoursHandle\/.{1,}$/i,
+        key: 'WorkHoursHandle',
+        visible: true,
+        permissionCode: 'workorder_item_lookup'
+      },
+      {
         menu: '物资清单',
         routeReg: /^\/WorkOrderList\/Inventory\/\w{1,}$/i,
         key: 'Inventory',
         visible: true,
         permissionCode: 'workorder_list_lookup'
-      }
+      },
+      {
+        menu: '生产报价单',
+        routeReg: /^\/WorkOrderList\/OrderPrice\/\w{1,}$/i,
+        key: 'OrderPrice',
+        visible: true,
+        permissionCode: 'offer_order_lookup'
+      },
     ]
   },
   {
@@ -64,25 +78,25 @@ export default [{
       permissionCode: 'drawing_drawing_lookup'
     }]
   },
-  {
-    menu: '订单报价',
-    defaultDock: false,
-    permissionCode: 'offer',
-    icon: '&#xe61e;',
-    subMenu: [{
-        menu: '订单报价',
-        route: '/OrderPrice',
-        key: 'OrderPrice',
-        permissionCode: 'offer_order_lookup'
-      },
-      {
-        menu: '历史报价',
-        route: '/HistoricalQuote',
-        key: 'HistoricalQuote',
-        permissionCode: 'offer_history_lookup'
-      },
-    ]
-  },
+  // {
+  //   menu: '订单报价',
+  //   defaultDock: false,
+  //   permissionCode: 'offer',
+  //   icon: '&#xe61e;',
+  //   subMenu: [{
+  //       menu: '订单报价',
+  //       route: '/OrderPrice',
+  //       key: 'OrderPrice',
+  //       permissionCode: 'offer_order_lookup'
+  //     },
+  //     {
+  //       menu: '历史报价',
+  //       route: '/HistoricalQuote',
+  //       key: 'HistoricalQuote',
+  //       permissionCode: 'offer_history_lookup'
+  //     },
+  //   ]
+  // },
   {
     menu: '工时统计',
     defaultDock: false,

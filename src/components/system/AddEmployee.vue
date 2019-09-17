@@ -66,24 +66,26 @@
 							placeholder="请选择"
 							optionFilterProp="children"
 							v-decorator="[
-							'roleId',
+							'roleCode',
 							{rules: [{ required: true, message: '请选择角色' }]}
 							]"
+							@change="getRoleId"
 						>
 							<a-select-option
 								v-for="(item, index) in roleList"
 								:key="index"
-								:value="item.id"
+								:value="item.roleCode"
 							>{{item.name}}</a-select-option>
 						</a-select>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 2 }" :wrapper-col="{ span: 22 }" label="工种">
 						<a-select
+							mode="multiple"
 							showSearch
 							placeholder="请选择"
 							optionFilterProp="children"
 							v-decorator="[
-							'workTypeId',
+							'workTypeIds',
 							{rules: [{ required: true, message: '请选择工种' }]}
 							]"
 						>
@@ -157,7 +159,8 @@ export default {
 			fileList: [],
 			roleList: [],
 			ProcessTypesList: [],
-			dateValue: ""
+			dateValue: "",
+			roleCode: ""
 		};
 	},
 	methods: {
@@ -248,8 +251,8 @@ export default {
 						phone: values.phone,
 						password: values.password,
 						organizeId: values.organizeId,
-						roleId: values.roleId,
-						workTypeId: values.workTypeId,
+						roleCode: values.roleCode,
+						workTypeIds: values.workTypeIds,
 						age: values.age,
 						gender: values.gender,
 						entryTime: this.dateValue,
@@ -364,10 +367,11 @@ export default {
 		getProcessTypesList() {
 			this.Axios(
 				{
-					url: "/api-platform/workType/list",
+					url: "/api-platform/workType/listOnAddEmp",
 					params: {
 						page: 1,
-						size: -1
+						size: -1,
+						roleCode: this.roleCode
 					},
 					type: "get",
 					option: { enableMsg: false }
@@ -382,6 +386,13 @@ export default {
 				},
 				({ type, info }) => {}
 			);
+		},
+		getRoleId(id) {
+			this.roleCode = id;
+			this.form.setFieldsValue({
+				workTypeIds: []
+			});
+			this.getProcessTypesList();
 		}
 	},
 	created() {

@@ -6,7 +6,7 @@
 				<a-col :span="24" style="padding:0 20px;">
 					<a-row>
 						<div style="line-height:50px;">
-							<a-col :span="12">
+							<a-col :span="15">
 								<a-button @click="addVisible=true">
 									<a-icon style="color:#1890ff;" type="plus" />新增
 								</a-button>
@@ -31,9 +31,10 @@
 								<a-button @click="toInventory" :disabled="selectedRowKeys.length!=1">
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>物资清单
 								</a-button>
+								<a-button @click="toOrderPrice" :disabled="selectedRowKeys.length!=1">生成报价单</a-button>
 							</a-col>
 
-							<a-col :span="12" style="text-align:right">
+							<a-col :span="9" style="text-align:right">
 								<a-select
 									placeholder="请选择"
 									optionFilterProp="children"
@@ -47,7 +48,7 @@
 									<a-select-option :value="3">已终止</a-select-option>
 									<a-select-option :value="4">完成</a-select-option>
 								</a-select>
-								<a-input type="text" v-model="keyword" style="width:300px" placeholder="工单号/工单标题/客户名称"></a-input>
+								<a-input type="text" v-model="keyword" style="width:200px" placeholder="工单号/工单标题/客户名称"></a-input>
 								<a-button type="primary" @click="getList">查询</a-button>
 							</a-col>
 						</div>
@@ -231,7 +232,7 @@ const columns = [
 	{
 		dataIndex: "workOrderTitle",
 		title: "工单标题",
-		width: 100,
+		width: 160,
 		key: "workOrderTitle",
 		scopedSlots: { customRender: "workOrderTitle" }
 	},
@@ -239,7 +240,7 @@ const columns = [
 		dataIndex: "clientName",
 		key: "clientName",
 		title: "客户名称",
-		width: 120
+		width: 100
 	},
 	{
 		dataIndex: "workOrderIsPriority",
@@ -266,14 +267,14 @@ const columns = [
 		dataIndex: "workOrderRemark",
 		key: "workOrderRemark",
 		title: "备注",
-		width: 120,
+		width: 100,
 		scopedSlots: { customRender: "comment" }
 	},
 	{
 		dataIndex: "createTime",
 		key: "createTime",
 		title: "创建时间",
-		width: 120
+		width: 100
 	},
 	{
 		dataIndex: "detail",
@@ -316,6 +317,11 @@ export default {
 		toInventory() {
 			this.$router.push({
 				path: "/WorkOrderList/Inventory/" + this.selectedRows[0].workOrderId
+			});
+		},
+		toOrderPrice() {
+			this.$router.push({
+				path: "/WorkOrderList/OrderPrice/" + this.selectedRows[0].workOrderId
 			});
 		},
 		//修改逻辑判断
@@ -639,7 +645,9 @@ export default {
 	},
 	created() {
 		this.getList();
-		let a = this.$route.matched.find(item => item.name === "OrderAdd")
+		let a = this.$route.matched.find(
+			item => item.name === "WorkOrderDetailsList"
+		)
 			? true
 			: false;
 		let b = this.$route.params.id !== undefined ? true : false;
@@ -648,7 +656,9 @@ export default {
 	watch: {
 		$route() {
 			this.getList();
-			let a = this.$route.matched.find(item => item.name === "OrderAdd")
+			let a = this.$route.matched.find(
+				item => item.name === "WorkOrderDetailsList"
+			)
 				? true
 				: false;
 			let b = this.$route.params.id !== undefined ? true : false;

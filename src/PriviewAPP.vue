@@ -171,7 +171,7 @@
 							<td style="width:10%">数量</td>
 							<td style="width:10%">单价(不含税：元)</td>
 							<td style="width:10%">总价(不含税：元)</td>
-							<td style="width:20%">交货时间</td>
+
 							<td style="width:10%">备注</td>
 						</tr>
 						<tr v-for="(i,index) in item.offerDes" :key="index+555555">
@@ -182,7 +182,7 @@
 							<td style="width:10%">{{i.number}}</td>
 							<td style="width:10%">{{i.realUnitPrice}}</td>
 							<td style="width:10%">{{i.realAddFee}}</td>
-							<td style="width:20%"></td>
+
 							<td style="width:10%">{{i.remark}}</td>
 						</tr>
 						<tr>
@@ -190,10 +190,9 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td></td>
 						</tr>
 						<tr>
-							<td colspan="9">
+							<td colspan="8">
 								大写（不含税）：
 								<span style="font-weight:900">{{number_chinese(item.total)}}</span>
 							</td>

@@ -40,7 +40,7 @@
 							>
 								<a-select-option value="MACHINING">机加</a-select-option>
 								<a-select-option value="SURFACE">表处</a-select-option>
-								<a-select-option value="CHECK">检验</a-select-option>
+								<!-- <a-select-option value="CHECK">检验</a-select-option> -->
 								<a-select-option value="STORAGE">入库</a-select-option>
 								<a-select-option value="WELDING">交焊</a-select-option>
 							</a-select>
@@ -73,8 +73,8 @@
 								:addonAfter="radioValue=='BYTIME'?'元/时':radioValue=='BYSURFACE'?'元/㎡':'元/kg'"
 							></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
-							<a-textarea maxlength="50" :autosize="{ minRows: 4, maxRows: 4 }" v-decorator="['remarks']"></a-textarea>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="名称简写">
+							<a-input maxlength="20" v-decorator="['remarks']"></a-input>
 						</a-form-item>
 					</a-form>
 				</a-modal>
@@ -95,7 +95,7 @@
 							>
 								<a-select-option value="MACHINING">机加</a-select-option>
 								<a-select-option value="SURFACE">表处</a-select-option>
-								<a-select-option value="CHECK">检验</a-select-option>
+								<!-- <a-select-option value="CHECK">检验</a-select-option> -->
 								<a-select-option value="STORAGE">入库</a-select-option>
 								<a-select-option value="WELDING">交焊</a-select-option>
 							</a-select>
@@ -128,8 +128,8 @@
 								:addonAfter="radioValue=='BYTIME'?'元/时':radioValue=='BYSURFACE'?'元/㎡':'元/kg'"
 							></a-input>
 						</a-form-item>
-						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="备注">
-							<a-textarea maxlength="50" :autosize="{ minRows: 4, maxRows: 4 }" v-decorator="['remarks']"></a-textarea>
+						<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="名称简写">
+							<a-input maxlength="20" v-decorator="['remarks']"></a-input>
 						</a-form-item>
 					</a-form>
 				</a-modal>
@@ -284,7 +284,7 @@ export default {
 		// },
 		chickNumber(rule, value, callback) {
 			if (/^\d+?$/.test(value) == false && (value != null) & (value != "")) {
-				callback(new Error("只能输入大于0的整数"));
+				callback(new Error("只能输入大于等于0的整数"));
 			} else {
 				callback();
 			}

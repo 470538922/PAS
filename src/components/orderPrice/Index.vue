@@ -1,5 +1,11 @@
 <template>
 	<div class="order_price">
+		<a-row style="padding: 20px;">
+			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
+			<a-button @click="findOne">
+				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>打印预览
+			</a-button>
+		</a-row>
 		<a-form :form="form" layout="inline">
 			<a-col :span="24">
 				<a-form-item label="询价方">
@@ -165,7 +171,11 @@
 						/>
 						<a-tooltip placement="top">
 							<template slot="title">
-								<span>{{record.biaochuItem}}</span>
+								<span v-for="(item,index2) in record.biaochuItem" :key="index2">
+									{{item}}
+									<br />
+								</span>
+								<!-- <span>{{record.biaochuItem}}</span> -->
 							</template>
 							<div v-if="record.editable!=true">{{text}}</div>
 						</a-tooltip>
@@ -187,15 +197,15 @@
 			</a-table>
 			<div style="line-height:50px;">
 				<a-col :span="8">
-					<a-button v-if="tableData.length>0" @click="uplodVisible=true">
+					<!-- <a-button v-if="tableData.length>0" @click="uplodVisible=true">
 						<a-icon type="upload" />重新导入
-					</a-button>
+					</a-button>-->
 				</a-col>
 				<a-col :span="8">
-					<div style="text-align:center;" v-if="tableData.length<1">
+					<!-- <div style="text-align:center;" v-if="tableData.length<1">
 						还未导入需要报价的清单，
 						<a href="javascript:" @click="uplodVisible=true">立即导入</a>
-					</div>
+					</div>-->
 				</a-col>
 				<a-col :span="8">
 					<div style="text-align:right;">
@@ -210,10 +220,10 @@
 					type="primary"
 					@click="add"
 					:disabled="tableData==null||tableData==[]||tableData==undefined||tableData==''"
-				>生成报价单</a-button>
+				>保存修改</a-button>
 			</div>
 		</a-col>
-		<a-modal
+		<!-- <a-modal
 			title="导入提示"
 			:footer="null"
 			width="420px"
@@ -224,7 +234,7 @@
 			<div>
 				导入步骤：
 				<br />1、下载模板
-				<!-- <a href="http://119.3.255.22:8001/订单报价模板.xlsx">《订单报价模板.xlsx》</a>； -->
+				<a href="http://119.3.255.22:8001/订单报价模板.xlsx">《订单报价模板.xlsx》</a>；
 				<a href="http://114.116.238.150:8006/model/baojiadan.xlsx">《订单报价模板.xlsx》</a>；
 				<br />2、按格式要求填写，请勿模板修改结构；
 				<br />3、点击下方“选择文件”按钮导入数据；
@@ -246,7 +256,7 @@
 					</a-button>
 				</a-upload>
 			</div>
-		</a-modal>
+		</a-modal>-->
 	</div>
 </template>
 <script>
@@ -295,18 +305,18 @@ const columns = [
 		width: "8%",
 		scopedSlots: { customRender: "processRealFee" }
 	},
-	{
-		title: "表处类型",
-		dataIndex: "type",
-		width: "5%",
-		scopedSlots: { customRender: "type" }
-	},
-	{
-		title: "表处单价",
-		dataIndex: "price",
-		width: "5%",
-		scopedSlots: { customRender: "price" }
-	},
+	// {
+	// 	title: "表处类型",
+	// 	dataIndex: "type",
+	// 	width: "5%",
+	// 	scopedSlots: { customRender: "type" }
+	// },
+	// {
+	// 	title: "表处单价",
+	// 	dataIndex: "price",
+	// 	width: "5%",
+	// 	scopedSlots: { customRender: "price" }
+	// },
 	{
 		title: "表处费(元)",
 		dataIndex: "biaochuRealFee",
@@ -405,7 +415,9 @@ export default {
 					console.log(values);
 					this.loadingShow = true;
 					let newData = [...this.tableData];
+					console.log(newData);
 					let data = {
+						workOrderId: this.$route.params.id,
 						inquiry: values.inquiry,
 						inquiryName: values.inquiryName,
 						inquiryPhone: values.inquiryPhone,
@@ -425,7 +437,10 @@ export default {
 								realAddFee: item.realAddFee,
 								addFee: item.addFee,
 								biaochuFee: item.biaochuFee,
-								biaochuItem: item.biaochuItem,
+								biaochuItem:
+									item.biaochuItem != null && item.biaochuItem != ""
+										? item.biaochuItem.join(",")
+										: null,
 								biaochuRealFee: item.biaochuRealFee,
 								drawingNo: item.drawingNo,
 								materialFee: item.materialFee,
@@ -470,7 +485,7 @@ export default {
 							if (result.data.code === 200) {
 								console.log(result);
 								this.loadingShow = false;
-								this.$router.push({ path: "/HistoricalQuote" });
+								// this.$router.push({ path: "/HistoricalQuote" });
 							}
 						},
 						({ type, info }) => {}
@@ -481,50 +496,6 @@ export default {
 		API() {
 			let url = this.global.apiSrc + "/zuul/api-workorder/offer/reckon";
 			return url;
-		},
-		handleChangeUpload(info) {
-			// console.log(info);
-			info.fileList = info.fileList.slice(-1);
-			this.fileList = info.fileList;
-			if (info.file.status !== "uploading") {
-				// console.log(info.file, info.fileList);
-			}
-			if (info.file.status === "done") {
-				// this.$message.success("上传成功！");
-				// console.log(info);
-				if (info.fileList[0].response.code !== 200) {
-					this.$message.error(info.fileList[0].response.msg);
-				} else {
-					this.$message.success("上传成功！");
-					this.total = 0;
-					this.tableData = info.fileList[0].response.data.offerDesDTOS;
-					console.log(this.tableData);
-					this.uplodVisible = false;
-					for (let i = 0; i < this.tableData.length; i++) {
-						this.tableData[i].materialItem =
-							this.tableData[i].materialItem != null
-								? this.tableData[i].materialItem.split(",")
-								: "";
-						this.tableData[i].processItem =
-							this.tableData[i].processItem != null
-								? this.tableData[i].processItem.split(",")
-								: "";
-						this.tableData[i].processItem =
-							this.tableData[i].processItem != null &&
-							this.tableData[i].processItem != ""
-								? this.tableData[i].processItem.map(item => {
-										return item + "元";
-								  })
-								: "";
-						this.total +=
-							this.tableData[i].addFee != "" && this.tableData[i].addFee != null
-								? this.tableData[i].addFee
-								: 0;
-					}
-				}
-			} else if (info.file.status === "error") {
-				this.$message.error(`上传失败！`);
-			}
 		},
 		handleCancel() {
 			this.uplodVisible = false;
@@ -596,10 +567,177 @@ export default {
 				delete target.editable;
 				this.tableData = newData;
 			}
+		},
+		getById() {
+			let qs = require("qs");
+			let data = qs.stringify({
+				workOrderId: this.$route.params.id
+			});
+			this.Axios(
+				{
+					url: "/api-workorder/offer/reckon",
+					params: data,
+					type: "post",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result.data.data);
+						if (result.data.data.offerDes) {
+							this.tableData = result.data.data.offerDes;
+							this.form.setFieldsValue({
+								inquiry: result.data.data.inquiry,
+								inquiryName: result.data.data.inquiryName,
+								inquiryPhone: result.data.data.inquiryPhone,
+								inquiryMail: result.data.data.inquiryMail,
+								address: result.data.data.address,
+								baoName:
+									result.data.data.baoName != null &&
+									result.data.data.baoName != ""
+										? result.data.data.baoName
+										: this.userMsg.userName,
+								audit: result.data.data.audit,
+								baoPhone:
+									result.data.data.baoPhone != null &&
+									result.data.data.baoPhone != ""
+										? result.data.data.baoPhone
+										: this.userMsg.phone,
+								offerDate:
+									result.data.data.offerDate != null &&
+									result.data.data.offerDate != ""
+										? moment(result.data.data.offerDate, "YYYY/MM/DD")
+										: moment(this.NowDate, "YYYY/MM/DD"),
+								baoMail: result.data.data.baoMail,
+								validDate:
+									result.data.data.validDate != null &&
+									result.data.data.validDate != ""
+										? moment(result.data.data.validDate, "YYYY/MM/DD")
+										: undefined,
+								remark: result.data.data.remark
+							});
+						}
+						if (result.data.data.offerDesDTOS) {
+							this.tableData = result.data.data.offerDesDTOS;
+						}
+
+						// this.tableData = result.data.data.offerDes;
+						for (let i = 0; i < this.tableData.length; i++) {
+							this.tableData[i].biaochuItem =
+								this.tableData[i].biaochuItem != null
+									? this.tableData[i].biaochuItem.split(",")
+									: "";
+							this.tableData[i].materialItem =
+								this.tableData[i].materialItem != null
+									? this.tableData[i].materialItem.split(",")
+									: "";
+							this.tableData[i].processItem =
+								this.tableData[i].processItem != null
+									? this.tableData[i].processItem.split(",")
+									: "";
+							this.tableData[i].processItem =
+								this.tableData[i].processItem != null &&
+								this.tableData[i].processItem != ""
+									? this.tableData[i].processItem.map(item => {
+											return item;
+									  })
+									: "";
+							this.total +=
+								this.tableData[i].realAddFee != "" &&
+								this.tableData[i].realAddFee != null
+									? this.tableData[i].realAddFee
+									: 0;
+						}
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		findOne() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					let newData = [...this.tableData];
+					let data = {
+						inquiry: values.inquiry,
+						inquiryName: values.inquiryName,
+						inquiryPhone: values.inquiryPhone,
+						inquiryMail: values.inquiryMail,
+						address: values.address,
+						baoName: values.baoName,
+						audit: values.audit,
+						baoPhone: values.baoPhone,
+						offerDate: this.offerDate,
+						baoMail: values.baoMail,
+						validDate: this.validDate,
+						remark: values.remark,
+						total: this.total,
+						offerDes: newData.map(item => {
+							console.log(item.biaochuItem);
+							return {
+								realAddFee: item.realAddFee,
+								addFee: item.addFee,
+								biaochuFee: item.biaochuFee,
+								biaochuItem:
+									item.biaochuItem != null && item.biaochuItem != ""
+										? item.biaochuItem.join(",")
+										: null,
+								biaochuRealFee: item.biaochuRealFee,
+								drawingNo: item.drawingNo,
+								materialFee: item.materialFee,
+								materialItem:
+									item.materialItem != null && item.materialItem != ""
+										? item.materialItem.join(",")
+										: null,
+								materialPrice: item.materialPrice,
+								materialRealFee: item.materialRealFee,
+								name: item.name,
+								no: item.no,
+								number: item.number,
+								otherFee: item.otherFee,
+								price: item.price,
+								processFee: item.processFee,
+								processItem:
+									item.processItem != null && item.processItem != ""
+										? item.processItem.join(",")
+										: "",
+								processRealFee: item.processRealFee,
+								remark: item.remark,
+								type: item.type,
+								unitPrice: item.unitPrice,
+								realUnitPrice: item.realUnitPrice
+							};
+						})
+					};
+					let arr = new Array();
+					arr.push(data);
+					sessionStorage.priview = JSON.stringify(arr);
+					sessionStorage.priviewType = 2;
+					window.open("/priview.html", "_blank");
+				}
+			});
+			// this.Axios(
+			// 	{
+			// 		url: "/api-workorder/offer/findone",
+			// 		params: { id: this.$route.params.id },
+			// 		type: "get",
+			// 		option: { enableMsg: false }
+			// 	},
+			// 	this
+			// ).then(
+			// 	result => {
+			// 		if (result.data.code === 200) {
+			// 			console.log(result);
+			// 			sessionStorage.priview = JSON.stringify(result.data.data);
+			// 			sessionStorage.priviewType = 2;
+			// 			window.open("/priview.html", "_blank");
+			// 		}
+			// 	},
+			// 	({ type, info }) => {}
+			// );
 		}
 	},
 	created() {
-		console.log(this.userMsg);
 		setTimeout(() => {
 			this.form.setFieldsValue({
 				baoName: this.userMsg.userName,
@@ -607,6 +745,7 @@ export default {
 				offerDate: moment(this.NowDate, "YYYY/MM/DD")
 			});
 		}, 100);
+		this.getById();
 	}
 };
 </script>

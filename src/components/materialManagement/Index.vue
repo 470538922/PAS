@@ -86,7 +86,7 @@
 				<a-col :span="12">
 					<a-form-item label="厚">
 						<a-input
-							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写厚' },{validator: chickNumber}]}]"
+							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写厚' },{validator: chickNumber1}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -337,6 +337,17 @@ export default {
 				value != null
 			) {
 				callback(new Error("只能输入大于0的整数"));
+			} else {
+				callback();
+			}
+		},
+		chickNumber1(rule, value, callback) {
+			if (
+				(/^\d+(\.\d{0,1})?$/.test(value) == false || value <= 0) &&
+				value != "" &&
+				value != null
+			) {
+				callback(new Error("只能输入大于0,且只能保留1位小数"));
 			} else {
 				callback();
 			}
