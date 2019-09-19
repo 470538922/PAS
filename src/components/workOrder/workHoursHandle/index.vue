@@ -2,6 +2,7 @@
 	<div class="work_hours_handle">
 		<a-row style="padding:0 20px;">
 			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
+			<a-button @click="coefficientVisible=true">工时系数</a-button>
 			<a-button @click="save">
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
 			</a-button>
@@ -52,30 +53,65 @@
 							<th>工种</th>
 							<th>工序内容</th>
 							<th>
-								<span style="color:red;padding:0 4px">*</span>单件工时(分)
-							</th>
-							<th>
 								<span style="color:red;padding:0 4px">*</span>准备工时(分)
 							</th>
-							<th>合格数</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>单件工时(分)
+							</th>
+							<th>工时系数</th>
+							<!-- <th>合格数</th>
 							<th>加工者</th>
-							<th>检验</th>
+							<th>检验</th>-->
 						</tr>
 						<tr v-for="(i, index1) in tableData[index]" :key="index1">
 							<td style="width:5%">{{index1+1}}</td>
 							<td style="width:10%">{{i.workTypeName}}</td>
 							<td style="width:25%">{{i.processInfo}}</td>
 							<td style="width:15%;padding:4px;">
+								<a-input type="number" v-model="i.preparationTime"></a-input>
+							</td>
+							<td style="width:15%;padding:4px;">
 								<a-input type="number" v-model="i.itemWorkTime"></a-input>
 							</td>
 							<td style="width:15%;padding:4px;">
-								<a-input type="number" v-model="i.preparationTime"></a-input>
+								<a-select style="width:100%;" @change="(value)=>getCoefficientValue(value,index,index1)">
+									<a-select-option
+										:value="item.id"
+										v-for="(item,index3) in coefficientList"
+										:key="index3"
+									>{{item.range}}</a-select-option>
+								</a-select>
 							</td>
-							<td style="width:10%">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
+							<!-- <td style="width:10%">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
 							<td
 								style="width:10%"
 							>{{i.executives.length>0?i.executives.find(item=>{return item.isExecution==true}).employeeName:""}}</td>
-							<td style="width:10%"></td>
+							<td style="width:10%"></td>-->
+						</tr>
+					</table>
+				</a-col>
+				<a-col :span="24" style="padding:0 12px 20px">
+					<h3>历史工时信息</h3>
+					<table class="table_style">
+						<tr>
+							<th>序号</th>
+							<th>工种</th>
+							<th>工序内容</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>准备工时(分)
+							</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>单件工时(分)
+							</th>
+							<th>工时系数</th>
+						</tr>
+						<tr v-for="(i, index1) in tableData[index]" :key="index1">
+							<td style="width:5%">{{index1+1}}</td>
+							<td style="width:10%">{{i.workTypeName}}</td>
+							<td style="width:25%">{{i.processInfo}}</td>
+							<td style="width:15%;">{{i.preparationTime}}</td>
+							<td style="width:15%;">{{i.itemWorkTime}}</td>
+							<td style="width:15%;"></td>
 						</tr>
 					</table>
 				</a-col>
@@ -86,18 +122,42 @@
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
 			</a-button>
 		</a-row>
+		<a-modal
+			title="工时系数配置"
+			:footer="null"
+			width="800px"
+			:visible="coefficientVisible"
+			@cancel="handleCancel()"
+			:maskClosable="false"
+		>
+			<Coefficient></Coefficient>
+			<div style="text-align:right;padding-top:20px;">
+				<a-button type="primary" @click="coefficientVisible=false">关闭</a-button>
+			</div>
+		</a-modal>
 	</div>
 </template>
 <script>
+import Coefficient from "./Coefficient";
 export default {
 	data() {
 		return {
+			coefficientVisible: false,
 			allMsg: [],
 			tableData: [],
-			getData: []
+			getData: [],
+			coefficientList: []
 		};
 	},
 	methods: {
+		getCoefficientValue(value, index, index1) {
+			console.log(value);
+			console.log(index);
+			console.log(index1);
+		},
+		handleCancel() {
+			this.coefficientVisible = false;
+		},
 		getPreviewList() {
 			this.Axios(
 				{
@@ -112,10 +172,18 @@ export default {
 					if (result.data.code === 200) {
 						this.allMsg = result.data.data;
 						console.log(this.allMsg);
-						this.tableData = this.allMsg.map(item => {
-							return item.drawingDO.process;
+						this.tableData = this.allMsg.map(item1 => {
+							return item1.drawingDO.process.map(item => {
+								return {
+									...item,
+									itemWorkTime:
+										item.itemWorkTime != null ? item.itemWorkTime : 0,
+									preparationTime:
+										item.preparationTime != null ? item.preparationTime : 0
+								};
+							});
 						});
-
+						this.tableData;
 						console.log(this.tableData);
 					}
 				},
@@ -188,10 +256,44 @@ export default {
 					({ type, info }) => {}
 				);
 			}
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-workorder/coefficient/list",
+					params: {},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result);
+						this.coefficientList = result.data.data.map(item => {
+							return {
+								range:
+									item.minValue +
+									"~" +
+									item.maxValue +
+									" 系数" +
+									item.coefficient,
+								id: item.id
+							};
+						});
+						console.log(this.coefficientList);
+					}
+				},
+				({ type, info }) => {}
+			);
 		}
 	},
 	created() {
 		this.getPreviewList();
+		this.getList();
+	},
+	components: {
+		Coefficient
 	}
 };
 </script>

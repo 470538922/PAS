@@ -5,6 +5,7 @@
 			<a-input style="width:200px;margin-right:20px;" v-model="employeeName"></a-input>时间：
 			<a-range-picker @change="getTime" format="YYYY/MM/DD" />
 			<a-button @click="getList">查询</a-button>
+			<a-button @click="download">导出</a-button>
 		</a-row>
 		<a-row style="padding-top:10px;">
 			<a-table :columns="columns" :pagination="false" :dataSource="data" rowKey="empNo">
@@ -56,7 +57,7 @@ const columns = [
 	{
 		dataIndex: "workLoad",
 		key: "workLoad",
-		title: "总工时",
+		title: "总工时(H)",
 		width: "25%"
 	},
 	{
@@ -84,6 +85,65 @@ export default {
 		};
 	},
 	methods: {
+		download() {
+			this.$axios
+				.post(
+					this.global.apiSrc + "/api-workorder/workLoadCounting/exportExcel",
+					{
+						startTime: this.startTime != "" ? this.startTime : null,
+						endTime: this.endTime != "" ? this.endTime : null
+					},
+					{
+						responseType: "blob" // 设置响应数据类型
+					}
+				)
+				.then(res => {
+					if (res.status == 200) {
+						console.log(res);
+						var blob = new Blob([res.data], {
+							type:
+								"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+						});
+						var downloadElement = document.createElement("a");
+						var href = window.URL.createObjectURL(blob); //创建下载的链接
+						downloadElement.href = href;
+						let fileName;
+						console.log(this.startTime, this.endTime);
+						if (
+							this.startTime != "" &&
+							this.startTime != null &&
+							this.endTime != "" &&
+							this.endTime != null
+						) {
+							fileName =
+								this.startTime.replace(/\//g, "") +
+								"~" +
+								this.endTime.replace(/\//g, "");
+						} else if (
+							(this.startTime == "" || this.startTime == null) &&
+							(this.endTime != "" && this.endTime != null)
+						) {
+							fileName = this.endTime.replace(/\//g, "") + "之前所有";
+						} else if (
+							this.startTime != "" &&
+							this.startTime != null &&
+							(this.endTime == "" || this.endTime == null)
+						) {
+							fileName = this.startTime.replace(/\//g, "") + "至今所有";
+						} else if (
+							(this.startTime == "" || this.startTime == null) &&
+							(this.endTime == "" || this.endTime == null)
+						) {
+							fileName = "所有";
+						}
+						downloadElement.download = fileName + "工时统计.xlsx"; //下载后文件名
+						document.body.appendChild(downloadElement);
+						downloadElement.click(); //点击下载
+						document.body.removeChild(downloadElement); //下载完成移除元素
+						window.URL.revokeObjectURL(href); //释放掉blob对象
+					}
+				});
+		},
 		getTime(a, b) {
 			console.log(b);
 			this.startTime = b[0];
