@@ -86,6 +86,11 @@ export default {
 	},
 	methods: {
 		download() {
+			let qs = require("qs");
+			let value = qs.stringify({
+				startTime: this.startTime != "" ? this.startTime : null,
+				endTime: this.endTime != "" ? this.endTime : null
+			});
 			this.$axios
 				.post(
 					this.global.apiSrc + "/api-workorder/workLoadCounting/exportExcel",
@@ -94,7 +99,8 @@ export default {
 						endTime: this.endTime != "" ? this.endTime : null
 					},
 					{
-						responseType: "blob" // 设置响应数据类型
+						responseType: "blob", // 设置响应数据类型
+						headers: { "Content-Type": "application/json" }
 					}
 				)
 				.then(res => {
