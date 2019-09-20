@@ -552,8 +552,8 @@ export default {
 							? this.tableData[i].realAddFee
 							: 0
 					);
-					console.log(this.total);
 				}
+				this.total = this.total.toFixed(2);
 			}
 		},
 		cancel(key) {
@@ -649,6 +649,7 @@ export default {
 									? this.tableData[i].realAddFee
 									: 0;
 						}
+						this.total = this.total.toFixed(2);
 					}
 				},
 				({ type, info }) => {}

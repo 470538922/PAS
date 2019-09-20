@@ -97,7 +97,7 @@
 								:key="sub_menu.key"
 								v-for="(sub_menu,index2) in menu.subMenu"
 								@click="switchTab(sub_menu.key)"
-							>{{sub_menu.menu}}</a-menu-item>
+							>&nbsp;{{sub_menu.menu}}</a-menu-item>
 						</a-sub-menu>
 					</a-menu>
 				</a-layout-sider>
