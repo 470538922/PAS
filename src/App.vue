@@ -97,7 +97,7 @@
 								:key="sub_menu.key"
 								v-for="(sub_menu,index2) in menu.subMenu"
 								@click="switchTab(sub_menu.key)"
-							>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{sub_menu.menu}}</a-menu-item>
+							>&nbsp;{{sub_menu.menu}}</a-menu-item>
 						</a-sub-menu>
 					</a-menu>
 				</a-layout-sider>
@@ -129,7 +129,7 @@
 					</a-layout-content>
 				</a-layout>
 			</a-layout>
-			<a-layout-footer>PMS (V1.2_beta（内测版）) ©2019 Created by Changhong Intelligent Manufacturing</a-layout-footer>
+			<a-layout-footer>PMS (V1.2.1_beta（内测版）) ©2019 Created by Changhong Intelligent Manufacturing</a-layout-footer>
 		</a-layout>
 	</a-locale-provider>
 </template>

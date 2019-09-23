@@ -404,31 +404,31 @@ export default {
 		}
 		.table_style {
 			width: 100%;
-			border: 1px solid #dde2eb;
+			border: 1px solid #000000;
 			border-collapse: collapse;
 			tr {
 				width: 100%;
 				th {
 					text-align: center;
-					border: 1px solid #dde2eb;
+					border: 1px solid #000000;
 					line-height: 28px;
 				}
 				td {
 					text-align: center;
-					border: 1px solid #dde2eb;
+					border: 1px solid #000000;
 					line-height: 28px;
 				}
 			}
 		}
 		.table_style1 {
 			width: 100%;
-			border: 1px solid #dde2eb;
+			border: 1px solid #000000;
 			border-collapse: collapse;
 			tr {
 				width: 100%;
 				td {
 					text-align: left;
-					border: 1px solid #dde2eb;
+					border: 1px solid #000000;
 					line-height: 50px;
 					padding: 0 8px;
 				}

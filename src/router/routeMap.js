@@ -31,7 +31,7 @@ export default [{
     permissionCode: 'workorder',
     icon: '&#xe602;',
     subMenu: [{
-        menu: '工单管理',
+        menu: '工单列表',
         route: '/WorkOrderList',
         key: 'workOrderList',
         permissionCode: 'workorder_manage_lookup'
@@ -66,18 +66,7 @@ export default [{
       },
     ]
   },
-  {
-    menu: '工艺图纸',
-    defaultDock: false,
-    permissionCode: 'drawing',
-    icon: '&#xe616;',
-    subMenu: [{
-      menu: '工艺图纸',
-      route: '/DrawingsList',
-      key: 'drawingsList',
-      permissionCode: 'drawing_drawing_lookup'
-    }]
-  },
+
   // {
   //   menu: '订单报价',
   //   defaultDock: false,
@@ -97,25 +86,14 @@ export default [{
   //     },
   //   ]
   // },
-  {
-    menu: '工时统计',
-    defaultDock: false,
-    permissionCode: 'workhours',
-    icon: '&#xea06;',
-    subMenu: [{
-      menu: '工时统计',
-      route: '/WorkingHours',
-      key: 'workingHours',
-      permissionCode: 'workhours_lookup'
-    }, ]
-  },
+
   {
     menu: '工种管理',
     defaultDock: false,
     permissionCode: 'worktype',
     icon: '&#xe605;',
     subMenu: [{
-      menu: '工种管理',
+      menu: '工种列表',
       route: '/ProcessTypes',
       key: 'ProcessTypes',
       permissionCode: 'worktype_worktype_lookup'
@@ -127,7 +105,7 @@ export default [{
     permissionCode: 'employee',
     icon: '&#xe6de;',
     subMenu: [{
-        menu: '员工管理',
+        menu: '员工列表',
         route: '/Employee',
         key: 'employee',
         permissionCode: 'employee_list_lookup'
@@ -154,14 +132,38 @@ export default [{
     permissionCode: 'rawMateria',
     icon: '&#xe64a;',
     subMenu: [{
-      menu: '原材料管理',
+      menu: '原材料列表',
       route: '/materialManagementList',
       key: 'materialManagementList',
       permissionCode: 'raw_raw_lookup'
     }, ]
   },
   {
-    menu: '合作单位',
+    menu: '图纸管理',
+    defaultDock: false,
+    permissionCode: 'drawing',
+    icon: '&#xe616;',
+    subMenu: [{
+      menu: '图纸列表',
+      route: '/DrawingsList',
+      key: 'drawingsList',
+      permissionCode: 'drawing_drawing_lookup'
+    }]
+  },
+  {
+    menu: '数据分析',
+    defaultDock: false,
+    permissionCode: 'workhours',
+    icon: '&#xea06;',
+    subMenu: [{
+      menu: '工时统计',
+      route: '/WorkingHours',
+      key: 'workingHours',
+      permissionCode: 'workhours_lookup'
+    }, ]
+  },
+  {
+    menu: '基础数据',
     defaultDock: false,
     permissionCode: 'collaboration',
     icon: '&#xe6a5;',
@@ -170,20 +172,20 @@ export default [{
       route: '/Subcontract',
       key: 'Subcontract',
       permissionCode: 'collaboration_col_lookup'
-    }, ]
-  },
-  {
-    menu: '留言反馈',
-    defaultDock: false,
-    permissionCode: 'advise',
-    icon: '&#xe65f;',
-    subMenu: [{
+    }, {
       menu: '留言反馈',
       route: '/Feedback',
       key: 'Feedback',
       permissionCode: 'advise_list_lookup'
-    }, ]
+    }]
   },
+  // {
+  //   menu: '留言反馈',
+  //   defaultDock: false,
+  //   permissionCode: 'advise',
+  //   icon: '&#xe65f;',
+  //   subMenu: [, ]
+  // },
   {
     menu: '系统配置',
     defaultDock: false,
