@@ -7,15 +7,20 @@
 					<a-row>
 						<div style="line-height:50px;">
 							<a-col :span="8">
-								<a-button @click="addVisible=true">
+								<permission-button permCode banType="hide" @click="addVisible=true">
 									<a-icon style="color:#1890ff;" type="plus" />新增
-								</a-button>
-								<a-button @click="showEdit" :disabled="selectedRowKeys.length!=1">
+								</permission-button>
+								<permission-button
+									permCode
+									banType="hide"
+									@click="showEdit"
+									:disabled="selectedRowKeys.length!=1"
+								>
 									<a-icon style="color:#1890ff;" type="edit" />修改
-								</a-button>
+								</permission-button>
 								<!-- <a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
 									<a-icon style="color:#1890ff;" type="delete" />删除
-								</a-button> -->
+								</a-button>-->
 							</a-col>
 							<a-col :span="16" style="text-align:right">
 								<a-input type="text" v-model="keyword" style="width:300px" placeholder="图纸号/图纸名称"></a-input>

@@ -10,6 +10,7 @@ import base from "./base.js";
 import Axios from './AxiosRequest';
 import global from './components/global/Global'
 import menuSourceMap from "./router/routeMap";
+import permissionPacker from "./PermissionPacker.js"
 import {
   Affix,
   Anchor,
@@ -84,7 +85,7 @@ Vue.prototype.$error = Modal.error;
 Vue.prototype.$warning = Modal.warning;
 Vue.prototype.$confirm = Modal.confirm;
 
-
+Vue.use(permissionPacker);
 Vue.use(Affix);
 Vue.use(Anchor);
 Vue.use(AutoComplete);
