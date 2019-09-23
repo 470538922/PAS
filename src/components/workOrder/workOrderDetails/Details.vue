@@ -138,13 +138,6 @@ const columns = [
 		scopedSlots: { customRender: "processInfo" }
 	},
 	{
-		dataIndex: "workingHours",
-		key: "workingHours",
-		title: "工时(h)",
-		width: 50,
-		scopedSlots: { customRender: "workingHours" }
-	},
-	{
 		dataIndex: "principalEmployeeName",
 		key: "principalEmployeeName",
 		title: "班组长",

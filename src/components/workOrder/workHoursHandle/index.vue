@@ -2,40 +2,41 @@
 	<div class="work_hours_handle">
 		<a-row style="padding:0 20px;">
 			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
+			<a-button @click="coefficientVisible=true">工时系数</a-button>
 			<a-button @click="save">
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
 			</a-button>
 		</a-row>
 		<a-row style="padding:20px 20px 0;" v-for="(item,index) in allMsg" :key="index">
 			<div class="item_case">
-				<a-col :span="24" class="item_title">{{item.workOrderDesDO.name}}</a-col>
+				<a-col :span="24" class="item_title">{{item.drawing.name}}</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">工作令号：</span>
-					<span>{{item.drawingDO.workOrder.gongzuolingNo}}</span>
+					<span>{{item.drawing.drawingNo}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">图号：</span>
-					<span>{{item.workOrderDesDO.drawingNo}}</span>
+					<span>{{item.drawing.drawingNo}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">计划编号：</span>
-					<span>{{item.workOrderDesDO.planCode}}</span>
+					<span>{{item.drawing.workOrderDes.planCode}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">名称：</span>
-					<span>{{item.workOrderDesDO.name}}</span>
+					<span>{{item.drawing.name}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">计划数量：</span>
-					<span>{{item.workOrderDesDO.amount}}</span>
+					<span>{{item.drawing.workOrderDes.amount}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">每毛坯件数：</span>
-					<span>{{item.drawingDO.inTheEmbryoComponents}}</span>
+					<span>{{item.drawing.inTheEmbryoComponents}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">材料名称：</span>
-					<span>{{(item.drawingDO.rawMaterialDO.type==1?"板料":item.drawingDO.rawMaterialDO.type==2?"棒料":"型材")+' '+item.drawingDO.rawMaterialDO.name}}</span>
+					<span>{{(item.drawing.rawMaterialDO.type==1?"板料":item.drawing.rawMaterialDO.type==2?"棒料":"型材")+' '+item.drawing.rawMaterialDO.name}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">毛坯外形尺寸：</span>
@@ -43,7 +44,7 @@
 				</a-col>
 				<a-col :span="24" class="item_content">
 					<span class="item_label">备注：</span>
-					<span>{{item.workOrderDesDO.remark}}</span>
+					<span>{{item.drawing.workOrderDes.remark}}</span>
 				</a-col>
 				<a-col :span="24" style="padding:20px 12px;">
 					<table class="table_style">
@@ -52,30 +53,73 @@
 							<th>工种</th>
 							<th>工序内容</th>
 							<th>
-								<span style="color:red;padding:0 4px">*</span>单件工时(分)
-							</th>
-							<th>
 								<span style="color:red;padding:0 4px">*</span>准备工时(分)
 							</th>
-							<th>合格数</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>单件工时(分)
+							</th>
+							<th>工时系数</th>
+							<!-- <th>合格数</th>
 							<th>加工者</th>
-							<th>检验</th>
+							<th>检验</th>-->
 						</tr>
 						<tr v-for="(i, index1) in tableData[index]" :key="index1">
 							<td style="width:5%">{{index1+1}}</td>
 							<td style="width:10%">{{i.workTypeName}}</td>
 							<td style="width:25%">{{i.processInfo}}</td>
 							<td style="width:15%;padding:4px;">
+								<a-input type="number" v-model="i.preparationTime"></a-input>
+							</td>
+							<td style="width:15%;padding:4px;">
 								<a-input type="number" v-model="i.itemWorkTime"></a-input>
 							</td>
 							<td style="width:15%;padding:4px;">
-								<a-input type="number" v-model="i.preparationTime"></a-input>
+								<a-select
+									style="width:100%;"
+									v-model="i.coefficientDO.id"
+									@change="(value)=>getCoefficientValue(value,index,index1)"
+								>
+									<a-select-option
+										:value="item.id"
+										v-for="(item,index3) in coefficientList"
+										:key="index3"
+									>{{item.range}}</a-select-option>
+								</a-select>
 							</td>
-							<td style="width:10%">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
+							<!-- <td style="width:10%">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
 							<td
 								style="width:10%"
 							>{{i.executives.length>0?i.executives.find(item=>{return item.isExecution==true}).employeeName:""}}</td>
-							<td style="width:10%"></td>
+							<td style="width:10%"></td>-->
+						</tr>
+					</table>
+				</a-col>
+				<a-col :span="24" style="padding:0 12px 20px">
+					<h3>历史工时信息</h3>
+					<table class="table_style">
+						<tr>
+							<th>序号</th>
+							<th>工种</th>
+							<th>工序内容</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>准备工时(分)
+							</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>单件工时(分)
+							</th>
+							<th>
+								<span style="color:red;padding:0 4px">*</span>工时系数
+							</th>
+						</tr>
+						<tr v-for="(i, index1) in item.history" :key="index1">
+							<td style="width:5%">{{index1+1}}</td>
+							<td style="width:10%">{{i.workTypeName}}</td>
+							<td style="width:25%">{{i.processInfo}}</td>
+							<td style="width:15%;">{{i.preparationTime}}</td>
+							<td style="width:15%;">{{i.itemWorkTime}}</td>
+							<td
+								style="width:15%;"
+							>{{i.coefficientDO!=null?i.coefficientDO.minValue+"~"+i.coefficientDO.maxValue+" 系数"+i.coefficientDO.coefficient:""}}</td>
 						</tr>
 					</table>
 				</a-col>
@@ -86,22 +130,46 @@
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
 			</a-button>
 		</a-row>
+		<a-modal
+			title="工时系数配置"
+			:footer="null"
+			width="800px"
+			:visible="coefficientVisible"
+			@cancel="handleCancel()"
+			:maskClosable="false"
+		>
+			<Coefficient></Coefficient>
+			<div style="text-align:right;padding-top:20px;">
+				<a-button type="primary" @click="coefficientVisible=false">关闭</a-button>
+			</div>
+		</a-modal>
 	</div>
 </template>
 <script>
+import Coefficient from "./Coefficient";
 export default {
 	data() {
 		return {
+			coefficientVisible: false,
 			allMsg: [],
 			tableData: [],
-			getData: []
+			getData: [],
+			coefficientList: []
 		};
 	},
 	methods: {
+		getCoefficientValue(value, index, index1) {
+			console.log(value);
+			console.log(index);
+			console.log(index1);
+		},
+		handleCancel() {
+			this.coefficientVisible = false;
+		},
 		getPreviewList() {
 			this.Axios(
 				{
-					url: "/api-workorder/workOrderDes/preview",
+					url: "/api-workorder/WorkLoadManage/list",
 					params: this.$route.params.id.split(","),
 					type: "post",
 					option: { enableMsg: false }
@@ -110,12 +178,36 @@ export default {
 			).then(
 				result => {
 					if (result.data.code === 200) {
-						this.allMsg = result.data.data;
-						console.log(this.allMsg);
-						this.tableData = this.allMsg.map(item => {
-							return item.drawingDO.process;
+						let a = result.data.data.map(item => {
+							return {
+								...item,
+								drawing: {
+									...item.drawing,
+									process: item.drawing.process.map(i => {
+										return {
+											...i,
+											coefficientDO:
+												i.coefficientDO != null ? i.coefficientDO : { id: "" }
+										};
+									})
+								}
+							};
 						});
-
+						console.log(a);
+						this.allMsg = a;
+						console.log(this.allMsg);
+						this.tableData = this.allMsg.map(item1 => {
+							return item1.drawing.process.map(item => {
+								return {
+									...item,
+									itemWorkTime:
+										item.itemWorkTime != null ? item.itemWorkTime : 0,
+									preparationTime:
+										item.preparationTime != null ? item.preparationTime : 0
+								};
+							});
+						});
+						this.tableData;
 						console.log(this.tableData);
 					}
 				},
@@ -130,7 +222,8 @@ export default {
 					return {
 						processId: i.id,
 						itemWorkTime: i.itemWorkTime,
-						preparationTime: i.preparationTime
+						preparationTime: i.preparationTime,
+						coefficientId: i.coefficientDO.id
 					};
 				});
 			});
@@ -147,19 +240,20 @@ export default {
 					})
 					.find(item => item == false) != undefined
 			) {
-				this.$message.error("单件工时、准备工时只能是正整数");
+				this.$message.error("单件工时、准备工时只能是大于等于0的整数");
 			} else if (
 				value
 					.map(item => {
 						return (
 							item.itemWorkTime !== "" &&
 							item.itemWorkTime !== null &&
-							(item.preparationTime !== "" && item.preparationTime !== null)
+							(item.preparationTime !== "" && item.preparationTime !== null) &&
+							(item.coefficientId !== "" && item.coefficientId !== null)
 						);
 					})
 					.find(item => item == false) != undefined
 			) {
-				this.$message.error("单件工时、准备工时不能为空");
+				this.$message.error("单件工时、准备工时、工时系数不能为空");
 			} else {
 				this.Axios(
 					{
@@ -188,10 +282,45 @@ export default {
 					({ type, info }) => {}
 				);
 			}
+		},
+		getList() {
+			this.Axios(
+				{
+					url: "/api-workorder/coefficient/list",
+					params: {},
+					type: "get",
+					option: { enableMsg: false }
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						console.log(result.data.data);
+						if (result.data.data != null && result.data.data != []) {
+							this.coefficientList = result.data.data.map(item => {
+								return {
+									range:
+										item.minValue +
+										"~" +
+										item.maxValue +
+										" 系数" +
+										item.coefficient,
+									id: item.id
+								};
+							});
+						}
+					}
+				},
+				({ type, info }) => {}
+			);
 		}
 	},
 	created() {
 		this.getPreviewList();
+		this.getList();
+	},
+	components: {
+		Coefficient
 	}
 };
 </script>

@@ -149,3 +149,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.button_text {
+  height: auto;
+  border-color: transparent;
+  color: #409eff;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+}
+.button_text:hover {
+  color: #66b1ff;
+  border-color: transparent;
+  background-color: transparent;
+}
+.button_text:active {
+  color: #3a8ee6;
+  background-color: transparent;
+  outline: none;
+}
+.button_text:focus {
+  color: #66b1ff;
+  border-color: transparent;
+  background-color: transparent;
+}

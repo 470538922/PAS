@@ -381,6 +381,8 @@ export default {
 			if (params.type == "affirm") {
 				this.technologyAddVisible = params.value;
 				this.getList(this.$route.params.id);
+				this.selectedRows = [];
+				this.selectedRowKeys = [];
 			}
 		},
 		editTechnology(params) {
@@ -391,6 +393,8 @@ export default {
 			if (params.type == "affirm") {
 				this.technologyEditVisible = params.value;
 				this.getList(this.$route.params.id);
+				this.selectedRows = [];
+				this.selectedRowKeys = [];
 			}
 		},
 		technologyModalShow(row) {

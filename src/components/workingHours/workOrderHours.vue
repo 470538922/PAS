@@ -54,7 +54,7 @@ const columns = [
 	{
 		dataIndex: "workLoad",
 		key: "workLoad",
-		title: "总工时",
+		title: "总工时(H)",
 		width: "20%"
 	},
 	{

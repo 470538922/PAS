@@ -414,11 +414,11 @@ export default {
 	methods: {
 		chickNumber(rule, value, callback) {
 			if (
-				/^\+?[1-9]\d*$/.test(value) == false &&
+				/^(0|[1-9]\d*)(\s|$|\.\d{1,1}\b)/.test(value) == false &&
 				value != "" &&
 				value != null
 			) {
-				callback(new Error("只能输入大于0的整数"));
+				callback(new Error("请输入大于等于0，只能保留1位小数"));
 			} else {
 				callback();
 			}
