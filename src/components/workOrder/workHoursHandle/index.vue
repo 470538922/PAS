@@ -119,7 +119,7 @@
 							<td style="width:15%;">{{i.itemWorkTime}}</td>
 							<td
 								style="width:15%;"
-							>{{i.coefficientDO.minValue+"~"+i.coefficientDO.maxValue+" 系数"+i.coefficientDO.coefficient}}</td>
+							>{{i.coefficientDO!=null?i.coefficientDO.minValue+"~"+i.coefficientDO.maxValue+" 系数"+i.coefficientDO.coefficient:""}}</td>
 						</tr>
 					</table>
 				</a-col>
@@ -295,19 +295,20 @@ export default {
 			).then(
 				result => {
 					if (result.data.code === 200) {
-						console.log(result);
-						this.coefficientList = result.data.data.map(item => {
-							return {
-								range:
-									item.minValue +
-									"~" +
-									item.maxValue +
-									" 系数" +
-									item.coefficient,
-								id: item.id
-							};
-						});
-						console.log(this.coefficientList);
+						console.log(result.data.data);
+						if (result.data.data != null && result.data.data != []) {
+							this.coefficientList = result.data.data.map(item => {
+								return {
+									range:
+										item.minValue +
+										"~" +
+										item.maxValue +
+										" 系数" +
+										item.coefficient,
+									id: item.id
+								};
+							});
+						}
 					}
 				},
 				({ type, info }) => {}
