@@ -12,7 +12,7 @@ import Organization from '@/components/organization/index'
 import Employee from '@/components/system/employee'
 import AddEmployee from '@/components/system/AddEmployee'
 import EditEmployee from '@/components/system/EditEmployee'
-import Admin from '@/components/system/admin/Admin'
+
 import Authority from '@/components/system/authority/Authority'
 import AddAuthority from '@/components/system/authority/AddAuthority'
 import EditAuthority from '@/components/system/authority/EditAuthority'
@@ -156,14 +156,6 @@ export default new Router({
           },
         }
       ]
-    },
-    {
-      path: '/Admin',
-      name: 'Admin',
-      component: Admin,
-      meta: {
-        requireAuth: true,
-      },
     },
     {
       path: '/Authority',

@@ -129,7 +129,7 @@
 					</a-layout-content>
 				</a-layout>
 			</a-layout>
-			<a-layout-footer>PMS (V1.2.1_beta（内测版）) ©2019 Created by Changhong Intelligent Manufacturing</a-layout-footer>
+			<a-layout-footer>PMS (V1.2.2_beta（内测版）) ©2019 Created by Changhong Intelligent Manufacturing</a-layout-footer>
 		</a-layout>
 	</a-locale-provider>
 </template>
@@ -151,7 +151,8 @@ import {
 	Col,
 	Row,
 	Badge,
-	Tooltip
+	Tooltip,
+	LocaleProvider
 } from "ant-design-vue";
 import menuSourceMap from "./router/routeMap";
 import clone from "clone";
@@ -171,6 +172,7 @@ Vue.component(Col.name, Col);
 Vue.component(Row.name, Row);
 Vue.component(Badge.name, Badge);
 Vue.component(Tooltip.name, Tooltip);
+Vue.use(LocaleProvider);
 
 const global = window;
 export default {

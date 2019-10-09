@@ -51,6 +51,9 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Col } from "ant-design-vue";
+Vue.use(Col);
 export default {
 	props: {
 		detailsMsg: {

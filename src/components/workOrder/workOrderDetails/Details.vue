@@ -114,6 +114,11 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Col, Row, Form } from "ant-design-vue";
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Form);
 const columns = [
 	{
 		dataIndex: "serialNo",

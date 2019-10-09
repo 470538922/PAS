@@ -176,14 +176,21 @@ export default {
 						// this.$router.replace("/Dashboard");
 						sessionStorage.token = result.data.data.token;
 						let permissionUrl =
-							result.data.data.user.role != null&&result.data.data.user.role != ""
-								? result.data.data.user.role.permissionLookups.map(item => {
+							result.data.data.user.permissions != null &&
+							result.data.data.user.permissions != ""
+								? result.data.data.user.permissions.map(item => {
 										return {
 											module: item.permissionUrl,
-											permissionItem: []
+											permissionItem:
+												item.buttons != undefined
+													? item.buttons.map(i => {
+															return i.permissionUrl;
+													  })
+													: []
 										};
 								  })
 								: [];
+						// console.log(permissionUrl);
 						sessionStorage.permissionUrl = JSON.stringify(permissionUrl);
 						sessionStorage.user = JSON.stringify(result.data.data.user);
 						if (result.data.data.user.userType == 1) {
@@ -206,6 +213,22 @@ export default {
 					}
 				}
 			);
+		},
+		filterArray(data, parent) {
+			let vm = this;
+			var tree = [];
+			var temp;
+			for (var i = 0; i < data.length; i++) {
+				if (data[i].parentCode == parent) {
+					var obj = data[i];
+					temp = this.filterArray(data, data[i].code);
+					if (temp.length > 0) {
+						obj.children = temp;
+					}
+					tree.push(obj);
+				}
+			}
+			return tree;
 		}
 	},
 	components: {

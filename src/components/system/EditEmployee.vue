@@ -128,7 +128,12 @@
 						</a-upload>
 					</a-form-item>
 					<a-form-item :wrapper-col="{ span: 22,offset: 2 }">
-						<a-button type="primary" @click="handleSubmit">提交</a-button>
+						<permission-button
+							permCode="employee_update_lookup.employee_update_save"
+							banType="hide"
+							type="primary"
+							@click="handleSubmit"
+						>提交</permission-button>
 					</a-form-item>
 				</a-form>
 			</div>
@@ -136,6 +141,27 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Upload,
+	Form,
+	Input,
+	Icon,
+	TreeSelect,
+	Select,
+	DatePicker,
+	Radio,
+	Row
+} from "ant-design-vue";
+Vue.use(Upload);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(Icon);
+Vue.use(TreeSelect);
+Vue.use(Select);
+Vue.use(DatePicker);
+Vue.use(Row);
+Vue.use(Select);
 import moment from "moment";
 const treeData = [
 	{

@@ -9,15 +9,29 @@
 							<!-- <a-button type="primary" @click="$router.push({path:'/Authority/AddAuthority'})">
 								<a-icon type="plus-circle"/>新增
 							</a-button>-->
-							<a-button @click="$router.push({path:'/Authority/AddAuthority'})">
+							<permission-button
+								permCode
+								banType="hide"
+								@click="$router.push({path:'/Authority/AddAuthority'})"
+							>
 								<a-icon style="color:#1890ff;" type="plus" />新增
-							</a-button>
-							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+							</permission-button>
+							<permission-button
+								permCode
+								banType="hide"
+								@click="edit"
+								:disabled="selectedRowKeys.length!=1"
+							>
 								<a-icon style="color:#1890ff;" type="edit" />修改
-							</a-button>
-							<a-button :disabled="selectedRowKeys.length!=1" @click="showDeleteConfirm">
+							</permission-button>
+							<permission-button
+								permCode="system_role_list_lookup.system_role_delete"
+								banType="hide"
+								:disabled="selectedRowKeys.length!=1"
+								@click="showDeleteConfirm"
+							>
 								<a-icon style="color:#1890ff;" type="delete" />删除
-							</a-button>
+							</permission-button>
 						</a-col>
 					</div>
 				</a-row>
@@ -46,22 +60,12 @@
 	</div>
 </template>
 <script>
-const rowSelection = {
-	culumnsWidth: "5%",
-	onChange: (selectedRowKeys, selectedRows) => {
-		console.log(
-			`selectedRowKeys: ${selectedRowKeys}`,
-			"selectedRows: ",
-			selectedRows
-		);
-	},
-	onSelect: (record, selected, selectedRows) => {
-		console.log(record, selected, selectedRows);
-	},
-	onSelectAll: (selected, selectedRows, changeRows) => {
-		console.log(selected, selectedRows, changeRows);
-	}
-};
+import Vue from "vue";
+import { Table, Col, Row, Pagination } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
 const columns = [
 	{
 		dataIndex: "name",

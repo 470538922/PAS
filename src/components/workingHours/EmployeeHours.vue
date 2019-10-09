@@ -5,7 +5,11 @@
 			<a-input style="width:200px;margin-right:20px;" v-model="employeeName"></a-input>时间：
 			<a-range-picker @change="getTime" format="YYYY/MM/DD" />
 			<a-button @click="getList">查询</a-button>
-			<a-button @click="download">导出</a-button>
+			<permission-button
+				permCode="workhours_lookup.workhour_daochu"
+				banType="hide"
+				@click="download"
+			>导出</permission-button>
 		</a-row>
 		<a-row style="padding-top:10px;">
 			<a-table :columns="columns" :pagination="false" :dataSource="data" rowKey="empNo">
@@ -40,6 +44,21 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Row,
+	Modal,
+	Pagination,
+	Input,
+	DatePicker
+} from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Input);
+Vue.use(DatePicker);
 import EmployeeHoursDetails from "./EmployeeHoursDetails";
 const columns = [
 	{

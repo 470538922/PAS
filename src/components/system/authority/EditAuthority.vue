@@ -35,7 +35,12 @@
 						/>
 					</a-form-item>
 					<a-form-item :wrapper-col="{ span: 22,offset: 2 }">
-						<a-button type="primary" @click="updata()">提交</a-button>
+						<permission-button
+							permCode="role_update_lookup.role_update_save"
+							banType="hide"
+							type="primary"
+							@click="updata()"
+						>提交</permission-button>
 					</a-form-item>
 				</a-form>
 			</div>
@@ -43,6 +48,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Tree, Col, Row, Form, Input } from "ant-design-vue";
+Vue.use(Input);
+Vue.use(Tree);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Form);
 export default {
 	data() {
 		return {

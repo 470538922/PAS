@@ -124,6 +124,25 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Tabs,
+	Modal,
+	Form,
+	Input,
+	DatePicker,
+	Select,
+	Radio
+} from "ant-design-vue";
+Vue.use(Table);
+Vue.use(Tabs);
+Vue.use(Select);
+Vue.use(Modal);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(DatePicker);
+Vue.use(Radio);
 import moment from "moment";
 import OrderSelect from "../public/OrderSelect";
 export default {
@@ -148,11 +167,11 @@ export default {
 	methods: {
 		chickNumber(rule, value, callback) {
 			if (
-				/^\+?[1-9]\d*$/.test(value) == false &&
+				(/^\d+(\.\d{0,2})?$/.test(value) == false || value <= 0) &&
 				value != "" &&
 				value != null
 			) {
-				callback(new Error("只能输入大于0的整数"));
+				callback(new Error("只能输入大于0,且只能保留两位小数"));
 			} else {
 				callback();
 			}

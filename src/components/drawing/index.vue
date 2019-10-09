@@ -7,11 +7,15 @@
 					<a-row>
 						<div style="line-height:50px;">
 							<a-col :span="8">
-								<permission-button permCode banType="hide" @click="addVisible=true">
+								<permission-button
+									permCode="drawing_drawing_lookup.drawing_drawing_add"
+									banType="hide"
+									@click="addVisible=true"
+								>
 									<a-icon style="color:#1890ff;" type="plus" />新增
 								</permission-button>
 								<permission-button
-									permCode
+									permCode="drawing_drawing_lookup.drawing_drawing_update"
 									banType="hide"
 									@click="showEdit"
 									:disabled="selectedRowKeys.length!=1"
@@ -74,6 +78,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Table, Col, Row, Modal, Pagination } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
 import add from "./Add";
 import edit from "./Edit";
 const columns = [

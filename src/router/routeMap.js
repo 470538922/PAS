@@ -41,28 +41,28 @@ export default [{
         routeReg: /^\/WorkOrderList\/WorkOrderDetailsList\/\w{1,}$/i,
         key: 'WorkOrderDetailsList',
         visible: true,
-        permissionCode: 'workorder_item_lookup'
+        permissionCode: 'workorder_detail_lookup'
       },
       {
         menu: '工时管理',
         routeReg: /^\/WorkOrderList\/WorkOrderDetailsList\/\w{1,}\/WorkHoursHandle\/.{1,}$/i,
         key: 'WorkHoursHandle',
         visible: true,
-        permissionCode: 'workorder_item_lookup'
+        permissionCode: 'workorder_worktime_lookup'
       },
       {
         menu: '物资清单',
         routeReg: /^\/WorkOrderList\/Inventory\/\w{1,}$/i,
         key: 'Inventory',
         visible: true,
-        permissionCode: 'workorder_list_lookup'
+        permissionCode: 'workorder_partlist_lookup'
       },
       {
         menu: '生产报价单',
         routeReg: /^\/WorkOrderList\/OrderPrice\/\w{1,}$/i,
         key: 'OrderPrice',
         visible: true,
-        permissionCode: 'offer_order_lookup'
+        permissionCode: 'workorder_offer_lookup'
       },
     ]
   },
@@ -214,13 +214,13 @@ export default [{
         route: '/Authority/AddAuthority',
         key: 'addAuthority',
         visible: true,
-        permissionCode: 'system_role_add_lookup'
+        permissionCode: 'role_add_lookup'
       }, {
         menu: '权限修改',
         routeReg: /^\/Authority\/EditAuthority\/\w{1,}$/i,
         key: 'editAuthority',
         visible: true,
-        permissionCode: 'system_role_update_lookup'
+        permissionCode: 'role_update_lookup'
       },
     ]
   }

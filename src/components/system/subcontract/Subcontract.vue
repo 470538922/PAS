@@ -7,15 +7,29 @@
 						<!-- <a-button type="primary" @click="modalNewVisible=true">
 							<a-icon type="plus-circle"/>添加
 						</a-button>-->
-						<a-button @click="modalNewVisible=true">
+						<permission-button
+							permCode="collaboration_col_lookup.collaboration_col_add"
+							banType="hide"
+							@click="modalNewVisible=true"
+						>
 							<a-icon style="color:#1890ff;" type="plus" />新增
-						</a-button>
-						<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
+						</permission-button>
+						<permission-button
+							permCode="collaboration_col_lookup.collaboration_col_update"
+							banType="hide"
+							@click="editShow"
+							:disabled="selectedRowKeys.length!=1"
+						>
 							<a-icon style="color:#1890ff;" type="edit" />修改
-						</a-button>
-						<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+						</permission-button>
+						<permission-button
+							permCode="collaboration_col_lookup.collaboration_col_delete"
+							banType="hide"
+							@click="showDeleteConfirm"
+							:disabled="selectedRowKeys.length!=1"
+						>
 							<a-icon style="color:#1890ff;" type="delete" />删除
-						</a-button>
+						</permission-button>
 					</a-col>
 					<a-col :span="16" style="text-align:right">
 						关键字：
@@ -161,6 +175,25 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Modal,
+	Pagination,
+	Select,
+	Radio,
+	Form
+} from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Select);
+Vue.use(Radio);
+Vue.use(Form);
 const columns = [
 	{
 		dataIndex: "type",

@@ -37,7 +37,7 @@
 								</template>
 								<template slot="deviceModel" slot-scope="text, record, index">
 									<div>
-										<a-date-picker style="width:100%"/>
+										<a-date-picker style="width:100%" />
 									</div>
 								</template>
 								<template slot="locationNo" slot-scope="text, record, index">
@@ -49,7 +49,7 @@
 											@change="handleChange"
 										>
 											<a-button>
-												<a-icon type="upload"/>Click to Upload
+												<a-icon type="upload" />Click to Upload
 											</a-button>
 										</a-upload>
 									</div>
@@ -62,7 +62,7 @@
 													<template slot="content">
 														<span>删除</span>
 													</template>
-													<a-icon type="delete" style="color:red;"/>
+													<a-icon type="delete" style="color:red;" />
 												</a-popover>
 											</a-popconfirm>
 										</span>
@@ -74,17 +74,17 @@
 								style=" cursor: pointer;color:#1890ff;margin-top:12px;"
 								class="handle_table"
 							>
-								<a-icon type="plus-circle"/>&nbsp;添加一行
+								<a-icon type="plus-circle" />&nbsp;添加一行
 							</div>
 						</a-tab-pane>
 						<a-tab-pane tab="批量导入" key="2" forceRender>
 							批量导入说明：
-							<br>第1步：下载并填写模板
+							<br />第1步：下载并填写模板
 							<a>移交单模板.xls</a> ；
-							<br>第2步：将图纸文件存放到文件夹，必须按序号命名，仅支持jpg|png格式；
-							<br>第3步：导入模板；
-							<br>第4步：导入图纸；
-							<br>第5步：校对数据并提交保存。
+							<br />第2步：将图纸文件存放到文件夹，必须按序号命名，仅支持jpg|png格式；
+							<br />第3步：导入模板；
+							<br />第4步：导入图纸；
+							<br />第5步：校对数据并提交保存。
 							<a-row style="margin-top:12px;">
 								<a-table :pagination="false" :columns="columns" :dataSource="data" bordered rowKey="id">
 									<template
@@ -102,7 +102,7 @@
 									</template>
 									<template slot="deviceModel" slot-scope="text, record, index">
 										<div>
-											<a-date-picker style="width:100%"/>
+											<a-date-picker style="width:100%" />
 										</div>
 									</template>
 									<template slot="locationNo" slot-scope="text, record, index">
@@ -114,7 +114,7 @@
 												@change="handleChange"
 											>
 												<a-button>
-													<a-icon type="upload"/>Click to Upload
+													<a-icon type="upload" />Click to Upload
 												</a-button>
 											</a-upload>
 										</div>
@@ -127,7 +127,7 @@
 														<template slot="content">
 															<span>删除</span>
 														</template>
-														<a-icon type="delete" style="color:red;"/>
+														<a-icon type="delete" style="color:red;" />
 													</a-popover>
 												</a-popconfirm>
 											</span>
@@ -144,7 +144,7 @@
 										@change="handleChange"
 									>
 										<a-button>
-											<a-icon type="upload"/>导入模板
+											<a-icon type="upload" />导入模板
 										</a-button>
 									</a-upload>
 								</a-col>
@@ -156,7 +156,7 @@
 										@change="handleChange"
 									>
 										<a-button>
-											<a-icon type="upload"/>导入图纸
+											<a-icon type="upload" />导入图纸
 										</a-button>
 									</a-upload>
 								</a-col>
@@ -173,6 +173,29 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Modal,
+	Form,
+	Input,
+	Tabs,
+	Upload,
+	Popconfirm,
+	Popover
+} from "ant-design-vue";
+Vue.use(Form);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Input);
+Vue.use(Tabs);
+Vue.use(Upload);
+Vue.use(Popconfirm);
+Vue.use(Popover);
 const columns = [
 	{
 		dataIndex: "deviceNo",

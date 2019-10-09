@@ -30,7 +30,7 @@
 				<a-form-item label="原料类型">
 					<a-select
 						v-decorator="['type',{rules: [{ required: true, message: '请选择原料' }]}]"
-						style="width: 226px"
+						style="width: 246px"
 						placeholder="请选择"
 						showSearch
 						:filterOption="filterOption"
@@ -45,7 +45,7 @@
 			<a-col :span="12">
 				<a-form-item label="选择原料">
 					<a-select
-						style="width: 226px"
+						style="width: 246px"
 						showSearch
 						:filterOption="filterOption"
 						v-decorator="['rawMaterialId',{rules: [{ required: true, message: '请选择原料' }]}]"
@@ -66,7 +66,7 @@
 			</a-col>
 			<a-col :span="12">
 				<a-form-item label="毛坯数量">
-					<a-input v-decorator="['embryoNum']" disabled style="width:226px;"></a-input>
+					<a-input v-decorator="['embryoNum']" disabled style="width:246px;"></a-input>
 				</a-form-item>
 			</a-col>
 			<a-col :span="12">
@@ -75,7 +75,7 @@
 						type="number"
 						oninput="if(value.length>10)value=value.slice(0,10)"
 						v-decorator="['inTheEmbryoComponents',{rules: [{ required: true, message: '请填写每毛坯件数' },{validator: chickNumber}]}]"
-						style="width:226px;"
+						style="width:246px;"
 						@change="geteMbryoNum"
 					></a-input>
 				</a-form-item>
@@ -88,14 +88,14 @@
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							v-decorator="['length',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber}]}]"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>&nbsp;±
 						<a-input
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10);if(value<0)value=null"
 							v-decorator="['lengthError']"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -106,14 +106,14 @@
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							v-decorator="['width',{rules: [{ required: true, message: '请填写宽' },{validator: chickNumber}]}]"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>&nbsp;±
 						<a-input
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10);if(value<0)value=null"
 							v-decorator="['widthError']"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -124,14 +124,14 @@
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							v-decorator="['height',{rules: [{ required: true, message: '请填写高' },{validator: chickNumber}]}]"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>&nbsp;±
 						<a-input
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10);if(value<0)value=null"
 							v-decorator="['heightError']"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -144,14 +144,14 @@
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							v-decorator="['radius',{rules: [{ required: true, message: '请填写半径' },{validator: chickNumber}]}]"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>&nbsp;±
 						<a-input
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10);if(value<0)value=null"
 							v-decorator="['radiusError']"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -162,14 +162,14 @@
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							v-decorator="['stickLength',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumber}]}]"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>&nbsp;±
 						<a-input
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10);if(value<0)value=null"
 							v-decorator="['stickLengthError']"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
@@ -182,21 +182,21 @@
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							v-decorator="['profileLength',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumber}]}]"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>&nbsp;±
 						<a-input
 							type="number"
 							placeholder="单位:mm"
 							oninput="if(value.length>10)value=value.slice(0,10);if(value<0)value=null"
 							v-decorator="['profileLengthError']"
-							style="width:104px;"
+							style="width:114px;"
 						></a-input>
 					</a-form-item>
 				</a-col>
 			</a-col>
 			<a-col :span="24">
 				<a-form-item label="备注">
-					<a-input v-decorator="['remarks']" maxlength="50" style="width:800px;"></a-input>
+					<a-input v-decorator="['remarks']" maxlength="50" style="width:820px;"></a-input>
 				</a-form-item>
 			</a-col>
 			<a-col :span="24">
@@ -302,6 +302,26 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Popover,
+	Progress,
+	Form,
+	Input,
+	Select
+} from "ant-design-vue";
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Popover);
+Vue.use(Progress);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(Select);
+
 const columns = [
 	{
 		dataIndex: "serialNo",
@@ -393,11 +413,11 @@ export default {
 	methods: {
 		chickNumber(rule, value, callback) {
 			if (
-				/^(0|[1-9]\d*)(\s|$|\.\d{1,1}\b)/.test(value) == false &&
+				/^(0|[1-9]\d*)(\s|$|\.\d{1,2}\b)/.test(value) == false &&
 				value != "" &&
 				value != null
 			) {
-				callback(new Error("请输入大于等于0，只能保留1位小数"));
+				callback(new Error("请输入大于等于0，只能保留两位小数"));
 			} else {
 				callback();
 			}

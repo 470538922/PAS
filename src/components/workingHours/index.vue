@@ -11,6 +11,9 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Tabs } from "ant-design-vue";
+Vue.use(Tabs);
 import EmployeeHours from "./EmployeeHours";
 import workOrderHours from "./workOrderHours";
 export default {

@@ -1,12 +1,22 @@
 <template>
 	<div class="feedback">
 		<div style="line-height:50px;">
-			<a-button @click="replyShow" :disabled="selectedRowKeys.length!=1">
+			<permission-button
+				permCode="advise_list_lookup.advice_reply"
+				banType="hide"
+				@click="replyShow"
+				:disabled="selectedRowKeys.length!=1"
+			>
 				<a-icon style="color:#1890ff;" type="edit" />回复
-			</a-button>
-			<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+			</permission-button>
+			<permission-button
+				permCode="advise_list_lookup.advice_delete"
+				banType="hide"
+				@click="showDeleteConfirm"
+				:disabled="selectedRowKeys.length!=1"
+			>
 				<a-icon style="color:#1890ff;" type="delete" />删除
-			</a-button>
+			</permission-button>
 		</div>
 		<a-table
 			rowKey="id"
@@ -63,6 +73,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Table, Modal, Pagination, Input, Form } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Modal);
+Vue.use(Input);
+Vue.use(Form);
 const columns = [
 	{
 		dataIndex: "userName",

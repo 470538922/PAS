@@ -2,10 +2,14 @@
 	<div class="work_hours_handle">
 		<a-row style="padding:0 20px;">
 			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
-			<a-button @click="coefficientVisible=true">工时系数</a-button>
-			<a-button @click="save">
+			<permission-button permCode banType="hide" @click="coefficientVisible=true">工时系数</permission-button>
+			<permission-button
+				permCode="workorder_worktime_lookup.workorder_workhour_save"
+				banType="hide"
+				@click="save"
+			>
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
-			</a-button>
+			</permission-button>
 		</a-row>
 		<a-row style="padding:20px 20px 0;" v-for="(item,index) in allMsg" :key="index">
 			<div class="item_case">
@@ -58,7 +62,15 @@
 							<th>
 								<span style="color:red;padding:0 4px">*</span>单件工时(分)
 							</th>
-							<th>工时系数</th>
+							<th>
+								工时系数
+								<a-tooltip placement="top">
+									<template slot="title">
+										<span>工时系数不填时，默认为系数1</span>
+									</template>
+									<a-icon type="info-circle" style="color:rgb(24, 144, 255)" />
+								</a-tooltip>
+							</th>
 							<!-- <th>合格数</th>
 							<th>加工者</th>
 							<th>检验</th>-->
@@ -75,6 +87,7 @@
 							</td>
 							<td style="width:15%;padding:4px;">
 								<a-select
+									allowClear
 									style="width:100%;"
 									v-model="i.coefficientDO.id"
 									@change="(value)=>getCoefficientValue(value,index,index1)"
@@ -101,17 +114,11 @@
 							<th>序号</th>
 							<th>工种</th>
 							<th>工序内容</th>
-							<th>
-								<span style="color:red;padding:0 4px">*</span>准备工时(分)
-							</th>
-							<th>
-								<span style="color:red;padding:0 4px">*</span>单件工时(分)
-							</th>
-							<th>
-								<span style="color:red;padding:0 4px">*</span>工时系数
-							</th>
+							<th>准备工时(分)</th>
+							<th>单件工时(分)</th>
+							<th>工时系数</th>
 						</tr>
-						<tr v-for="(i, index1) in item.history" :key="index1">
+						<tr v-for="(i, index1) in item.history!=null?item.history:[]" :key="index1">
 							<td style="width:5%">{{index1+1}}</td>
 							<td style="width:10%">{{i.workTypeName}}</td>
 							<td style="width:25%">{{i.processInfo}}</td>
@@ -126,9 +133,13 @@
 			</div>
 		</a-row>
 		<a-row style="padding:20px 20px 0;">
-			<a-button @click="save">
+			<permission-button
+				permCode="workorder_worktime_lookup.workorder_workhour_save"
+				banType="hide"
+				@click="save"
+			>
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60d;</i>保存修改
-			</a-button>
+			</permission-button>
 		</a-row>
 		<a-modal
 			title="工时系数配置"
@@ -146,6 +157,12 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Col, Row, Modal, Input } from "ant-design-vue";
+Vue.use(Input);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
 import Coefficient from "./Coefficient";
 export default {
 	data() {
@@ -193,7 +210,6 @@ export default {
 								}
 							};
 						});
-						console.log(a);
 						this.allMsg = a;
 						console.log(this.allMsg);
 						this.tableData = this.allMsg.map(item1 => {
@@ -247,13 +263,12 @@ export default {
 						return (
 							item.itemWorkTime !== "" &&
 							item.itemWorkTime !== null &&
-							(item.preparationTime !== "" && item.preparationTime !== null) &&
-							(item.coefficientId !== "" && item.coefficientId !== null)
+							(item.preparationTime !== "" && item.preparationTime !== null)
 						);
 					})
 					.find(item => item == false) != undefined
 			) {
-				this.$message.error("单件工时、准备工时、工时系数不能为空");
+				this.$message.error("单件工时、准备工时不能为空");
 			} else {
 				this.Axios(
 					{

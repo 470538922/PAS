@@ -74,6 +74,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Col, Upload, Form, Input, Icon } from "ant-design-vue";
+Vue.use(Col);
+Vue.use(Upload);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(Icon);
 export default {
 	data() {
 		return {

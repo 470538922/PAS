@@ -10,7 +10,12 @@
 		>
 			<template slot="operation" slot-scope="text, record, index">
 				<div>
-					<span style="cursor: pointer;color:#1890ff;" @click="handleEdit(record)">修改</span>&nbsp;
+					<permission-button
+						permCode="raw_raw_lookup.raw_raw_update"
+						banType="disabled"
+						class="button_text btn_disabled"
+						@click="handleEdit(record)"
+					>修改</permission-button>&nbsp;
 					<!-- <a-popconfirm title="确定删除吗?" @confirm="() => onDelete(record)">
 						<span style="cursor: pointer;color:#1890ff">删除</span>
 					</a-popconfirm>-->
@@ -36,7 +41,7 @@
 			class="modal_form_style"
 			:footer="null"
 		>
-			<a-form :form="form" layout="inline" style="overflow:hidden"  @keyup.enter.native="edit">
+			<a-form :form="form" layout="inline" style="overflow:hidden" @keyup.enter.native="edit">
 				<a-col :span="12">
 					<a-form-item label="名称">
 						<a-input
@@ -54,7 +59,7 @@
 				<a-col :span="12">
 					<a-form-item label="长度">
 						<a-input
-							v-decorator="['length',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumber}]}]"
+							v-decorator="['length',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumberFloat}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -100,6 +105,25 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Col,
+	Row,
+	Modal,
+	Icon,
+	Input,
+	Form,
+	Pagination,
+	Table
+} from "ant-design-vue";
+Vue.use(Col);
+Vue.use(Table);
+Vue.use(Pagination);
+Vue.use(Row);
+Vue.use(Form);
+Vue.use(Icon);
+Vue.use(Input);
+Vue.use(Modal);
 const columns = [
 	{
 		dataIndex: "name",
@@ -225,7 +249,7 @@ export default {
 								widthOrRadius: result.data.data.widthOrRadius,
 								remark: result.data.data.remark,
 								heightOrLength: result.data.data.heightOrLength,
-								density: result.data.data.density / 100,
+								density: result.data.data.density,
 								price: result.data.data.price
 							});
 						}, 100);
@@ -246,7 +270,7 @@ export default {
 						name: values.name,
 						remark: values.remark,
 						number: values.number,
-						density: values.density * 100,
+						density: values.density,
 						price: values.price
 					};
 					this.Axios(
@@ -316,7 +340,7 @@ export default {
 						this.data = result.data.data.content;
 						this.total = result.data.data.totalElement;
 						for (let i = 0; i < this.data.length; i++) {
-							this.data[i].density = this.data[i].density / 100;
+							this.data[i].density = this.data[i].density;
 						}
 					}
 				},

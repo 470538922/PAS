@@ -1,12 +1,22 @@
 <template>
 	<div class="coefficient">
 		<a-row style="padding-bottom:12px;">
-			<a-button @click="addVisible=true">新增</a-button>
+			<permission-button
+				permCode="workorder_worktime_lookup.workorder_workhour_num_add"
+				banType="hide"
+				@click="addVisible=true"
+			>新增</permission-button>
 		</a-row>
 		<a-row>
 			<a-table rowKey="id" :columns="columns" :pagination="false" :dataSource="data" size="small">
 				<template slot="operation" slot-scope="text, record, index">
-					<a-button class="button_text" style="margin-right:8px;" @click="findOne(record.id)">修改</a-button>
+					<permission-button
+						permCode="workorder_worktime_lookup.workorder_workhour_num_update"
+						banType="hide"
+						class="button_text"
+						style="margin-right:8px;"
+						@click="findOne(record.id)"
+					>修改</permission-button>
 					<a-popconfirm
 						title="确定删除吗？"
 						@confirm="del(record.id)"
@@ -14,7 +24,11 @@
 						okText="确定"
 						cancelText="取消"
 					>
-						<a-button class="button_text">删除</a-button>
+						<permission-button
+							permCode="workorder_worktime_lookup.workorder_workhour_num_delete"
+							banType="hide"
+							class="button_text"
+						>删除</permission-button>
 					</a-popconfirm>
 				</template>
 				<template slot="range" slot-scope="text, record, index">
@@ -154,6 +168,24 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Modal,
+	Form,
+	Input,
+	Popconfirm
+} from "ant-design-vue";
+Vue.use(Form);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Input);
+Vue.use(Popconfirm);
+
 const columns = [
 	{
 		dataIndex: "title",
@@ -283,6 +315,7 @@ export default {
 							if (result.data.code === 200) {
 								console.log(result);
 								this.addVisible = false;
+								this.form.resetFields();
 								this.getList();
 							}
 						},

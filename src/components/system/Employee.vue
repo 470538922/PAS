@@ -9,16 +9,30 @@
 							<!-- <a-button type="primary" @click="$router.push({path:'/Employee/AddEmployee'})">
 								<a-icon type="plus-circle"/>添加
 							</a-button>-->
-							<a-button @click="$router.push({path:'/Employee/AddEmployee'})">
+							<permission-button
+								permCode
+								banType="hide"
+								@click="$router.push({path:'/Employee/AddEmployee'})"
+							>
 								<a-icon style="color:#1890ff;" type="plus" />新增
-							</a-button>
-							<a-button @click="edit" :disabled="selectedRowKeys.length!=1">
+							</permission-button>
+							<permission-button
+								permCode
+								banType="hide"
+								@click="edit"
+								:disabled="selectedRowKeys.length!=1"
+							>
 								<a-icon style="color:#1890ff;" type="edit" />修改
-							</a-button>
-							<a-button @click="resetPwd" :disabled="selectedRowKeys.length!=1">
+							</permission-button>
+							<permission-button
+								permCode="employee_list_lookup.employee_list_reset"
+								banType="hide"
+								@click="resetPwd"
+								:disabled="selectedRowKeys.length!=1"
+							>
 								<i style="color:#1890ff;margin-right:6px;display:inline-block;" class="iconfont">&#xe6b6;</i>
 								重置密码
-							</a-button>
+							</permission-button>
 							<!-- <a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
 								<a-icon style="color:#1890ff;" type="delete" />删除
 							</a-button>-->
@@ -46,7 +60,8 @@
 									unCheckedChildren="禁用"
 									:defaultChecked="record.state==0?true:false"
 									@click="changeState(record,index)"
-								/>
+									:disabled="roleSwitch!=undefined?false:true"
+								></a-switch>
 							</div>
 						</template>
 						<template slot="userName" slot-scope="text, record, index">
@@ -129,22 +144,15 @@
 	</div>
 </template>
 <script>
-const rowSelection = {
-	culumnsWidth: "5%",
-	onChange: (selectedRowKeys, selectedRows) => {
-		console.log(
-			`selectedRowKeys: ${selectedRowKeys}`,
-			"selectedRows: ",
-			selectedRows
-		);
-	},
-	onSelect: (record, selected, selectedRows) => {
-		console.log(record, selected, selectedRows);
-	},
-	onSelectAll: (selected, selectedRows, changeRows) => {
-		console.log(selected, selectedRows, changeRows);
-	}
-};
+import Vue from "vue";
+import { Table, Col, Row, Modal, Pagination, Switch } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Switch);
+
 const columns = [
 	{
 		dataIndex: "employeeNo",
@@ -196,7 +204,6 @@ export default {
 		return {
 			detailsVisible: false,
 			param: "",
-			rowSelection,
 			visible: false,
 			isHideList: this.$route.params.id !== undefined ? true : false,
 			allClassify: [
@@ -212,7 +219,8 @@ export default {
 			pageSize: 10,
 			total: 0,
 			selectedRowKeys: [],
-			employeeDetails: {}
+			employeeDetails: {},
+			roleSwitch: ""
 		};
 	},
 	methods: {
@@ -380,7 +388,14 @@ export default {
 	},
 	created() {
 		this.getList();
-		console.log(this.$route);
+		this.roleSwitch =
+			JSON.parse(sessionStorage.getItem("permissionUrl")).find(
+				item => item.module == "employee_list_lookup"
+			) != undefined
+				? JSON.parse(sessionStorage.getItem("permissionUrl"))
+						.find(item => item.module == "employee_list_lookup")
+						.permissionItem.find(item => item == "employee_list_switch")
+				: undefined;
 		let a = this.$route.matched.find(item => item.name === "AddEmployee")
 			? true
 			: false;

@@ -2,9 +2,18 @@
 	<div class="inventory">
 		<a-row style="line-height:50px;">
 			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
-			<a-button @click="getPreviewList">
+			<permission-button
+				permCode="workorder_partlist_lookup.partlist_save"
+				banType="hide"
+				@click="save"
+			>保存</permission-button>
+			<permission-button
+				permCode="workorder_partlist_lookup.workorder_partlist_watch"
+				banType="hide"
+				@click="getPreviewList"
+			>
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>打印预览
-			</a-button>
+			</permission-button>
 		</a-row>
 		<a-row>
 			<a-col :span="24" style="padding:20px 0;">
@@ -56,7 +65,7 @@
 					bordered
 					size="small"
 					:pagination="false"
-					rowKey="drawingNo"
+					rowKey="id"
 				>
 					<template
 						v-for="col in [ 'materialCode', 'units','weight','number','recommend','manufacturers','way','remark']"
@@ -67,7 +76,7 @@
 							<a-input
 								style="margin: -5px 0"
 								:value="text"
-								@change="e => handleChange(e.target.value, record.drawingNo, col)"
+								@change="e => handleChange(e.target.value, record.id, col)"
 							/>
 						</div>
 					</template>
@@ -82,16 +91,37 @@
 					<template slot="no" slot-scope="text, record, index">
 						<span>{{index+1}}</span>
 					</template>
+					<template slot="detail" slot-scope="text, record, index">
+						<permission-button permCode banType="hide" class="button_text" @click="del(index)">删除</permission-button>
+						<!-- <span style="color:#1890ff;cursor: pointer;" @click="technologyModalShow(record)">工艺排配</span> -->
+					</template>
 					<!-- <template slot="materials" slot-scope="text, record, index">
 						<span>{{index+1}}</span>
 					</template>-->
 				</a-table>
-				<div style="line-height:50px;">提示：以上数据仅临时存储，离开该页将自动清空。</div>
+				<!-- <div style="line-height:50px;">提示：以上数据仅临时存储，离开该页将自动清空。</div> -->
 			</a-col>
 		</a-row>
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Form,
+	Pagination,
+	DatePicker,
+	Input
+} from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Form);
+Vue.use(DatePicker);
+Vue.use(Input);
 import moment from "moment";
 const columns = [
 	{
@@ -104,23 +134,28 @@ const columns = [
 	{
 		title: "物料代码",
 		dataIndex: "materialCode",
-		width: 124,
+		width: 100,
 		scopedSlots: { customRender: "materialCode" }
 	},
+	// {
+	// 	title: "图号",
+	// 	dataIndex: "drawingNo",
+	// 	width: 140
+	// },
+	// {
+	// 	title: "名称",
+	// 	dataIndex: "name",
+	// 	width: 140
+	// },
 	{
-		title: "图号",
-		dataIndex: "drawingNo",
-		width: 140
-	},
-	{
-		title: "名称",
-		dataIndex: "name",
-		width: 140
+		title: "材料规格",
+		dataIndex: "rawInfoStr",
+		width: 120
 	},
 	{
 		title: "所需物资",
 		dataIndex: "materials",
-		width: 130,
+		width: 120,
 		scopedSlots: { customRender: "materials" }
 	},
 	{
@@ -132,13 +167,13 @@ const columns = [
 	{
 		title: "需求重量",
 		dataIndex: "weight",
-		width: 80,
+		width: 100,
 		scopedSlots: { customRender: "weight" }
 	},
 	{
 		title: "需求数量",
 		dataIndex: "number",
-		width: 80,
+		width: 100,
 		scopedSlots: { customRender: "number" }
 	},
 	{
@@ -162,7 +197,7 @@ const columns = [
 	{
 		title: "需求方式",
 		dataIndex: "way",
-		width: 130,
+		width: 100,
 		scopedSlots: { customRender: "way" }
 	},
 	{
@@ -170,28 +205,19 @@ const columns = [
 		dataIndex: "remark",
 		width: 100,
 		scopedSlots: { customRender: "remark" }
+	},
+	{
+		dataIndex: "detail",
+		key: "detail",
+		title: "操作",
+		width: 80,
+		scopedSlots: { customRender: "detail" }
 	}
 ];
 
-const data = [
-	{
-		id: 111,
-		no: 1,
-		materialCode: 2,
-		drawingNo: 3,
-		name: 4,
-		materials: 5,
-		units: 6,
-		weight: 7,
-		number: 8,
-		recommend: 9,
-		manufacturers: 10,
-		time: "",
-		way: 12,
-		remark: 13
-	}
-];
+const data = [];
 export default {
+	inject: ["reload"],
 	data() {
 		this.cacheData = data.map(item => ({ ...item }));
 		return {
@@ -200,10 +226,15 @@ export default {
 			data,
 			date: new Date().toLocaleDateString(),
 			inventory: {},
-			enterpriseName: JSON.parse(sessionStorage.getItem("user")).enterpriseName
+			enterpriseName: JSON.parse(sessionStorage.getItem("user")).enterpriseName,
+			workOrderId: "",
+			id: ""
 		};
 	},
 	methods: {
+		del(index) {
+			this.data.splice(index, 1);
+		},
 		moment,
 		onChangeDate(date, dateString) {},
 		onTableChangeDate(date, dateString, index) {
@@ -211,7 +242,7 @@ export default {
 		},
 		handleChange(value, key, column) {
 			const newData = [...this.data];
-			const target = newData.filter(item => key === item.drawingNo)[0];
+			const target = newData.filter(item => key === item.id)[0];
 			if (target) {
 				target[column] = value;
 				this.data = newData;
@@ -254,43 +285,120 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result);
-						this.data = result.data.data.rawInfo.map(item => {
+						this.id = result.data.data.id;
+						this.workOrderId = result.data.data.workOrderDO.id;
+						this.data = result.data.data.quotationItems.map((item, index) => {
 							return {
-								materialCode: "",
-								drawingNo: item.drawingNo,
-								name: item.drawingName,
+								id: index,
+								materialCode:
+									item.materialCode != undefined &&
+									item.materialCode != null &&
+									item.materialCode != ""
+										? item.materialCode
+										: "",
+								rawInfoStr: item.rawInfoStr,
 								materials:
-									(item.rawType == 1
+									(item.rawMaterial.type == 1
 										? "板料"
-										: item.rawType == 2
+										: item.rawMaterial.type == 2
 										? "棒料"
 										: "型材") +
 									" " +
-									item.rawName,
+									item.rawMaterial.name,
 								units: "EA",
 								weight: item.weight,
 								number: item.rawNum,
-								recommend: "",
-								manufacturers: "",
-								time: "",
-								way: "",
-								remark: ""
+								recommend:
+									item.recommendFirm != undefined &&
+									item.recommendFirm != null &&
+									item.recommendFirm != ""
+										? item.recommendFirm
+										: "",
+								manufacturers:
+									item.realFirm != undefined &&
+									item.realFirm != null &&
+									item.realFirm != ""
+										? item.realFirm
+										: "",
+								time:
+									item.demandTime != undefined &&
+									item.demandTime != null &&
+									item.demandTime != ""
+										? item.demandTime
+										: "",
+								way:
+									item.demandWay != undefined &&
+									item.demandWay != null &&
+									item.demandWay != ""
+										? item.demandWay
+										: "",
+								remark:
+									item.note != undefined && item.note != null && item.note != ""
+										? item.note
+										: "",
+								rawMaterialId: item.rawMaterial.id
 							};
 						});
 						setTimeout(() => {
 							this.form.setFieldsValue({
 								filing: moment(this.date, "YYYY/MM/DD"),
-								department: "",
-								no: "",
+								department: result.data.data.organizeName,
+								no: result.data.data.code,
 								demander: JSON.parse(sessionStorage.getItem("user")).userName,
-								order: result.data.data.workOrder.gongzuolingNo,
-								project: result.data.data.workOrder.title
+								order: result.data.data.workOrderDO.gongzuolingNo,
+								project: result.data.data.workOrderDO.title
 							});
 						}, 100);
 					}
 				},
 				({ type, info }) => {}
 			);
+		},
+		save() {
+			this.form.validateFieldsAndScroll((err, values) => {
+				if (!err) {
+					console.log(values);
+					console.log(this.data);
+					this.Axios(
+						{
+							url: "/api-workorder/quotation/add",
+							params: {
+								id: this.id,
+								code: values.no,
+								organizeName: values.department,
+								workOrderId: this.workOrderId,
+								quotations: this.data.map(item => {
+									return {
+										demandTime: item.time,
+										demandWay: item.way,
+										materialCode: item.materialCode,
+										note: item.remark,
+										num: item.number,
+										rawMaterialId: item.rawMaterialId,
+										realFirm: item.manufacturers,
+										recommendFirm: item.recommend,
+										unit: item.units,
+										weight: item.weight
+									};
+								})
+							},
+							type: "post",
+							option: { successMsg: "保存成功！" },
+							config: {
+								headers: { "Content-Type": "application/json" }
+							}
+						},
+						this
+					).then(
+						result => {
+							if (result.data.code === 200) {
+								this.reload();
+							}
+						},
+						({ type, info }) => {}
+					);
+				}
+			});
 		}
 	},
 	created() {

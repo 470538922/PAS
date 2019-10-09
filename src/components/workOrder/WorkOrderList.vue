@@ -7,31 +7,75 @@
 					<a-row>
 						<div style="line-height:50px;">
 							<a-col :span="15">
-								<a-button @click="addVisible=true">
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_add"
+									banType="hide"
+									@click="addVisible=true"
+								>
 									<a-icon style="color:#1890ff;" type="plus" />新增
-								</a-button>
-								<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
+								</permission-button>
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_update"
+									banType="hide"
+									@click="editShow"
+									:disabled="selectedRowKeys.length!=1"
+								>
 									<a-icon style="color:#1890ff;" type="edit" />修改
-								</a-button>
-								<a-button @click="showDeleteConfirm" :disabled="selectedRows.length==0">
+								</permission-button>
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_delete"
+									banType="hide"
+									@click="showDeleteConfirm"
+									:disabled="selectedRows.length==0"
+								>
 									<a-icon style="color:#1890ff;" type="delete" />删除
-								</a-button>
-								<a-button @click="goIntoOperation" :disabled="selectedRows.length==0">
+								</permission-button>
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_init"
+									banType="hide"
+									@click="goIntoOperation"
+									:disabled="selectedRows.length==0"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6fd;</i>投产
-								</a-button>
-								<a-button @click="regain" :disabled="selectedRows.length==0">
+								</permission-button>
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_reuse"
+									banType="hide"
+									@click="regain"
+									:disabled="selectedRows.length==0"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe625;</i>恢复
-								</a-button>
-								<a-button @click="pauseShow" :disabled="selectedRows.length!=1">
+								</permission-button>
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_stop"
+									banType="hide"
+									@click="pauseShow"
+									:disabled="selectedRows.length!=1"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe62d;</i>暂停
-								</a-button>
-								<a-button @click="terminationShow" :disabled="selectedRows.length!=1">
+								</permission-button>
+								<permission-button
+									permCode="workorder_manage_lookup.workorder_manager_end"
+									banType="hide"
+									@click="terminationShow"
+									:disabled="selectedRows.length!=1"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6aa;</i>终止
-								</a-button>
-								<a-button @click="toInventory" :disabled="selectedRowKeys.length!=1">
+								</permission-button>
+								<permission-button
+									permCode
+									banType="hide"
+									@click="toInventory"
+									:disabled="selectedRowKeys.length!=1"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>物资清单
-								</a-button>
-								<a-button @click="toOrderPrice" :disabled="selectedRowKeys.length!=1">生成报价单</a-button>
+								</permission-button>
+								<permission-button
+									permCode
+									banType="hide"
+									@click="toOrderPrice"
+									:disabled="selectedRowKeys.length!=1"
+								>生成报价单</permission-button>
 							</a-col>
 
 							<a-col :span="9" style="text-align:right">
@@ -80,6 +124,12 @@
 									<span v-if="text==4" style="font-size:14px;color:#10CF0C;">完成</span>
 								</div>
 							</template>
+							<template slot="hasWorkLoad" slot-scope="text, record, index">
+								<div>
+									<a-icon type="close" v-if="text==false" style="color:red;font-size: 16px;" />
+									<a-icon type="check" v-if="text==true" style="color:green;font-size: 16px;" />
+								</div>
+							</template>
 							<template slot="priority" slot-scope="text, record, index">
 								<div>
 									<i class="iconfont" style="color:#F59A23;" v-if="text==true">&#xe649;</i>
@@ -116,7 +166,13 @@
 								</div>
 							</template>
 							<template slot="detail" slot-scope="text, record, index">
-								<span style="color:#1890ff;cursor: pointer;" @click="toWorkOrderDetailsList(record)">工单明细</span>
+								<permission-button
+									permCode
+									banType="disabled"
+									class="button_text btn_disabled"
+									@click="toWorkOrderDetailsList(record)"
+								>工单明细</permission-button>
+								<!-- <span style="color:#1890ff;cursor: pointer;" @click="toWorkOrderDetailsList(record)">工单明细</span> -->
 							</template>
 						</a-table>
 						<a-pagination
@@ -218,6 +274,26 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Pagination,
+	Modal,
+	Popover,
+	Progress,
+	Form,
+	Input,
+	Select
+} from "ant-design-vue";
+Vue.use(Table);
+Vue.use(Pagination);
+Vue.use(Select);
+Vue.use(Modal);
+Vue.use(Popover);
+Vue.use(Progress);
+Vue.use(Form);
+Vue.use(Input);
+
 import AddWorkOrder from "./AddWorkOrder";
 import EditWorkOrder from "./EditWorkOrder";
 import WorkOrderListDetails from "./WorkOrderListDetails";
@@ -271,10 +347,23 @@ const columns = [
 		scopedSlots: { customRender: "comment" }
 	},
 	{
-		dataIndex: "createTime",
-		key: "createTime",
-		title: "创建时间",
-		width: 100
+		dataIndex: "hasWorkLoad",
+		key: "hasWorkLoad",
+		title: "工时定额",
+		width: 100,
+		scopedSlots: { customRender: "hasWorkLoad" }
+	},
+	// {
+	// 	dataIndex: "createTime",
+	// 	key: "createTime",
+	// 	title: "创建时间",
+	// 	width: 100
+	// },
+	{
+		dataIndex: "gmtPlanCompleted",
+		key: "gmtPlanCompleted",
+		title: "计划完工时间",
+		width: 120
 	},
 	{
 		dataIndex: "detail",

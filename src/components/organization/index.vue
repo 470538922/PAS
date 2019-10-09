@@ -21,25 +21,42 @@
 							<template slot="content">
 								<span>添加子级</span>
 							</template>
-							<a-icon class="icon_style" type="plus-circle" @click="modalSublevelShow(item)" />
+							<permission-button
+								permCode="system_org_lookup.system_orginaze_add"
+								banType="hide"
+								class="button_text"
+								@click="modalSublevelShow(item)"
+							>
+								<a-icon class="icon_style" type="plus-circle" />
+							</permission-button>
 						</a-popover>&nbsp;&nbsp;
 						<a-popover placement="top">
 							<template slot="content">
 								<span>修改</span>
 							</template>
-							<a-icon
-								class="icon_style"
+							<permission-button
+								permCode="system_org_lookup.system_orginaze_update"
+								banType="hide"
+								class="button_text"
 								v-if="item.organizeParentCode!=0"
-								type="edit"
 								@click="modalEditShow(item)"
-							/>
+							>
+								<a-icon class="icon_style" type="edit" />
+							</permission-button>
 						</a-popover>&nbsp;&nbsp;
 						<a-popconfirm title="确定删除吗?" @confirm="onDelete(item)">
 							<a-popover placement="top">
 								<template slot="content">
 									<span>删除</span>
 								</template>
-								<a-icon class="icon_style" v-if="item.organizeParentCode!=0" type="delete" />
+								<permission-button
+									permCode="system_org_lookup.system_orginaze_delete"
+									banType="hide"
+									class="button_text"
+									v-if="item.organizeParentCode!=0"
+								>
+									<a-icon class="icon_style" type="delete" />
+								</permission-button>
 							</a-popover>
 						</a-popconfirm>
 					</span>
@@ -100,6 +117,24 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Tree,
+	Form,
+	Input,
+	Modal,
+	Popconfirm,
+	Popover,
+	Icon
+} from "ant-design-vue";
+Vue.use(Popconfirm);
+Vue.use(Tree);
+Vue.use(Popover);
+Vue.use(Input);
+Vue.use(Modal);
+Vue.use(Form);
+Vue.use(Icon);
+
 export default {
 	data() {
 		return {

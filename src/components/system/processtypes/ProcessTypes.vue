@@ -7,15 +7,29 @@
 						<!-- <a-button type="primary" @click="modalNewVisible=true">
 							<a-icon type="plus-circle"/>添加
 						</a-button>-->
-						<a-button @click="modalNewVisible=true">
+						<permission-button
+							permCode="worktype_worktype_lookup.worktype_add"
+							banType="hide"
+							@click="modalNewVisible=true"
+						>
 							<a-icon style="color:#1890ff;" type="plus" />新增
-						</a-button>
-						<a-button @click="modalEditShow" :disabled="selectedRows.length!=1">
+						</permission-button>
+						<permission-button
+							permCode="worktype_worktype_lookup.worktype_update"
+							banType="hide"
+							@click="modalEditShow"
+							:disabled="selectedRows.length!=1"
+						>
 							<a-icon style="color:#1890ff;" type="edit" />修改
-						</a-button>
-						<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+						</permission-button>
+						<permission-button
+							permCode="worktype_worktype_lookup.worktype_delete"
+							banType="hide"
+							@click="showDeleteConfirm"
+							:disabled="selectedRowKeys.length!=1"
+						>
 							<a-icon style="color:#1890ff;" type="delete" />删除
-						</a-button>
+						</permission-button>
 					</a-col>
 					<!-- <a-col :span="16" style="text-align:right">
 						关键字：
@@ -162,24 +176,26 @@
 	</div>
 </template>
 <script>
-const rowSelection = {
-	culumnsWidth: "5%",
-	onChange: (selectedRowKeys, selectedRows) => {
-		// console.log(
-		// 	`selectedRowKeys: ${selectedRowKeys}`,
-		// 	"selectedRows: ",
-		// 	selectedRows
-		// );
-		this.selectedRows = selectedRows;
-		console.log(this.selectedRows);
-	},
-	onSelect: (record, selected, selectedRows) => {
-		// console.log(record, selected, selectedRows);
-	},
-	onSelectAll: (selected, selectedRows, changeRows) => {
-		// console.log(selected, selectedRows, changeRows);
-	}
-};
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Modal,
+	Pagination,
+	Select,
+	Radio,
+	Form
+} from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Select);
+Vue.use(Radio);
+Vue.use(Form);
+
 const columns = [
 	{
 		dataIndex: "workTypeName",
@@ -245,7 +261,6 @@ export default {
 		return {
 			selectedRowKeys: [],
 			selectedRows: [],
-			rowSelection,
 			form: this.$form.createForm(this),
 			modalNewVisible: false,
 			modalEditVisible: false,

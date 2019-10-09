@@ -14,7 +14,7 @@
 							<td colspan="3" style="width:30%">
 								<tr style="display: block;">
 									<td class="td_style" style="border-left:none;">名称</td>
-									<td class="td_style" style="border-left:1px solid #dde2eb;">图号</td>
+									<td class="td_style" style="border-left:1px solid #000000;">图号</td>
 								</tr>
 							</td>
 							<!-- <td colspan="2" style="width:20%">图号</td> -->
@@ -28,7 +28,7 @@
 									<td class="td_style" style="border-left:none;">{{item.workOrderDesDO.name}}</td>
 									<td
 										class="td_style"
-										style="border-left:1px solid #dde2eb;"
+										style="border-left:1px solid #000000;"
 									>{{item.workOrderDesDO.drawingNo}}</td>
 								</tr>
 							</td>
@@ -58,36 +58,36 @@
 							<td style="width:10%">检验</td>
 						</tr>
 						<tr v-for="(i,j) in item.drawingDO.process" :key="j+111">
-							<td style="width:10%;height:45px;">{{j+1}}</td>
-							<td style="width:10%;height:45px;">{{i.workTypeName}}</td>
-							<td colspan="3" style="width:50%;height:45px;text-align:left;">{{i.processInfo}}</td>
-							<!-- <td style="width:10%;height:45px;"></td> -->
-							<td style="width:10%;height:45px;">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
+							<td style="width:10%;height:42px;">{{j+1}}</td>
+							<td style="width:10%;height:42px;">{{i.workTypeName}}</td>
+							<td colspan="3" style="width:50%;height:42px;text-align:left;">{{i.processInfo}}</td>
+							<!-- <td style="width:10%;height:42px;"></td> -->
+							<td style="width:10%;height:42px;">{{i.checkResultDO!=null?i.checkResultDO.result:""}}</td>
 							<td
-								style="width:10%;height:45px;"
+								style="width:10%;height:42px;"
 							>{{i.executives.length>0?i.executives.find(item=>{return item.isExecution==true}).employeeName:""}}</td>
-							<td style="width:10%;height:45px;"></td>
+							<td style="width:10%;height:42px;"></td>
 						</tr>
 						<tr
 							v-for="(z,k) in 15-(item.drawingDO.process.length!=0?item.drawingDO.process.length:0)"
 							:key="k+22222"
 						>
-							<td style="width:10%;height:45px;">{{z+item.drawingDO.process.length}}</td>
-							<td style="width:10%;height:45px;"></td>
+							<td style="width:10%;height:42px;">{{z+item.drawingDO.process.length}}</td>
+							<td style="width:10%;height:42px;"></td>
 							<td colspan="3" style="width:40%"></td>
-							<!-- <td style="width:10%;height:45px;"></td> -->
-							<td style="width:10%;height:45px;"></td>
-							<td style="width:10%;height:45px;"></td>
-							<td style="width:10%;height:45px;"></td>
+							<!-- <td style="width:10%;height:42px;"></td> -->
+							<td style="width:10%;height:42px;"></td>
+							<td style="width:10%;height:42px;"></td>
+							<td style="width:10%;height:42px;"></td>
 						</tr>
 					</table>
 					<div style="margin-top:20px;">
-						<a-col :span="6">
+						<a-col :span="5">
 							<div>
 								<img :src="item.qrCode" alt style="width:120px;" />
 							</div>
 						</a-col>
-						<a-col :span="10" style="line-height:24px;">
+						<a-col :span="12" style="line-height:24px;">
 							<p>
 								<span class="label_style">关联工单：</span>
 								<span>{{item.workOrderDesDO.workOrder.no}}</span>
@@ -97,10 +97,10 @@
 								<span>{{enterpriseName}}</span>
 							</p>
 						</a-col>
-						<a-col :span="8">
+						<a-col :span="7">
 							<p>
 								<span class="label_style">拟制：</span>
-								<span></span>
+								<span>{{userNmae}}</span>
 							</p>
 							<p>
 								<span class="label_style">审核：</span>
@@ -273,8 +273,7 @@
 						<tr style="background-color:#f1f1f1;color:#333333 ;font-weight:normal;">
 							<th style="width:3%">序号</th>
 							<th style="width:8%">物料代码</th>
-							<th style="width:10%">图号</th>
-							<th style="width:10%">名称</th>
+							<th style="width:10%">材料规格</th>
 							<th style="width:8%">所需物资</th>
 							<th style="width:4%">计量单位</th>
 							<th style="width:4%">需求重量</th>
@@ -288,8 +287,7 @@
 						<tr v-for="(item,i) in demand.rawInfo" :key="i+8888">
 							<td style="width:3%">{{i+1}}</td>
 							<td style="width:8%">{{item.materialCode}}</td>
-							<td style="width:10%">{{item.drawingNo}}</td>
-							<td style="width:10%">{{item.name}}</td>
+							<td style="width:10%">{{item.rawInfoStr}}</td>
 							<td style="width:8%">{{item.materials}}</td>
 							<td style="width:4%">{{item.units}}</td>
 							<td style="width:4%">{{item.weight}}</td>
@@ -335,7 +333,8 @@ export default {
 			priviewType: null,
 			priceMsg: [],
 			demand: [],
-			enterpriseName: JSON.parse(sessionStorage.getItem("user")).enterpriseName
+			enterpriseName: JSON.parse(sessionStorage.getItem("user")).enterpriseName,
+			userNmae: JSON.parse(sessionStorage.getItem("user")).userName
 		};
 	},
 	methods: {
@@ -365,6 +364,7 @@ export default {
 		}
 	},
 	created() {
+		console.log(JSON.parse(sessionStorage.getItem("user")).userName);
 		this.priviewType = sessionStorage.getItem("priviewType");
 		// this.priviewType = 3;
 		if (this.priviewType == 1) {

@@ -76,6 +76,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Table, Col, Row, Modal, Pagination } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
 import md5 from "js-md5/src/md5.js";
 import CryptoJS from "crypto-js/crypto-js.js";
 const columns = [

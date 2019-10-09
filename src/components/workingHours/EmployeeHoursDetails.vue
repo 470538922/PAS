@@ -32,6 +32,21 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Row,
+	Modal,
+	Pagination,
+	Input,
+	DatePicker
+} from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Input);
+Vue.use(DatePicker);
 const columns = [
 	{
 		dataIndex: "empNo",

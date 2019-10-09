@@ -14,24 +14,56 @@
 				<a-card hoverable style="width: 300px;display:inline-block;margin-right:12px;">
 					<img alt="example" src="../../assets/u1663.svg" slot="cover" />
 					<template class="ant-card-actions" slot="actions">
-						<a-icon type="plus" style="font-size:20px" @click="addBoardVisible=true" />
-						<i class="iconfont" style="font-size:20px" @click="BoardListVisible=true">&#xe627;</i>
+						<permission-button
+							permCode="raw_raw_lookup.raw_raw_add"
+							banType="hide"
+							class="button_text"
+							@click="addBoardVisible=true"
+						>
+							<a-icon type="plus" style="font-size:20px;" />
+						</permission-button>
+						<permission-button permCode banType="hide" class="button_text" @click="BoardListVisible=true">
+							<i class="iconfont" style="font-size:16px">&#xe627;</i>
+						</permission-button>
 					</template>
 					<a-card-meta title="板料" description="板料指由板坯轧制的光滑平面金属的半制品，其长度和宽度远远大于厚度。"></a-card-meta>
 				</a-card>
 				<a-card hoverable style="width: 300px;display:inline-block;margin-right:12px;">
 					<img alt="example" src="../../assets/u1672.svg" slot="cover" />
 					<template class="ant-card-actions" slot="actions">
-						<a-icon type="plus" style="font-size:20px" @click="addStickVisible=true" />
-						<i class="iconfont" style="font-size:20px" @click="StickListVisible=true">&#xe627;</i>
+						<permission-button
+							permCode="raw_raw_lookup.raw_raw_add"
+							banType="hide"
+							class="button_text"
+							@click="addStickVisible=true"
+						>
+							<a-icon type="plus" style="font-size:20px" />
+						</permission-button>
+						<permission-button permCode banType="hide" class="button_text" @click="StickListVisible=true">
+							<i class="iconfont" style="font-size:16px">&#xe627;</i>
+						</permission-button>
 					</template>
 					<a-card-meta title="棒料" description="棒料是针对于板材和其他型材而言，就是有一定长度的圆形或多边形长棍形状的材料。"></a-card-meta>
 				</a-card>
 				<a-card hoverable style="width: 300px;display:inline-block;">
 					<img alt="example" src="../../assets/u2378.svg" slot="cover" />
 					<template class="ant-card-actions" slot="actions">
-						<a-icon type="plus" style="font-size:20px" @click="addProfileVisible=true" />
-						<i class="iconfont" style="font-size:20px" @click="ProfileListVisible=true">&#xe627;</i>
+						<permission-button
+							permCode="raw_raw_lookup.raw_raw_add"
+							banType="hide"
+							class="button_text"
+							@click="addProfileVisible=true"
+						>
+							<a-icon type="plus" style="font-size:20px" />
+						</permission-button>
+						<permission-button
+							permCode
+							banType="hide"
+							class="button_text"
+							@click="ProfileListVisible=true"
+						>
+							<i class="iconfont" style="font-size:16px">&#xe627;</i>
+						</permission-button>
 					</template>
 					<a-card-meta title="型材" description="型材是指金属经过塑性加工成形，品种规格繁多，用途广泛，在轧制生产中占有非常重要的地位。"></a-card-meta>
 				</a-card>
@@ -64,7 +96,7 @@
 				<a-col :span="12">
 					<a-form-item label="长">
 						<a-input
-							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber}]}]"
+							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber1}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -75,7 +107,7 @@
 				<a-col :span="12">
 					<a-form-item label="宽">
 						<a-input
-							v-decorator="['widthOrRadius',{rules: [{ required: true, message: '请填写宽' },{validator: chickNumber}]}]"
+							v-decorator="['widthOrRadius',{rules: [{ required: true, message: '请填写宽' },{validator: chickNumber1}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -156,7 +188,7 @@
 				<a-col :span="12">
 					<a-form-item label="半径">
 						<a-input
-							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写半径' },{validator: chickNumber}]}]"
+							v-decorator="['lengthOrRadius',{rules: [{ required: true, message: '请填写半径' },{validator: chickNumber1}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -167,7 +199,7 @@
 				<a-col :span="12">
 					<a-form-item label="长">
 						<a-input
-							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber}]}]"
+							v-decorator="['heightOrLength',{rules: [{ required: true, message: '请填写长' },{validator: chickNumber1}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -237,7 +269,7 @@
 				<a-col :span="12">
 					<a-form-item label="长度">
 						<a-input
-							v-decorator="['length',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumber}]}]"
+							v-decorator="['length',{rules: [{ required: true, message: '请填写长度' },{validator: chickNumber1}]}]"
 							type="number"
 							oninput="if(value.length>10)value=value.slice(0,10)"
 							style="width:260px;"
@@ -313,6 +345,15 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Card, Col, Row, Modal, Icon, Input, Form } from "ant-design-vue";
+Vue.use(Card);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Form);
+Vue.use(Icon);
+Vue.use(Input);
+Vue.use(Modal);
 import BordList from "./BordList";
 import StickList from "./StickList";
 import ProfileList from "./ProfileList";
@@ -343,11 +384,11 @@ export default {
 		},
 		chickNumber1(rule, value, callback) {
 			if (
-				(/^\d+(\.\d{0,1})?$/.test(value) == false || value <= 0) &&
+				(/^\d+(\.\d{0,2})?$/.test(value) == false || value <= 0) &&
 				value != "" &&
 				value != null
 			) {
-				callback(new Error("只能输入大于0,且只能保留1位小数"));
+				callback(new Error("只能输入大于0,且只能保留两位小数"));
 			} else {
 				callback();
 			}
@@ -401,7 +442,7 @@ export default {
 						name: values.name,
 						remark: values.remark,
 						number: values.number,
-						density: values.density * 100,
+						density: values.density,
 						price: values.price
 					};
 					this.Axios(
@@ -442,7 +483,7 @@ export default {
 						name: values.name,
 						remark: values.remark,
 						number: values.number,
-						density: values.density * 100,
+						density: values.density,
 						price: values.price
 					};
 					this.Axios(
@@ -481,7 +522,7 @@ export default {
 						name: values.name,
 						remark: values.remark,
 						number: values.number,
-						density: values.weight * 100,
+						density: values.weight,
 						price: values.price
 					};
 					this.Axios(

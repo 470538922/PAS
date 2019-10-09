@@ -2,9 +2,13 @@
 	<div class="order_price">
 		<a-row style="padding: 20px;">
 			<a-button @click="$router.back(-1)" icon="left">返回</a-button>
-			<a-button @click="findOne">
+			<permission-button
+				permCode="workorder_offer_lookup.workorder_offer_watch"
+				banType="hide"
+				@click="findOne"
+			>
 				<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>打印预览
-			</a-button>
+			</permission-button>
 		</a-row>
 		<a-form :form="form" layout="inline">
 			<a-col :span="24">
@@ -215,12 +219,14 @@
 				</a-col>
 			</div>
 			<div style="line-height:60px;">
-				<a-button
+				<permission-button
+					permCode="workorder_offer_lookup.workorder_offer_save"
+					banType="hide"
 					:loading="loadingShow"
 					type="primary"
 					@click="add"
 					:disabled="tableData==null||tableData==[]||tableData==undefined||tableData==''"
-				>保存修改</a-button>
+				>保存修改</permission-button>
 			</div>
 		</a-col>
 		<!-- <a-modal
@@ -260,6 +266,27 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Col,
+	Row,
+	Modal,
+	Icon,
+	Input,
+	Form,
+	Table,
+	Popconfirm,
+	Tooltip
+} from "ant-design-vue";
+Vue.use(Col);
+Vue.use(Table);
+Vue.use(Row);
+Vue.use(Form);
+Vue.use(Icon);
+Vue.use(Input);
+Vue.use(Popconfirm);
+Vue.use(Tooltip);
+
 import moment from "moment";
 const columns = [
 	{

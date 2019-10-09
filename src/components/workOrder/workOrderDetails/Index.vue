@@ -8,22 +8,46 @@
 						<div style="line-height:50px;">
 							<a-col :span="12">
 								<a-button @click="$router.back(-1)" icon="left" style="margin-right:20px;">返回</a-button>
-								<a-button @click="addShow">
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_add"
+									banType="hide"
+									@click="addShow"
+								>
 									<a-icon style="color:#1890ff;" type="plus" />新增
-								</a-button>
-								<a-button @click="editShow" :disabled="selectedRowKeys.length!=1">
+								</permission-button>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_update"
+									banType="hide"
+									@click="editShow"
+									:disabled="selectedRowKeys.length!=1"
+								>
 									<a-icon style="color:#1890ff;" type="edit" />修改
-								</a-button>
+								</permission-button>
 
-								<a-button @click="showDeleteConfirm" :disabled="selectedRowKeys.length!=1">
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_delete"
+									banType="hide"
+									@click="showDeleteConfirm"
+									:disabled="selectedRowKeys.length!=1"
+								>
 									<a-icon style="color:#1890ff;" type="delete" />删除
-								</a-button>
-								<a-button @click="toworkHoursHandle" :disabled="selectedRowKeys.length<1">
+								</permission-button>
+								<permission-button
+									permCode
+									banType="hide"
+									@click="toworkHoursHandle"
+									:disabled="selectedRowKeys.length<1"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xea06;</i>工时管理
-								</a-button>
-								<a-button @click="toPriview" :disabled="selectedRowKeys.length<1">
+								</permission-button>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_watch"
+									banType="hide"
+									@click="toPriview"
+									:disabled="selectedRowKeys.length<1"
+								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>预览
-								</a-button>
+								</permission-button>
 							</a-col>
 						</div>
 					</a-row>
@@ -36,6 +60,12 @@
 							:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
 						>
 							<template slot="isShooting" slot-scope="text, record, index">
+								<div>
+									<a-icon type="close" v-if="text==false" style="color:red;font-size: 16px;" />
+									<a-icon type="check" v-if="text==true" style="color:green;font-size: 16px;" />
+								</div>
+							</template>
+							<template slot="hasWorkLoad" slot-scope="text, record, index">
 								<div>
 									<a-icon type="close" v-if="text==false" style="color:red;font-size: 16px;" />
 									<a-icon type="check" v-if="text==true" style="color:green;font-size: 16px;" />
@@ -61,7 +91,13 @@
 								</div>
 							</template>
 							<template slot="detail" slot-scope="text, record, index">
-								<span style="color:#1890ff;cursor: pointer;" @click="technologyModalShow(record)">工艺排配</span>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_paipei"
+									banType="disabled"
+									class="button_text btn_disabled"
+									@click="technologyModalShow(record)"
+								>工艺排配</permission-button>
+								<!-- <span style="color:#1890ff;cursor: pointer;" @click="technologyModalShow(record)">工艺排配</span> -->
 							</template>
 						</a-table>
 					</a-row>
@@ -272,6 +308,28 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Col,
+	Row,
+	Modal,
+	Popover,
+	Progress,
+	Form,
+	Input,
+	DatePicker
+} from "ant-design-vue";
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Modal);
+Vue.use(Popover);
+Vue.use(Progress);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(DatePicker);
+
 import moment from "moment";
 import TechnologyAdd from "./TechnologyAdd";
 import TechnologyEdit from "./TechnologyEdit";
@@ -324,9 +382,16 @@ const columns = [
 		scopedSlots: { customRender: "comment" }
 	},
 	{
+		dataIndex: "hasWorkLoad",
+		key: "hasWorkLoad",
+		title: "工时定额",
+		width: 100,
+		scopedSlots: { customRender: "hasWorkLoad" }
+	},
+	{
 		dataIndex: "isShooting",
 		key: "isShooting",
-		title: "是否完成工艺排配",
+		title: "工艺排配",
 		width: 120,
 		scopedSlots: { customRender: "isShooting" }
 	},

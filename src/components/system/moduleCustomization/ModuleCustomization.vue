@@ -9,7 +9,7 @@
 							<template slot="title">
 								<span>您可以将本系统的模块名称随意修改，为方便您的使用习惯。（不填写表示使用系统默认）</span>
 							</template>
-							<a-icon type="exclamation-circle" style="margin-left:8px;"/>
+							<a-icon type="exclamation-circle" style="margin-left:8px;" />
 						</a-tooltip>
 					</a-form-item>
 					<a-form-item :label-col=" { span: 4 }" :wrapper-col="{ span: 20 }" label="“生产进度”替换为">
@@ -42,6 +42,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Row, Form, Input, Tooltip } from "ant-design-vue";
+Vue.use(Input);
+Vue.use(Row);
+Vue.use(Form);
+Vue.use(Tooltip);
+
 export default {
 	data() {
 		return {

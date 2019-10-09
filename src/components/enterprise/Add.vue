@@ -92,6 +92,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Col, Upload, Form, Input, Icon } from "ant-design-vue";
+Vue.use(Col);
+Vue.use(Upload);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(Icon);
 import md5 from "js-md5/src/md5.js";
 import CryptoJS from "crypto-js/crypto-js.js";
 export default {

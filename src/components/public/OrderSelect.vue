@@ -27,6 +27,11 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Table, Pagination } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+
 const columns = [
 	{
 		dataIndex: "deviceNo",

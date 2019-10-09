@@ -13,7 +13,7 @@
 						<span style="margin-left: 8px">
 							<template v-if="hasSelected">{{`已选择 ${selectedRowKeys.length} 人`}}</template>
 						</span>
-						<a-input-search placeholder="请输入关键字" style="width: 200px;float:right;" @search="onSearch"/>
+						<a-input-search placeholder="请输入关键字" style="width: 200px;float:right;" @search="onSearch" />
 					</div>
 					<a-table
 						size="small"
@@ -27,6 +27,15 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Table, Col, Row, Pagination, Input, Tree } from "ant-design-vue";
+Vue.use(Pagination);
+Vue.use(Table);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Input);
+Vue.use(Tree);
+
 const columns = [
 	{
 		title: "员工编号",
@@ -110,7 +119,7 @@ export default {
 				this.selectedRowKeys = [];
 			}, 1000);
 		},
-		onSelectChange(selectedRowKeys,a) {
+		onSelectChange(selectedRowKeys, a) {
 			console.log(a);
 			console.log("selectedRowKeys changed: ", selectedRowKeys);
 			this.selectedRowKeys = selectedRowKeys;

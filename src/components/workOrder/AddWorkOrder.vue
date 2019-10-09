@@ -217,6 +217,32 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import {
+	Table,
+	Tabs,
+	Modal,
+	Popover,
+	Progress,
+	Form,
+	Input,
+	DatePicker,
+	Upload,
+	Select,
+	Radio
+} from "ant-design-vue";
+Vue.use(Table);
+Vue.use(Tabs);
+Vue.use(Select);
+Vue.use(Modal);
+Vue.use(Popover);
+Vue.use(Progress);
+Vue.use(Form);
+Vue.use(Input);
+Vue.use(DatePicker);
+Vue.use(Upload);
+Vue.use(Radio);
+
 import OrderSelect from "../public/OrderSelect";
 import moment from "moment";
 const columns = [

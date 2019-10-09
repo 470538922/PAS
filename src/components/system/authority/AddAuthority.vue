@@ -35,7 +35,12 @@
 						/>
 					</a-form-item>
 					<a-form-item :wrapper-col="{ span: 22,offset: 2 }">
-						<a-button type="primary" @click="addRole()">提交</a-button>
+						<permission-button
+							permCode="role_add_lookup.role_add_save"
+							banType="hide"
+							type="primary"
+							@click="addRole()"
+						>提交</permission-button>
 					</a-form-item>
 				</a-form>
 			</div>
@@ -43,6 +48,13 @@
 	</div>
 </template>
 <script>
+import Vue from "vue";
+import { Tree, Col, Row, Form, Input } from "ant-design-vue";
+Vue.use(Input);
+Vue.use(Tree);
+Vue.use(Col);
+Vue.use(Row);
+Vue.use(Form);
 import axios from "axios";
 const treeData = [
 	{
@@ -124,7 +136,7 @@ export default {
 						console.log(result);
 						this.treeData = result.data.data.map(item => {
 							return {
-								title: item.permissionName,
+								title: item.permissionName + "(" + item.permissionUrl + ")",
 								key: item.id,
 								code: parseInt(item.code),
 								parentCode: parseInt(item.parentCode)
