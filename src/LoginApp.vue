@@ -65,6 +65,7 @@
 	</div>
 </template>
 <script>
+import axios from "axios";
 import Identify from "./components/public/Identify";
 import md5 from "js-md5/src/md5.js";
 import CryptoJS from "crypto-js/crypto-js.js";
@@ -158,14 +159,51 @@ export default {
 			// console.log(this.password);
 			let qs = require("qs");
 			let data = qs.stringify({
-				param: this.user.userName,
-				password: pass
+				username: this.user.userName,
+				// param: this.user.userName,
+				password: pass,
+				client_id: "webApp",
+				client_secret:
+					"4+rRL1RN5nsR5yzcCNt9+kyHHrba1Hi0BJiiEv0C9mAC4gKSZbiWLg==",
+				grant_type: "password"
 			});
+			this.$axios
+				.post(this.global.apiSrc + "/uaa/oauth/token", data)
+				.then(
+					response => {
+						console.log(response);
+						if (response.status === 200) {
+							sessionStorage.token = response.data.access_token;
+							this.getUserMsg(response.data.access_token);
+						}
+					},
+					error => {
+						console.log(error.response.status);
+						if (error.response.status === 400) {
+							this.$message.error("账号或密码错误");
+						} else {
+							this.$message.error(error.response.data.msg);
+						}
+					}
+				)
+				.catch(res => {
+					// console.log(res);
+					// this.$message.error("账号或密码错误");
+				});
+		},
+		getUserMsg(token) {
+			const instance = axios.create({});
+			instance.defaults.headers.common["Authorization"] = "bearer " + token;
+			// this.$axios
+			// 	.get(this.global.apiSrc + "/api-sso/Admin/permission")
+			// 	.then(response => {
+			// 		console.log(response);
+			// 	});
 			this.Axios(
 				{
-					url: "/api-sso/Admin/login",
-					params: data,
-					type: "post",
+					url: "/api-sso/Admin/permission",
+					params: {},
+					type: "get",
 					option: { enableMsg: false }
 				},
 				this
@@ -173,12 +211,11 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result.data.data);
-						// this.$router.replace("/Dashboard");
-						sessionStorage.token = result.data.data.token;
+						// sessionStorage.token = result.data.data.token;
 						let permissionUrl =
-							result.data.data.user.permissions != null &&
-							result.data.data.user.permissions != ""
-								? result.data.data.user.permissions.map(item => {
+							result.data.data.permissions != null &&
+							result.data.data.permissions != ""
+								? result.data.data.permissions.map(item => {
 										return {
 											module: item.permissionUrl,
 											permissionItem:
@@ -190,13 +227,14 @@ export default {
 										};
 								  })
 								: [];
-						// console.log(permissionUrl);
+						console.log(permissionUrl);
+						let user = { ...result.data.data };
 						sessionStorage.permissionUrl = JSON.stringify(permissionUrl);
-						sessionStorage.user = JSON.stringify(result.data.data.user);
-						if (result.data.data.user.userType == 1) {
+						sessionStorage.user = JSON.stringify(user);
+						if (result.data.data.userType == 1) {
 							window.location.href = "/Dashboard";
 						}
-						if (result.data.data.user.userType == 0) {
+						if (result.data.data.userType == 0) {
 							window.location.href = "/Enterprise";
 						}
 					}

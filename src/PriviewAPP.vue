@@ -12,7 +12,7 @@
 								<h3>加工工艺过程卡片</h3>
 							</td>
 							<td colspan="3" style="width:30%">
-								<tr style="display: block;">
+								<tr style="display: block;overflow: hidden;">
 									<td class="td_style" style="border-left:none;">名称</td>
 									<td class="td_style" style="border-left:1px solid #000000;">图号</td>
 								</tr>
@@ -24,7 +24,7 @@
 							<td style="width:15%">{{item.workOrderDesDO.planCode}}</td>
 							<td style="width:15%">{{item.workOrderDesDO.amount}}</td>
 							<td colspan="3" style="width:30%">
-								<tr style="display: block;">
+								<tr style="display: block;overflow: hidden;">
 									<td class="td_style" style="border-left:none;">{{item.workOrderDesDO.name}}</td>
 									<td
 										class="td_style"
@@ -37,8 +37,13 @@
 						<tr>
 							<td colspan="2" style="width:20%">材料名称、牌号</td>
 							<td colspan="2" style="width:30%">毛坯外形尺寸</td>
-							<td style="width:20%">每毛坯件数</td>
-							<td colspan="4" style="width:30%">备注</td>
+							<td style="width:20%">毛坯数量</td>
+							<td colspan="3" style="width:30%">
+								<tr style="display: block;overflow: hidden;">
+									<td class="td_style" style="border-left:none;">单件零件重量</td>
+									<td class="td_style" style="border-left:1px solid #000000;">单件表面积</td>
+								</tr>
+							</td>
 						</tr>
 						<tr>
 							<td
@@ -46,8 +51,18 @@
 								style="width:20%"
 							>{{(item.drawingDO.rawMaterialDO.type==1?"板料":item.drawingDO.rawMaterialDO.type==2?"棒料":"型材")+' '+item.drawingDO.rawMaterialDO.name}}</td>
 							<td colspan="2" style="width:30%">{{item.dimensions}}</td>
-							<td style="width:20%">{{item.drawingDO.inTheEmbryoComponents}}</td>
-							<td colspan="4" style="width:30%">{{item.workOrderDesDO.remark}}</td>
+							<td
+								style="width:20%"
+							>{{Math.ceil(item.workOrderDesDO.amount/item.drawingDO.inTheEmbryoComponents)}}</td>
+							<td colspan="3" style="width:30%">
+								<tr style="display: block;overflow: hidden;">
+									<td class="td_style" style="border-left:none;">{{item.weightAndArea.weight}}</td>
+									<td
+										class="td_style"
+										style="border-left:1px solid #000000;"
+									>{{item.weightAndArea.surfaceArea}}</td>
+								</tr>
+							</td>
 						</tr>
 						<tr>
 							<td style="width:10%">序号</td>
@@ -69,7 +84,7 @@
 							<td style="width:10%;height:42px;"></td>
 						</tr>
 						<tr
-							v-for="(z,k) in 15-(item.drawingDO.process.length!=0?item.drawingDO.process.length:0)"
+							v-for="(z,k) in 12-(item.drawingDO.process.length!=0?item.drawingDO.process.length:0)"
 							:key="k+22222"
 						>
 							<td style="width:10%;height:42px;">{{z+item.drawingDO.process.length}}</td>
@@ -114,31 +129,35 @@
 		<div v-if="priviewType==2">
 			<div class="content_case" v-for="(item,index) in priceMsg" :key="index+66666">
 				<div style="text-align:center;">
-					<h2>{{enterpriseName}}制造报价单</h2>
+					<h2>{{item.title}}</h2>
 				</div>
 				<a-col :span="24">
 					<a-col :span="12">
-						<span class="label_style">需求方：</span>
+						<span class="label_style">需方：</span>
 						<span>{{item.inquiry}}</span>
 					</a-col>
 					<a-col :span="12">
-						<span class="label_style">需求方订单号：</span>
-						<span></span>
+						<span class="label_style">需方订单号：</span>
+						<span>{{item.inquiryNo}}</span>
 					</a-col>
 					<a-col :span="12">
 						<span class="label_style">供方：</span>
-						<span>{{enterpriseName}}</span>
+						<span>{{item.supplier}}</span>
 					</a-col>
 					<a-col :span="12">
 						<span class="label_style">供方订单号：</span>
-						<span></span>
+						<span>{{item.supplierNo}}</span>
 					</a-col>
-					<a-col :span="24">
+					<a-col :span="12">
 						<span class="label_style">项目名称：</span>
-						<span>{{item.address}}</span>
+						<span>{{item.projectName}}</span>
+					</a-col>
+					<a-col :span="12">
+						<span class="label_style">协议编号：</span>
+						<span>{{item.agreementNo}}</span>
 					</a-col>
 					<a-col :span="24">
-						<span class="label_style">报价时间：</span>
+						<span class="label_style">签订时间：</span>
 						<span>{{item.offerDate}}</span>
 					</a-col>
 					<!-- <table class="table_style1">
@@ -161,7 +180,7 @@
 					</table>-->
 				</a-col>
 				<a-col :span="24" style="margin:24px 0 12px;">需求方购买产品如下：</a-col>
-				<a-col :span="24" style="border:1px solid #dde2eb;">
+				<a-col :span="24">
 					<table class="table_style">
 						<tr style="background-color:#f1f1f1;color:#333333 ;font-weight:normal;">
 							<td style="width:5%">序号</td>
@@ -185,28 +204,36 @@
 
 							<td style="width:10%">{{i.remark}}</td>
 						</tr>
-						<tr>
-							<td colspan="5">合计：{{item.total}}</td>
-							<td></td>
-							<td></td>
-							<td></td>
-						</tr>
-						<tr>
-							<td colspan="8">
-								大写（不含税）：
-								<span style="font-weight:900">{{number_chinese(item.total)}}</span>
-							</td>
-						</tr>
 					</table>
-					<!-- <div style="text-align:right;line-height:50px;">
-						合计：
+					<div style="line-height:32px;">
+						<span style="text-align:right;width:100px;display:inline-block;">合计(不含税)：</span>
 						<span style="font-size:18px;color:red;padding-right:12px;">{{item.total}}</span>
-					</div>-->
+						<p>
+							<span style="text-align:right;width:100px;display:inline-block;">大写(不含税)：</span>
+							<span style="font-size:18px;color:red;padding-right:12px;">{{number_chinese(item.total)}}</span>
+						</p>
+					</div>
+					<div style="padding:0 0 12px;overflow:hidden;">
+						<a-col :span="12" style="text-align:center">
+							<span>供方：</span>
+							<span
+								style="display:inline-block;width:200px;border-bottom:1px solid #000000;height:24px;vertical-align: top;"
+							></span>
+						</a-col>
+						<a-col :span="12">
+							<span>需方：</span>
+							<span
+								style="display:inline-block;width:200px;border-bottom:1px solid #000000;height:24px;vertical-align: top;"
+							></span>
+						</a-col>
+					</div>
 				</a-col>
-				<a-col
-					:span="24"
-					style="border:1px solid #dde2eb;padding:4px 0;border-top:none;"
-				>备注：{{item.remark}}</a-col>
+				<a-col :span="24">
+					<span style>注：</span>
+					<span style="display:inline-block;vertical-align: top;width:97%;">
+						<pre>{{item.remark}}</pre>
+					</span>
+				</a-col>
 				<!-- <a-col :span="24" style="border:1px solid #dde2eb;padding:4px 0;border-top:none;">
 					<a-col :span="12">
 						<span class="left_label">报价人：</span>
@@ -445,11 +472,22 @@ export default {
 		}
 	}
 	.td_style {
-		display: inline-block;
+		// display: inline-block;
 		border-right: none !important;
 		border-top: none !important;
 		border-bottom: none !important;
+		word-break: break-all;
 		width: 49%;
+		margin-bottom: -1000px;
+		padding-bottom: 1000px;
+		float: left;
 	}
+}
+pre {
+	white-space: pre-wrap; /* css3.0 */
+	white-space: -moz-pre-wrap; /* Firefox */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 </style>

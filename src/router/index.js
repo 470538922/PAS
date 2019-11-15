@@ -280,5 +280,14 @@ export default new Router({
       },
       children: []
     },
+    {
+      path: '/deliverySlip',
+      name: 'deliverySlip',
+      components: require('@/components/workOrder/deliverySlip/index'),
+      meta: {
+        requireAuth: true,
+      },
+      children: []
+    },
   ]
 })

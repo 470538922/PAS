@@ -28,7 +28,7 @@
 			</a-col>
 			<a-col :span="12">
 				<a-form-item label="原料类型">
-					<span>{{detailsMsg.rawMaterialDO.type==1?'板料':detailsMsg.rawMaterialDO.type==2?'棒料':"型材"}}</span>
+					<span>{{materialVlaue==1?'板料':materialVlaue==2?'棒料':"型材"}}</span>
 				</a-form-item>
 			</a-col>
 			<a-col :span="12">
@@ -80,8 +80,8 @@
 				</a-col>
 				<a-col :span="12">
 					<a-form-item label="毛坯外形尺寸长度">
-						<span>{{detailsMsg.lengthOrRadius}}</span>&nbsp;±
-						<span>{{detailsMsg.lengthOrRadiusError}}</span>
+						<span>{{detailsMsg.heightOrLength}}</span>&nbsp;±
+						<span>{{detailsMsg.heightOrLengthError}}</span>
 					</a-form-item>
 				</a-col>
 			</a-col>
@@ -107,6 +107,21 @@
 				<a-table :pagination="false" :columns="columns" :dataSource="data" bordered rowKey="id">
 					<template slot="serialNo" slot-scope="text, record, index">
 						<span class="serial_number">{{index+1}}</span>
+					</template>
+					<template slot="employeeName" slot-scope="text, record, index">
+						<a-popover title placement="right">
+							<template slot="content">
+								<span
+									v-if="record.workType!='STORAGE'"
+								>派工时间：{{record.executives.length>0?record.executives[0].gmtCreated:""}}</span>
+								<br v-if="record.workType!='STORAGE'" />
+								<span>完工时间：{{record.executives.length>0?record.executives[0].gmtModified:""}}</span>
+							</template>
+							<span
+								class="serial_number"
+								v-if="record.workType=='STORAGE'&&record.executives.length>0?record.executives[0].gmtCreated!=record.executives[0].gmtModified:true"
+							>{{record.executives.map(item=>item.employeeName).join("、")}}</span>
+						</a-popover>
 					</template>
 				</a-table>
 			</a-col>
@@ -141,6 +156,13 @@ const columns = [
 		title: "工序内容",
 		width: 120,
 		scopedSlots: { customRender: "processInfo" }
+	},
+	{
+		dataIndex: "employeeName",
+		key: "employeeName",
+		title: "操作者",
+		width: 80,
+		scopedSlots: { customRender: "employeeName" }
 	},
 	{
 		dataIndex: "principalEmployeeName",
@@ -198,7 +220,7 @@ export default {
 						console.log(result);
 						this.detailsMsg = result.data.data;
 						this.data = result.data.data.process;
-						this.materialVlaue = result.data.data.rawMaterialDO.type;
+						this.materialVlaue = this.detailsMsg.rawMaterialDO.type;
 					}
 				},
 				({ type, info }) => {}

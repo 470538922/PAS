@@ -12,61 +12,14 @@
 		</a-row>
 		<a-form :form="form" layout="inline">
 			<a-col :span="24">
-				<a-form-item label="询价方">
+				<a-form-item label="标题">
 					<a-input
 						maxlength="20"
-						v-decorator="['inquiry',{rules: [{ required: true, message: '请填写询价方' }]}]"
+						v-decorator="['title',{rules: [{ required: true, message: '请填写询价方' }]}]"
 						style="width:390px"
 					></a-input>
 				</a-form-item>
-				<a-form-item label="联系人">
-					<a-input maxlength="20" v-decorator="['inquiryName']" style="width:390px"></a-input>
-				</a-form-item>
-			</a-col>
-			<a-col :span="24">
-				<a-form-item label="联系电话">
-					<a-input
-						type="number"
-						oninput="if(value.length>11)value=value.slice(0,11)"
-						v-decorator="['inquiryPhone',{rules: [{validator: chickPhone}]}]"
-						style="width:390px"
-					></a-input>
-				</a-form-item>
-				<a-form-item label="电子邮箱">
-					<a-input
-						maxlength="20"
-						v-decorator="['inquiryMail',{rules: [{validator: chickMail}]}]"
-						style="width:390px"
-					></a-input>
-				</a-form-item>
-			</a-col>
-			<a-col :span="24" style="margin-bottom:20px;">
-				<a-form-item label="订单标题">
-					<a-input
-						maxlength="20"
-						v-decorator="['address',{rules: [{ required: true, message: '请填订单标题' }]}]"
-						style="width:390px"
-					></a-input>
-				</a-form-item>
-			</a-col>
-			<a-col :span="24">
-				<a-form-item label="报价人">
-					<a-input maxlength="20" v-decorator="['baoName']" style="width:390px"></a-input>
-				</a-form-item>
-				<a-form-item label="审核人">
-					<a-input maxlength="20" v-decorator="['audit']" style="width:390px"></a-input>
-				</a-form-item>
-			</a-col>
-			<a-col :span="24">
-				<a-form-item label="报价人电话">
-					<a-input
-						type="number"
-						oninput="if(value.length>11)value=value.slice(0,11)"
-						v-decorator="['baoPhone',{rules: [{validator: chickPhone}]}]"
-						style="width:390px"
-					></a-input>
-				</a-form-item>
-				<a-form-item label="报价日期">
+				<a-form-item label="签订时间">
 					<a-date-picker
 						v-decorator="['offerDate']"
 						@change="(e,d)=>handleTime(e,d,1)"
@@ -76,6 +29,40 @@
 				</a-form-item>
 			</a-col>
 			<a-col :span="24">
+				<a-form-item label="需方">
+					<a-input
+						v-decorator="['inquiry',{rules: [{ required: true, message: '请填写询价方' }]}]"
+						style="width:390px"
+					></a-input>
+				</a-form-item>
+				<a-form-item label="需方订单号">
+					<a-input maxlength="20" v-decorator="['inquiryNo']" style="width:390px"></a-input>
+				</a-form-item>
+			</a-col>
+			<a-col :span="24">
+				<a-form-item label="供方">
+					<a-input
+						maxlength="20"
+						v-decorator="['supplier',{rules: [{ required: true, message: '请填订单标题' }]}]"
+						style="width:390px"
+					></a-input>
+				</a-form-item>
+				<a-form-item label="供方订单号">
+					<a-input maxlength="20" v-decorator="['supplierNo']" style="width:390px"></a-input>
+				</a-form-item>
+			</a-col>
+			<a-col :span="24">
+				<a-form-item label="项目名称">
+					<a-input
+						v-decorator="['projectName',{rules: [{ required: true, message: '请填写询价方' }]}]"
+						style="width:390px"
+					></a-input>
+				</a-form-item>
+				<a-form-item label="协议编号">
+					<a-input v-decorator="['agreementNo',{rules: []}]" style="width:390px"></a-input>
+				</a-form-item>
+			</a-col>
+			<!-- <a-col :span="24">
 				<a-form-item label="报价人邮箱">
 					<a-input
 						maxlength="20"
@@ -91,11 +78,11 @@
 						style="width:390px"
 					/>
 				</a-form-item>
-			</a-col>
+			</a-col>-->
 			<a-col :span="24">
 				<a-form-item label="备注">
 					<a-textarea
-						maxlength="50"
+						maxlength="500"
 						v-decorator="['remark']"
 						style="width:920px;"
 						:autosize="{ minRows: 4, maxRows: 4 }"
@@ -386,6 +373,7 @@ export default {
 	data() {
 		this.cacheData = tableData.map(item => ({ ...item }));
 		return {
+			remark: "",
 			loadingShow: false,
 			form: this.$form.createForm(this),
 			columns,
@@ -445,17 +433,14 @@ export default {
 					console.log(newData);
 					let data = {
 						workOrderId: this.$route.params.id,
-						inquiry: values.inquiry,
-						inquiryName: values.inquiryName,
-						inquiryPhone: values.inquiryPhone,
-						inquiryMail: values.inquiryMail,
-						address: values.address,
-						baoName: values.baoName,
-						audit: values.audit,
-						baoPhone: values.baoPhone,
+						title: values.title,
 						offerDate: this.offerDate,
-						baoMail: values.baoMail,
-						validDate: this.validDate,
+						inquiry: values.inquiry,
+						inquiryNo: values.inquiryNo,
+						supplier: values.supplier,
+						supplierNo: values.supplierNo,
+						projectName: values.projectName,
+						agreementNo: values.agreementNo,
 						remark: values.remark,
 						total: this.total,
 						offerDesDTOList: newData.map(item => {
@@ -612,36 +597,27 @@ export default {
 				result => {
 					if (result.data.code === 200) {
 						console.log(result.data.data);
-						if (result.data.data.offerDes) {
+						if (result.data.data) {
 							this.tableData = result.data.data.offerDes;
 							this.form.setFieldsValue({
+								title:
+									result.data.data.title != undefined &&
+									result.data.data.title != null &&
+									result.data.data.title != ""
+										? result.data.data.title
+										: this.userMsg.enterpriseName + "报价单",
 								inquiry: result.data.data.inquiry,
-								inquiryName: result.data.data.inquiryName,
-								inquiryPhone: result.data.data.inquiryPhone,
-								inquiryMail: result.data.data.inquiryMail,
-								address: result.data.data.address,
-								baoName:
-									result.data.data.baoName != null &&
-									result.data.data.baoName != ""
-										? result.data.data.baoName
-										: this.userMsg.userName,
-								audit: result.data.data.audit,
-								baoPhone:
-									result.data.data.baoPhone != null &&
-									result.data.data.baoPhone != ""
-										? result.data.data.baoPhone
-										: this.userMsg.phone,
+								inquiryNo: result.data.data.inquiryNo,
+								supplier: result.data.data.supplier,
+								supplierNo: result.data.data.supplierNo,
+								projectName: result.data.data.projectName,
+								agreementNo: result.data.data.agreementNo,
 								offerDate:
 									result.data.data.offerDate != null &&
 									result.data.data.offerDate != ""
 										? moment(result.data.data.offerDate, "YYYY/MM/DD")
 										: moment(this.NowDate, "YYYY/MM/DD"),
-								baoMail: result.data.data.baoMail,
-								validDate:
-									result.data.data.validDate != null &&
-									result.data.data.validDate != ""
-										? moment(result.data.data.validDate, "YYYY/MM/DD")
-										: undefined,
+
 								remark: result.data.data.remark
 							});
 						}
@@ -687,17 +663,14 @@ export default {
 				if (!err) {
 					let newData = [...this.tableData];
 					let data = {
-						inquiry: values.inquiry,
-						inquiryName: values.inquiryName,
-						inquiryPhone: values.inquiryPhone,
-						inquiryMail: values.inquiryMail,
-						address: values.address,
-						baoName: values.baoName,
-						audit: values.audit,
-						baoPhone: values.baoPhone,
+						title: values.title,
 						offerDate: this.offerDate,
-						baoMail: values.baoMail,
-						validDate: this.validDate,
+						inquiry: values.inquiry,
+						inquiryNo: values.inquiryNo,
+						supplier: values.supplier,
+						supplierNo: values.supplierNo,
+						projectName: values.projectName,
+						agreementNo: values.agreementNo,
 						remark: values.remark,
 						total: this.total,
 						offerDes: newData.map(item => {
@@ -768,8 +741,7 @@ export default {
 	created() {
 		setTimeout(() => {
 			this.form.setFieldsValue({
-				baoName: this.userMsg.userName,
-				baoPhone: this.userMsg.phone,
+				title: this.userMsg.enterpriseName + "报价单",
 				offerDate: moment(this.NowDate, "YYYY/MM/DD")
 			});
 		}, 100);

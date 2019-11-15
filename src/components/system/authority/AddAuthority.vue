@@ -136,7 +136,7 @@ export default {
 						console.log(result);
 						this.treeData = result.data.data.map(item => {
 							return {
-								title: item.permissionName + "(" + item.permissionUrl + ")",
+								title: item.permissionName,
 								key: item.id,
 								code: parseInt(item.code),
 								parentCode: parseInt(item.parentCode)

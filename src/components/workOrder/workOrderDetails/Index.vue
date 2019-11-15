@@ -6,7 +6,7 @@
 				<a-col :span="24" style="padding:0 20px;">
 					<a-row>
 						<div style="line-height:50px;">
-							<a-col :span="12">
+							<a-col :span="24">
 								<a-button @click="$router.back(-1)" icon="left" style="margin-right:20px;">返回</a-button>
 								<permission-button
 									permCode="workorder_detail_lookup.workorder_detail_add"
@@ -48,6 +48,38 @@
 								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe60c;</i>预览
 								</permission-button>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_touchan"
+									banType="hide"
+									@click="goIntoOperation"
+									:disabled="selectedRows.length==0"
+								>
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6fd;</i>投产
+								</permission-button>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_huifu"
+									banType="hide"
+									@click="regain"
+									:disabled="selectedRows.length==0"
+								>
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe625;</i>恢复
+								</permission-button>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_zanting"
+									banType="hide"
+									@click="showPauseConfirm"
+									:disabled="selectedRows.length!=1"
+								>
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe62d;</i>暂停
+								</permission-button>
+								<permission-button
+									permCode="workorder_detail_lookup.workorder_detail_zhongzhi"
+									banType="hide"
+									@click="showTerminationConfirm"
+									:disabled="selectedRows.length!=1"
+								>
+									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6aa;</i>终止
+								</permission-button>
 							</a-col>
 						</div>
 					</a-row>
@@ -55,7 +87,7 @@
 						<a-table
 							rowKey="workOrderDesId"
 							:columns="columns"
-							:pagination="false"
+							:pagination="pagination"
 							:dataSource="data"
 							:rowSelection="{selectedRowKeys:selectedRowKeys,onChange: onSelectChange}"
 						>
@@ -69,6 +101,25 @@
 								<div>
 									<a-icon type="close" v-if="text==false" style="color:red;font-size: 16px;" />
 									<a-icon type="check" v-if="text==true" style="color:green;font-size: 16px;" />
+								</div>
+							</template>
+							<template slot="state" slot-scope="text, record, index">
+								<div>
+									<span v-if="text==1" style="font-size:14px;color:#027DB4;">生产中</span>
+									<span v-if="text==0" style="font-size:14px;color:#999999;">待产</span>
+									<a-popover title placement="right">
+										<template slot="content">
+											<span>原因：{{record.reason}}</span>
+										</template>
+										<span v-if="text==2" style="font-size:14px;color:#F59A23;">暂停</span>
+									</a-popover>
+									<a-popover title placement="right">
+										<template slot="content">
+											<span>原因：{{record.reason}}</span>
+										</template>
+										<span v-if="text==3" style="font-size:14px;color:#E02D2D;">终止</span>
+									</a-popover>
+									<span v-if="text==4" style="font-size:14px;color:#10CF0C;">完成</span>
 								</div>
 							</template>
 							<template slot="schedule" slot-scope="text, record, index">
@@ -102,7 +153,10 @@
 						</a-table>
 					</a-row>
 				</a-col>
-				<a-col :span="24" style="padding-top:12px;padding-left:20px;">提示：以上信息全部完成排配后，工单才能投产。</a-col>
+				<!-- <a-col
+					:span="24"
+					style="padding-top:12px;padding-left:20px;position: relative;top: -64px;"
+				>提示：以上信息全部完成排配后，工单才能投产。</a-col> -->
 			</a-row>
 		</div>
 
@@ -338,7 +392,7 @@ const columns = [
 	{
 		dataIndex: "planCode",
 		title: "计划编号",
-		width: 60,
+		width: 70,
 		key: "planCode"
 	},
 	{
@@ -363,37 +417,43 @@ const columns = [
 		dataIndex: "gmtRequestCompletion",
 		key: "gmtRequestCompletion",
 		title: "要求完成时间",
-		width: 80,
+		width: 90,
 		scopedSlots: { customRender: "priority" }
+	},
+	{
+		dataIndex: "state",
+		key: "state",
+		title: "当前状态",
+		width: 100,
+		scopedSlots: { customRender: "state" }
 	},
 	{
 		dataIndex: "schedule",
 		key: "schedule",
 		title: "生产进度",
-		width: 100,
+		width: 80,
 		scopedSlots: { customRender: "schedule" }
 	},
-
 	{
-		dataIndex: "remark",
-		key: "remark",
-		title: "备注",
-		width: 160,
-		scopedSlots: { customRender: "comment" }
-	},
-	{
-		dataIndex: "hasWorkLoad",
-		key: "hasWorkLoad",
+		dataIndex: "quotaPerson",
+		key: "quotaPerson",
 		title: "工时定额",
 		width: 100,
-		scopedSlots: { customRender: "hasWorkLoad" }
+		scopedSlots: { customRender: "quotaPerson" }
 	},
 	{
-		dataIndex: "isShooting",
-		key: "isShooting",
+		dataIndex: "arranger",
+		key: "arranger",
 		title: "工艺排配",
-		width: 120,
-		scopedSlots: { customRender: "isShooting" }
+		width: 100,
+		scopedSlots: { customRender: "arranger" }
+	},
+	{
+		dataIndex: "processNames",
+		key: "processNames",
+		title: "工艺进度",
+		width: 180
+		// scopedSlots: { customRender: "comment" }
 	},
 	{
 		dataIndex: "detail",
@@ -406,6 +466,10 @@ const columns = [
 export default {
 	data() {
 		return {
+			pagination: {
+				defaultPageSize: 50,
+				showTotal: total => `共 ${total} 条`
+			},
 			isHideList: this.$route.params.id !== undefined ? false : true,
 			columns,
 			data: [],
@@ -428,6 +492,176 @@ export default {
 		};
 	},
 	methods: {
+		//投产
+		goIntoOperation() {
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.isShooting == true;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("没有完成工艺排配，不能进行投产！");
+			} else if (
+				this.selectedRows
+					.map(item => {
+						return item.state == 0;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("只能对待产状态下的工单明细进行投产，请重新选择！");
+			} else {
+				this.Axios(
+					{
+						url: "/api-workorder/workOrderAction/goIntoOperation",
+						params: this.selectedRowKeys,
+						type: "post",
+						option: { successMsg: "投产成功！" },
+						config: {
+							headers: { "Content-Type": "application/json" }
+						}
+					},
+					this
+				).then(
+					result => {
+						if (result.data.code === 200) {
+							this.getList(this.$route.params.id);
+							this.selectedRowKeys = [];
+							this.selectedRows = [];
+						}
+					},
+					({ type, info }) => {}
+				);
+			}
+		},
+		//恢复
+		regain() {
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.state == 2;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error("只能对暂停状态下的工单明细进行恢复，请重新选择！");
+			} else {
+				this.Axios(
+					{
+						url: "/api-workorder/workOrderAction/regain",
+						params: this.selectedRowKeys,
+						type: "post",
+						option: { successMsg: "恢复成功！" },
+						config: {
+							headers: { "Content-Type": "application/json" }
+						}
+					},
+					this
+				).then(
+					result => {
+						if (result.data.code === 200) {
+							this.getList(this.$route.params.id);
+							this.selectedRowKeys = [];
+							this.selectedRows = [];
+						}
+					},
+					({ type, info }) => {}
+				);
+			}
+		},
+		//暂停
+		showPauseConfirm() {
+			let that = this;
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.state == 1;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error(
+					"只能对生产中状态下的工单明细进行暂停，请重新选择！"
+				);
+			} else {
+				this.$confirm({
+					title: "确定暂停所选工单明细吗?",
+					content: "",
+					onOk: function() {
+						that.pauseShow();
+					},
+					onCancel() {}
+				});
+			}
+		},
+		pauseShow() {
+			this.Axios(
+				{
+					url: "/api-workorder/workOrderAction/pause",
+					params: this.selectedRowKeys,
+					type: "post",
+					option: { successMsg: "暂停成功！" },
+					config: {
+						headers: { "Content-Type": "application/json" }
+					}
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList(this.$route.params.id);
+						this.selectedRowKeys = [];
+						this.selectedRows = [];
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
+		//终止
+		showTerminationConfirm() {
+			let that = this;
+			if (
+				this.selectedRows
+					.map(item => {
+						return item.state == 1 || item.state == 2;
+					})
+					.find(item => item == false) != undefined
+			) {
+				this.$message.error(
+					"只能对生产中或者暂停的工单明细进行终止，请重新选择！"
+				);
+			} else {
+				this.$confirm({
+					title: "确定终止所选工单明细吗?",
+					content: "",
+					onOk: function() {
+						that.terminationShow();
+					},
+					onCancel() {}
+				});
+			}
+		},
+		terminationShow() {
+			this.Axios(
+				{
+					url: "/api-workorder/workOrderAction/termination",
+					params: this.selectedRowKeys,
+					type: "post",
+					option: { successMsg: "终止成功！" },
+					config: {
+						headers: { "Content-Type": "application/json" }
+					}
+				},
+				this
+			).then(
+				result => {
+					if (result.data.code === 200) {
+						this.getList(this.$route.params.id);
+						this.selectedRowKeys = [];
+						this.selectedRows = [];
+					}
+				},
+				({ type, info }) => {}
+			);
+		},
 		chickNumber(rule, value, callback) {
 			if (
 				/^\+?[1-9]\d*$/.test(value) == false &&
@@ -527,13 +761,14 @@ export default {
 		},
 		moment,
 		addShow() {
-			if (this.data[0] == undefined) {
-				this.addVisible = true;
-			} else if (this.data[0].state != 0) {
-				this.$message.error(`工单当前状态无法进行新增操作`);
-			} else {
-				this.addVisible = true;
-			}
+			// if (this.data[0] == undefined) {
+			// 	this.addVisible = true;
+			// } else if (this.data[0].state != 0) {
+			// 	this.$message.error(`工单当前状态无法进行新增操作`);
+			// } else {
+			// 	this.addVisible = true;
+			// }
+			this.addVisible = true;
 		},
 		add() {
 			this.form.validateFieldsAndScroll((err, values) => {
@@ -700,12 +935,18 @@ export default {
 			);
 		},
 		getList(id) {
+			let data = {
+				workOrderId:
+					this.$route.params.id == 9527 ? null : this.$route.params.id,
+				keyword:
+					this.$route.params.id == 9527
+						? sessionStorage.getItem("drawingNo")
+						: null
+			};
 			this.Axios(
 				{
 					url: "/api-workorder/workOrderDes/list",
-					params: {
-						workOrderId: id
-					},
+					params: data,
 					type: "get",
 					option: { enableMsg: false }
 				},
@@ -715,6 +956,15 @@ export default {
 					if (result.data.code === 200) {
 						console.log(result);
 						this.data = result.data.data;
+						this.data = this.data.map(item => {
+							return {
+								...item,
+								processNames:
+									item.processNames != null
+										? item.processNames.replace(/,/g, ">")
+										: item.processNames
+							};
+						});
 						// this.total = result.data.data.totalElement;
 					}
 				},

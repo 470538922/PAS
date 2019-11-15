@@ -16,7 +16,7 @@
 				<a-col :span="24" class="item_title">{{item.drawing.name}}</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">工作令号：</span>
-					<span>{{item.drawing.drawingNo}}</span>
+					<span>{{item.drawing.workOrderDes.workOrder.gongzuolingNo}}</span>
 				</a-col>
 				<a-col :span="12" class="item_content">
 					<span class="item_label">图号：</span>
@@ -46,7 +46,11 @@
 					<span class="item_label">毛坯外形尺寸：</span>
 					<span>{{item.dimensions}}</span>
 				</a-col>
-				<a-col :span="24" class="item_content">
+				<a-col :span="12" class="item_content">
+					<span class="item_label">工艺人员：</span>
+					<span>{{item.drawing.modifiedBy}}</span>
+				</a-col>
+				<a-col :span="12" class="item_content">
 					<span class="item_label">备注：</span>
 					<span>{{item.drawing.workOrderDes.remark}}</span>
 				</a-col>
@@ -80,10 +84,18 @@
 							<td style="width:10%">{{i.workTypeName}}</td>
 							<td style="width:25%">{{i.processInfo}}</td>
 							<td style="width:15%;padding:4px;">
-								<a-input type="number" v-model="i.preparationTime"></a-input>
+								<a-input
+									type="number"
+									v-model="i.preparationTime"
+									onkeyup="if( ! /^(?:[1-9]\d*|0)(?:\.\d{1,2})?$/.test(this.value)){this.value='';}"
+								></a-input>
 							</td>
 							<td style="width:15%;padding:4px;">
-								<a-input type="number" v-model="i.itemWorkTime"></a-input>
+								<a-input
+									type="number"
+									v-model="i.itemWorkTime"
+									onkeyup="if( ! /^(?:[1-9]\d*|0)(?:\.\d{1,2})?$/.test(this.value)){this.value=this.value.replace(/\.{2,}/g,'');}"
+								></a-input>
 							</td>
 							<td style="width:15%;padding:4px;">
 								<a-select
@@ -250,13 +262,15 @@ export default {
 				value
 					.map(item => {
 						return (
-							/^[0-9]([0-9])*$/.test(item.itemWorkTime) &&
-							/^[0-9]([0-9])*$/.test(item.preparationTime)
+							/^(?:[1-9]\d*|0)(?:\.\d{1,2})?$/.test(item.itemWorkTime) &&
+							/^(?:[1-9]\d*|0)(?:\.\d{1,2})?$/.test(item.preparationTime)
 						);
 					})
 					.find(item => item == false) != undefined
 			) {
-				this.$message.error("单件工时、准备工时只能是大于等于0的整数");
+				this.$message.error(
+					"单件工时、准备工时只能是大于等于0的且保留两位小数"
+				);
 			} else if (
 				value
 					.map(item => {

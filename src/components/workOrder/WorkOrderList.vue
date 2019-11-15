@@ -6,7 +6,7 @@
 				<a-col :span="24" style="padding:0 20px;">
 					<a-row>
 						<div style="line-height:50px;">
-							<a-col :span="15">
+							<a-col :span="12">
 								<permission-button
 									permCode="workorder_manage_lookup.workorder_manager_add"
 									banType="hide"
@@ -30,7 +30,7 @@
 								>
 									<a-icon style="color:#1890ff;" type="delete" />删除
 								</permission-button>
-								<permission-button
+								<!-- <permission-button
 									permCode="workorder_manage_lookup.workorder_manager_init"
 									banType="hide"
 									@click="goIntoOperation"
@@ -61,7 +61,7 @@
 									:disabled="selectedRows.length!=1"
 								>
 									<i class="iconfont" style="color:#1890ff;margin-right:8px;">&#xe6aa;</i>终止
-								</permission-button>
+								</permission-button>-->
 								<permission-button
 									permCode
 									banType="hide"
@@ -78,7 +78,11 @@
 								>生成报价单</permission-button>
 							</a-col>
 
-							<a-col :span="9" style="text-align:right">
+							<a-col :span="12" style="text-align:right">
+								<a-select placeholder="请选择" optionFilterProp="children" v-model="type" style="width:100px;">
+									<a-select-option :value="1">工单</a-select-option>
+									<a-select-option :value="0">工单明细</a-select-option>
+								</a-select>
 								<a-select
 									placeholder="请选择"
 									optionFilterProp="children"
@@ -92,8 +96,13 @@
 									<a-select-option :value="3">已终止</a-select-option>
 									<a-select-option :value="4">完成</a-select-option>
 								</a-select>
-								<a-input type="text" v-model="keyword" style="width:200px" placeholder="工单号/工单标题/客户名称"></a-input>
-								<a-button type="primary" @click="getList">查询</a-button>
+								<a-input
+									type="text"
+									v-model="keyword"
+									style="width:300px"
+									:placeholder="type==1?'工作令、工单号、名称、交期':'图号'"
+								></a-input>
+								<a-button type="primary" @click="select">查询</a-button>
 							</a-col>
 						</div>
 					</a-row>
@@ -300,6 +309,12 @@ import WorkOrderListDetails from "./WorkOrderListDetails";
 
 const columns = [
 	{
+		dataIndex: "gongzuolingNo",
+		key: "gongzuolingNo",
+		title: "工作令",
+		width: 100
+	},
+	{
 		dataIndex: "workOrderNo",
 		title: "工单号",
 		width: 100,
@@ -312,12 +327,7 @@ const columns = [
 		key: "workOrderTitle",
 		scopedSlots: { customRender: "workOrderTitle" }
 	},
-	{
-		dataIndex: "clientName",
-		key: "clientName",
-		title: "客户名称",
-		width: 100
-	},
+
 	{
 		dataIndex: "workOrderIsPriority",
 		key: "workOrderIsPriority",
@@ -378,6 +388,7 @@ export default {
 	name: "orderList",
 	data() {
 		return {
+			type: 1,
 			form: this.$form.createForm(this),
 			isHideList: this.$route.params.id !== undefined ? true : false,
 			columns,
@@ -398,6 +409,22 @@ export default {
 		};
 	},
 	methods: {
+		select() {
+			if (this.type == 1) {
+				this.getList();
+			}
+			if (this.type == 0) {
+				if (this.keyword == "" || this.keyword == null) {
+					this.$message.error(`请输入图号`);
+					return false;
+				}
+				sessionStorage.drawingNo = this.keyword;
+				this.keyword = "";
+				this.$router.push({
+					path: "/WorkOrderList/WorkOrderDetailsList/" + 9527
+				});
+			}
+		},
 		showDetails(row) {
 			this.detailsVisible = true;
 			this.detailsMsg = row;

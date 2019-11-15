@@ -46,7 +46,7 @@ router.beforeEach((to, from, next) => {
   // global.imgPath = sessionStorage.getItem("imgPath");
   if (permissionUrl.length === 0) permissionUrl = JSON.parse(sessionStorage.getItem("permissionUrl") || '[]');
   let isLogin = sessionStorage.getItem('token')
-  instance.defaults.headers.common["token"] = isLogin;
+  instance.defaults.headers.common["Authorization"] = "bearer " + isLogin;
   if (to.meta.requireAuth) { // 判断是否需要登录权限
     if (isLogin) { // 判断是否登录
       let isHasPermission = false;
