@@ -59,7 +59,7 @@
 		</a-layout>
 		<div class="text_style">Sichuang Changhong Intelligent Manufacturing Technology Co. Ltd.</div>
 		<div class="erweima">
-			<img src="./assets/TGX3%ND]III)@IKUQ@(V_CT.png" alt />
+			<img src="http://114.116.238.150:8006/apk/apk.png" alt />
 			<p style="font-size:14px;color:#40a9ff;text-align:center;line-height:36px;">浏览器扫一扫</p>
 		</div>
 	</div>
